@@ -1,0 +1,117 @@
+<!-- Дмитрий Гирский -->
+<!doctype html>
+<html ng-app="email">
+<head>
+  <meta charset="utf-8">
+  <title>Document</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+</head>
+<body ng-controller="EmailController as emailController">
+  <div class="app">
+
+    <aside class="sidebar">
+      <nav class="sidebar__nav">
+        <a href="#"
+          ng-init="inboxActive=true"
+          ng-click="inboxActive=true; sentActive=false"
+          ng-class="{'sidebar__nav__link_active': inboxActive}">Входящие</a>
+        <a href="#"
+          ng-click="inboxActive=false; sentActive=true"
+          ng-class="{'sidebar__nav__link_active': sentActive}">Исходящие</a>
+      </nav>
+    </aside>
+
+    <div class="content">
+      <mail-inbox ng-show="inboxActive"></mail-inbox>
+      <mail-sent ng-show="sentActive"></mail-sent>
+      <mail-full></mail-full>
+    </div>
+  </div>
+  <script>
+  var app = angular.module('email', []);
+
+  app.directive('mailInbox', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'mail-inbox.html'
+    };
+  });
+
+  app.directive('mailSent', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'mail-sent.html'
+    };
+  });
+
+  app.directive('mailFull', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'mail-full.html'
+    };
+  });
+ 
+  app.controller('EmailController', function() {
+     
+    this.mails = {
+      "inbox": [
+        {
+          "photo": "https://randomuser.me/api/portraits/thumb/men/1.jpg",
+          "author": "Horne Day",
+          "theme": "laborum",
+          "text": "Adipisicing ullamco cupidatat ex aute fugiat adipisicing consectetur aliqua nulla consequat est culpa irure. Tempor irure magna culpa mollit esse fugiat culpa ullamco. Irure est deserunt fugiat aliqua ut elit nostrud excepteur laboris sunt laborum ex id culpa. Dolor exercitation nostrud exercitation officia consequat fugiat occaecat.",
+          "excerpt": "Aute laborum cillum sunt reprehenderit ullamco."
+        },
+        {
+          "photo": "https://randomuser.me/api/portraits/thumb/men/2.jpg",
+          "author": "Nina Hanson",
+          "theme": "sunt",
+          "text": "Ipsum qui officia sit proident qui cillum deserunt do nulla. Qui dolor laboris anim commodo excepteur ex Lorem fugiat esse dolore cillum nostrud. Amet excepteur est dolore esse veniam officia. Labore irure enim laboris est incididunt sunt anim anim ullamco irure ut occaecat aliqua. Quis duis ut cillum sunt excepteur mollit aliquip minim. Voluptate consequat id pariatur et esse incididunt magna esse voluptate consequat quis cillum fugiat irure. Mollit enim dolore velit magna sit laboris ipsum amet nisi.",
+          "excerpt": "Officia dolore reprehenderit culpa aliqua."
+        },
+        {
+          "photo": "https://randomuser.me/api/portraits/thumb/men/3.jpg",
+          "author": "Hayden Snow",
+          "theme": "commodo",
+          "text": "Irure fugiat eiusmod aliqua sunt amet commodo sit amet et laborum. Irure ea irure aute excepteur esse nisi exercitation incididunt culpa deserunt. Ullamco consectetur magna tempor est sint enim sunt cupidatat dolor tempor. In nisi eu ex Lorem sit fugiat reprehenderit culpa dolore aute elit proident nisi. Excepteur est incididunt esse sit reprehenderit enim est qui. Ea reprehenderit qui ipsum fugiat cupidatat cillum.",
+          "excerpt": "Laborum exercitation nisi anim sit cillum mollit sunt."
+        },
+        {
+          "photo": "https://randomuser.me/api/portraits/thumb/men/3.jpg",
+          "author": "Galloway Howe",
+          "theme": "laborum",
+          "text": "Excepteur occaecat enim irure labore non. Dolore proident ea ullamco sunt nisi consequat irure nulla. Ea proident aliquip officia culpa elit ea velit qui Lorem nisi esse excepteur deserunt. Dolore ullamco dolore anim aliquip non irure adipisicing mollit mollit magna. Esse nulla elit exercitation amet et non quis sit ullamco occaecat eu duis sunt enim. Irure tempor tempor tempor labore. Velit ut tempor proident enim tempor minim consequat esse voluptate do.",
+          "excerpt": "Fugiat dolor eiusmod in laborum Lorem cillum."
+        },
+        {
+          "photo": "https://randomuser.me/api/portraits/thumb/men/5.jpg",
+          "author": "Riley Ashley",
+          "theme": "quis",
+          "text": "Sunt dolor cupidatat elit excepteur amet duis aliqua ad et commodo eu et officia. Pariatur est fugiat enim laborum deserunt culpa nostrud veniam ex minim nulla duis cupidatat. Non occaecat irure anim et mollit. Quis est sunt dolor laborum. Dolor commodo veniam quis Lorem commodo cillum Lorem dolore cupidatat amet esse deserunt quis eu.",
+          "excerpt": "Elit id veniam Lorem amet adipisicing."
+        }
+      ],
+      "sent": [
+        {
+          "photo": "https://randomuser.me/api/portraits/thumb/men/2.jpg",
+          "author": "Hayden Snow",
+          "theme": "commodo",
+          "text": "Sent fugiat eiusmod aliqua sunt amet commodo sit amet et laborum. Irure ea irure aute excepteur esse nisi exercitation incididunt culpa deserunt. Ullamco consectetur magna tempor est sint enim sunt cupidatat dolor tempor. In nisi eu ex Lorem sit fugiat reprehenderit culpa dolore aute elit proident nisi. Excepteur est incididunt esse sit reprehenderit enim est qui. Ea reprehenderit qui ipsum fugiat cupidatat cillum.",
+          "excerpt": "Laborum exercitation nisi anim sit cillum mollit sunt."
+        },
+        {
+          "photo": "https://randomuser.me/api/portraits/thumb/men/1.jpg",
+          "author": "Riley Ashley",
+          "theme": "quis",
+          "text": "Sent dolor cupidatat elit excepteur amet duis aliqua ad et commodo eu et officia. Pariatur est fugiat enim laborum deserunt culpa nostrud veniam ex minim nulla duis cupidatat. Non occaecat irure anim et mollit. Quis est sunt dolor laborum. Dolor commodo veniam quis Lorem commodo cillum Lorem dolore cupidatat amet esse deserunt quis eu.",
+          "excerpt": "Elit id veniam Lorem amet adipisicing."
+        }
+      ]
+    };
+
+    this.selected = this.mails.inbox[0];
+  });
+  </script>
+</body>
+</html>

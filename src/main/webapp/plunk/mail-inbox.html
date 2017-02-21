@@ -1,0 +1,11 @@
+<div class="messages messages_inbox">
+  <article class="message"
+    ng-repeat="mail in emailController.mails.inbox"
+    ng-click="emailController.selected = mail">
+
+    <figure class="message__photo"><img src="{{mail.photo}}" alt=""></figure>
+    <a class="message__author" href="">{{mail.author}}</a>
+    <a class="message__theme" href="">{{mail.theme}}</a>
+    <p class="message__excerpt">{{mail.excerpt}}</p>
+  </article>
+</div>

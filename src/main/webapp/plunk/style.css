@@ -1,0 +1,135 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans&subset=latin,cyrillic);
+* {
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-family: 'Open sans', sans-serif;
+}
+body {
+  background: #e9e9e9;
+}
+
+/* Default */
+.app {
+  position: relative;
+  overflow: hidden;
+  width: 1024px;
+  border-top: 4px solid #1d2028;
+  margin: 25px auto 0;
+  border-radius: 5px;
+  background: #fff;
+  height: 550px;
+  box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, .1);
+}
+.content {
+  margin-left: 160px;
+  height: 100%;
+}
+
+/* Sidebar */
+.sidebar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: 160px;
+  background: #333745;
+}
+.sidebar__nav {
+  padding: 25px 0;
+  border-bottom: 1px solid #404452;
+}
+.sidebar__nav a {
+  font-size: 14px;
+  display: block;
+  padding: 0 25px;
+  text-decoration: none;
+  color: #fff;
+  line-height: 34px;
+}
+.sidebar__nav a:hover,
+.sidebar__nav__link_active {
+  background: #404452;
+}
+
+/* Messages */
+.messages {
+  overflow-y: scroll;
+  height: 100%;
+  width: 320px;
+  float: left;
+  border-right: 1px solid #dde0e8;
+}
+.messages_full {
+  margin-left: 320px;
+}
+.message__info {
+  overflow: hidden;
+  padding: 25px;
+  border-bottom: 1px solid #dde0e8;
+}
+.message__info__photo {
+  float: left;
+  margin-right: 15px;
+  overflow: hidden;
+  border-radius: 2px;
+  height: 72px;
+  width: 72px;
+}
+.message__info__author,
+.message__info__theme {
+  font-size: 14px;
+}
+.message__info__photo img {
+  max-width: 100%;
+}
+.message__text {
+  padding: 25px;
+  font-size: 14px;
+  text-align: justify;
+}
+.message {
+  cursor: pointer;
+  border-bottom: 1px solid #dde0e8;
+  padding: 25px;
+  overflow: hidden;
+  line-height: 16px;
+}
+.message:hover {
+  background: #f9f9f9;
+}
+.message:last-child {
+  border-bottom: none;
+}
+.message__photo {
+  margin-right: 15px;
+  float: left;
+  width: 72px;
+  height: 72px;
+  overflow: hidden;
+  border-radius: 2px;
+}
+.message__photo img {
+  max-width: 100%;
+}
+.message__author {
+  font-size: 14px;
+  display: block;
+  text-decoration: none;
+  color: #171a21;
+}
+.message__theme {
+  margin: 4px 0;
+  font-size: 14px;
+  display: block;
+  text-decoration: none;
+  color: #171a21;
+  font-weight: bold;
+}
+.message__excerpt {
+  color: #ccced3;
+  font-size: 14px;
+}
