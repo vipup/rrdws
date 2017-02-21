@@ -26,6 +26,20 @@
 	<packaging>war</packaging>
 
 	<dependencies>
+		<!-- JSTL -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>${jstl.version}</version>
+		</dependency>
+
+		<!-- Spring MVC framework -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>	
+	
 	<dependency>
 		<groupId>com.yahoo.platform.yui</groupId>
 		<artifactId>yuicompressor</artifactId>
@@ -528,7 +542,12 @@
 				                <targetPath>WEB-INF</targetPath>
 				                <includes>
 				                        <include>**/*.xml</include>
+				                        <include>**/*.jsp</include>
 				                </includes>
+				                <excludes>
+				                        <exclude>**/pages/*.jsp</exclude>
+				                </excludes>
+				                
 				        </resource>
 				    </webResources>
 					<archive>
@@ -815,6 +834,9 @@
 
 
 	<properties>
+		<jstl.version>1.2</jstl.version>
+		<spring.version>2.5.6</spring.version>
+			
 		<!--
 			This is just for "eclipse:eclipse" goal to always attempt
 			downloading sources
