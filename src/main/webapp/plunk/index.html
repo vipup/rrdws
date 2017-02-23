@@ -4,10 +4,21 @@
 <head>
   <meta charset="utf-8">
   <title>Document</title>
+  <link data-require="bootstrap-css@*" data-semver="3.3.6" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.css" />
   <link rel="stylesheet" href="style.css">
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 </head>
 <body ng-controller="EmailController as emailController">
+        <div class="panel panel-default">
+        <div class="panel-body">
+          <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">
+              <i class="glyphicon glyphicon-search"></i>
+            </span>
+            <input type="text" class="form-control" placeholder="Search:" ng-model="searchText" />
+          </div>
+        </div>
+      </div>
   <div class="app">
 
     <aside class="sidebar">
@@ -61,7 +72,8 @@
           "author": "Horne Day",
           "theme": "laborum",
           "text": "Adipisicing ullamco cupidatat ex aute fugiat adipisicing consectetur aliqua nulla consequat est culpa irure. Tempor irure magna culpa mollit esse fugiat culpa ullamco. Irure est deserunt fugiat aliqua ut elit nostrud excepteur laboris sunt laborum ex id culpa. Dolor exercitation nostrud exercitation officia consequat fugiat occaecat.",
-          "excerpt": "Aute laborum cillum sunt reprehenderit ullamco."
+          "excerpt": "Aute laborum cillum sunt reprehenderit ullamco.",
+          "date":1453424906251
         },
         {
           "photo": "https://randomuser.me/api/portraits/thumb/men/2.jpg",
@@ -69,27 +81,32 @@
           "theme": "sunt",
           "text": "Ipsum qui officia sit proident qui cillum deserunt do nulla. Qui dolor laboris anim commodo excepteur ex Lorem fugiat esse dolore cillum nostrud. Amet excepteur est dolore esse veniam officia. Labore irure enim laboris est incididunt sunt anim anim ullamco irure ut occaecat aliqua. Quis duis ut cillum sunt excepteur mollit aliquip minim. Voluptate consequat id pariatur et esse incididunt magna esse voluptate consequat quis cillum fugiat irure. Mollit enim dolore velit magna sit laboris ipsum amet nisi.",
           "excerpt": "Officia dolore reprehenderit culpa aliqua."
+          ,
+          "date":1453424906254
         },
         {
           "photo": "https://randomuser.me/api/portraits/thumb/men/3.jpg",
           "author": "Hayden Snow",
           "theme": "commodo",
           "text": "Irure fugiat eiusmod aliqua sunt amet commodo sit amet et laborum. Irure ea irure aute excepteur esse nisi exercitation incididunt culpa deserunt. Ullamco consectetur magna tempor est sint enim sunt cupidatat dolor tempor. In nisi eu ex Lorem sit fugiat reprehenderit culpa dolore aute elit proident nisi. Excepteur est incididunt esse sit reprehenderit enim est qui. Ea reprehenderit qui ipsum fugiat cupidatat cillum.",
-          "excerpt": "Laborum exercitation nisi anim sit cillum mollit sunt."
+          "excerpt": "Laborum exercitation nisi anim sit cillum mollit sunt.",
+          "date":1453424906254
         },
         {
           "photo": "https://randomuser.me/api/portraits/thumb/men/3.jpg",
           "author": "Galloway Howe",
           "theme": "laborum",
           "text": "Excepteur occaecat enim irure labore non. Dolore proident ea ullamco sunt nisi consequat irure nulla. Ea proident aliquip officia culpa elit ea velit qui Lorem nisi esse excepteur deserunt. Dolore ullamco dolore anim aliquip non irure adipisicing mollit mollit magna. Esse nulla elit exercitation amet et non quis sit ullamco occaecat eu duis sunt enim. Irure tempor tempor tempor labore. Velit ut tempor proident enim tempor minim consequat esse voluptate do.",
-          "excerpt": "Fugiat dolor eiusmod in laborum Lorem cillum."
+          "excerpt": "Fugiat dolor eiusmod in laborum Lorem cillum.",
+          "date":1453424906253
         },
         {
           "photo": "https://randomuser.me/api/portraits/thumb/men/5.jpg",
           "author": "Riley Ashley",
           "theme": "quis",
           "text": "Sunt dolor cupidatat elit excepteur amet duis aliqua ad et commodo eu et officia. Pariatur est fugiat enim laborum deserunt culpa nostrud veniam ex minim nulla duis cupidatat. Non occaecat irure anim et mollit. Quis est sunt dolor laborum. Dolor commodo veniam quis Lorem commodo cillum Lorem dolore cupidatat amet esse deserunt quis eu.",
-          "excerpt": "Elit id veniam Lorem amet adipisicing."
+          "excerpt": "Elit id veniam Lorem amet adipisicing.",
+          "date":1453424906250
         }
       ],
       "sent": [
