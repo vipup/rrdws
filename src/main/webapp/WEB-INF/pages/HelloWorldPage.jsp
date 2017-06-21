@@ -1,5 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <html>
+<head>
+<%@ page isELIgnored="false" %>
+</head>
 <body>
 	<h1>Spring MVC Hello World Example</h1>
 <h1>S-MVC Not works:</h1>
