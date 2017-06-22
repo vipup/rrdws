@@ -4,10 +4,10 @@
 <%@ page isELIgnored="false" %>
 </head>
 <body>
-	<h1>Spring MVC Hello World Example</h1>
-<h1>S-MVC Not works:</h1>
-	<h2>${msg}</h2>
-<h1>BUT works:</h1>	
-	<h2><%=request.getAttribute("msg")%></h2>
+	<h3>Spring MVC Hello World Example</h3>
+<h6>S-MVC Not works:</h6>
+	<h5>${msg}</h5>
+<h6>BUT works:</h6>	
+	<h4><%=request.getAttribute("msg")%></h4>
 </body>
 </html>

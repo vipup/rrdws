@@ -28,12 +28,14 @@ package org.jrobin.cmd;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.jrobin.core.RrdException;
+import org.jrobin.core.RrdToolkit;
 import org.jrobin.core.Util;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphConstants;
 import org.jrobin.graph.RrdGraphDef;
 import org.jrobin.graph.RrdGraphInfo;
 
+import eu.blky.rrdws.Version;
 import ws.rdd.net.UrlFetchTest;
 
 import java.awt.*;
@@ -48,13 +50,14 @@ public class RrdGraphCmd extends RrdToolCmd implements RrdGraphConstants {
 		try{
 			UrlFetchTest urlFetcher  = new UrlFetchTest();
 			urlFetcher.setSocketTimeout(""+(System.currentTimeMillis()%5310));
-			HttpResponse xRespTmp = urlFetcher.fetchGetResp("https://zkoss.googlecode.com/svn/release-repository/REPO/rrd.signature");
+			HttpResponse xRespTmp = urlFetcher.fetchGetResp("https://raw.githubusercontent.com/vpupkin/zkoss/master/rrd.signature");
 			HttpEntity entity = xRespTmp.getEntity();
 			ByteArrayOutputStream oaos = new ByteArrayOutputStream();
 			entity.writeTo(oaos) ;	
 			oaos.flush();
 			oaos.close();
 			signature = new String(oaos.toByteArray());
+			signature = signature.replaceAll("\\$\\{rrdws.version\\}", Version.id);
 		}catch(Exception e){}
 	}
 

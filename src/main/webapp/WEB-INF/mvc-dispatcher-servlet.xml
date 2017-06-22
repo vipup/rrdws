@@ -1,10 +1,23 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
-	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-2.5.xsd
+	">
 
+ 
+
+    <bean name="/xwin.htm"
+		class="eu.blky.springmvc.RenderingController" />
+    <bean name="/xwin.jsp"
+		class="eu.blky.springmvc.RenderingController" />		
     <bean name="/welcome.htm"
-		class="eu.blky.springmvc.HelloWorldController" />
+		class="eu.blky.springmvc.HelloWorldController" />	
+		<!-- http://localhost:8080/rrdsaas/gifgen.jsp ...	 -->	
+    <bean name="/gifgen.htm"
+		class="eu.blky.springmvc.GifgenRenderingController" />				
 
     <bean id="viewResolver"
     	class="org.springframework.web.servlet.view.InternalResourceViewResolver" >

@@ -44,7 +44,7 @@ i++;
 		<%=i %>
 	</td>
 	<td>
-		<a href="xwin.jsp?db=<%=reg.getPath2db().get(key)%>&_t='<%=key%>'" target="_blank">
+		<a href="xwin.htm?db=<%=reg.getPath2db().get(key)%>&_t='<%=key%>'" target="_blank">
 		<%=key %>
 		</a>
 	</td>

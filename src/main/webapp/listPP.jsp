@@ -74,10 +74,10 @@ if (i>(iDisplayStart+iDisplayLength))break;
 
 String iTmp =reg.getPath2db().get(key);
 String titleTmp = "`" + Tool.escapeJavaScript( key ) +"`";
-String aVal = "xwin.jsp?db="+ iTmp+"&_t="+titleTmp;
+String aVal = "xwin.htm?db="+ iTmp+"&_t="+titleTmp;
 String aTxt = ""+(i%3);
 String imgSrc = "gen.jsp?db="+ iTmp;
-String aHrefVal = "<a target='_blank' href='xwin.jsp?db="+ iTmp+"&_t="+key+"'>"+key+"</a>";
+String aHrefVal = "<a target='_blank' href='xwin.htm?db="+ iTmp+"&_t="+key+"'>"+key+"</a>";
 aHrefVal =  Tool.escapeJavaScript(  aHrefVal );
 %> <%=prefix%>[ "<%=i %>" , "<a target='_blank' href='<%=aVal%>'><%=aTxt%></a>" , "<%=iTmp%>" , "<%=aHrefVal%>" , "<img src='<%=imgSrc%>'/>" ]
 

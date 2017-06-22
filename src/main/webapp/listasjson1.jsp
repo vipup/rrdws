@@ -20,7 +20,7 @@ for (String key:reg.getPath2db().keySet() ){
 i++;
 String iTmp =reg.getPath2db().get(key);
 String titleTmp = "`" + key +"`";
-String aVal = "xwin.jsp?db="+ iTmp+"&_t="+titleTmp;
+String aVal = "xwin.htm?db="+ iTmp+"&_t="+titleTmp;
 String aTxt = ""+(i%3);
 String imgSrc = "gen.jsp?db="+ iTmp;
 %> <%=prefix%>[ "<%=i %>" , "<a target='_blank' href='<%=aVal%>'><%=aTxt%></a>" , "<%=iTmp%>" ,"<a target='_blank' href='<%=aVal%>'><%=key%></a>" , "<img src='<%=imgSrc%>'/>" ]

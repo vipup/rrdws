@@ -129,7 +129,7 @@
 				document.getElementById("rrdlist").setAttribute("value", txtTmp);
 				
 				// rrdIMG
-				var cmdPrefix = "gifgen.jsp?cmd=rrdtool+graph+speed.gif+";
+				var cmdPrefix = "gifgen.htm?cmd=rrdtool+graph+speed.gif+";
 				var cmd  = cmdPrefix ;
 				// -v 'vip'  -t 'XXXX!'
 				cmd = cmd + "-v '" +document.getElementById("_vtitle").value +"' ";
