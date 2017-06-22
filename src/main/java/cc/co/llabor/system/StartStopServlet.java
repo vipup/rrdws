@@ -1,5 +1,7 @@
  
 package cc.co.llabor.system;    
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean; 
@@ -54,7 +56,39 @@ public class StartStopServlet extends HttpServlet {
 	static Map<String, String> status = new TreeMap<String, String>(); 
 	
 	public void init(ServletConfig config) throws ServletException{
-		 
+		// restore prev RRDDB, if any
+		try{
+			File workdirTmp = new File ( Config.CALC_DEFAULT_WORKDIR() );
+			File tmpdirTmp = new File (System.getProperty("java.io.tmpdir"));
+			FilenameFilter filterTmp = new FilenameFilter(){
+
+				@Override
+				public boolean accept(File dir, String name) {
+					return name.startsWith("rrd") && name.endsWith(".backup") ; 
+				} 
+			}; 
+			// search last backup
+			File toRestore = null;
+			for (String next: tmpdirTmp.list(filterTmp)){
+				if (toRestore == null){
+					toRestore = new File(next);
+					continue;
+				}
+				File theNext = new File(next);
+				if (toRestore.lastModified() < theNext.lastModified()){
+					toRestore = theNext;
+				}
+			}
+			
+			if (toRestore != null){
+				Unzipper zTmp = new Unzipper(toRestore, workdirTmp);
+				zTmp.unzip();
+				status.put("restoreDB", "DB restore Done"); 
+			}
+		}catch(Exception e){
+			status.put("restoreDB", "DB restore is not possible! New Server/instance/App/Node/DB?");
+		}
+		
 		try {
 			status.put("initShutdownHook", initShutdownHook()); 
 		} catch (Exception e) {
@@ -384,6 +418,22 @@ public class StartStopServlet extends HttpServlet {
 		
 		
 		log_info(Repo.getBanner( "+rrdws"));
+		
+		// redeploy ?!?!?! DB will be deleted from  tomcat - try to backup it temporary
+		// backup the DB
+		
+		// restore prev RRDDB, if any
+		try{
+			File workdirTmp = new File ( Config.CALC_DEFAULT_WORKDIR() );
+			File tmpdirTmp = new File (System.getProperty("java.io.tmpdir")); 
+			File backupTmp = new File(tmpdirTmp, "rrd"+System.currentTimeMillis()+".backup"); 
+			Zipper zTmp = new Zipper(workdirTmp, backupTmp); 
+			zTmp.zip();
+			status.put("backupDB", "backupIsDone"); 
+		}catch(Exception e){
+			status.put("backupDB", "Fail"); 
+		}
+		
 		log_info("Stoped");
 	}
 
