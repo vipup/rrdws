@@ -71,21 +71,23 @@ public class StartStopServlet extends HttpServlet {
 			File toRestore = null;
 			for (String next: tmpdirTmp.list(filterTmp)){
 				if (toRestore == null){
-					toRestore = new File(next);
+					toRestore = new File(tmpdirTmp, next);
 					continue;
 				}
-				File theNext = new File(next);
+				File theNext = new File(tmpdirTmp, next);
 				if (toRestore.lastModified() < theNext.lastModified()){
 					toRestore = theNext;
 				}
 			}
 			
 			if (toRestore != null){
+				
 				Unzipper zTmp = new Unzipper(toRestore, workdirTmp);
 				zTmp.unzip();
 				status.put("restoreDB", "DB restore Done"); 
 			}
 		}catch(Exception e){
+			log.error("restoreDB", e);
 			status.put("restoreDB", "DB restore is not possible! New Server/instance/App/Node/DB?");
 		}
 		
