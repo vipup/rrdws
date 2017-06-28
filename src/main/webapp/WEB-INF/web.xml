@@ -13,14 +13,31 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/n
 		<param-name>buildNumber</param-name>
 		<param-value>${buildNumber}</param-value>
 	</context-param>
-<filter>
-  <filter-name>ETagFilter</filter-name>
-  <filter-class>cc.co.llabor.http.ETagFilter</filter-class>
-  <init-param>
-    <param-name>exclude</param-name>
-    <param-value>/main.htm</param-value>
-  </init-param>
-</filter>
+
+
+	<filter>
+		<filter-name>authFilterCheck</filter-name>
+		<filter-class>cc.co.llabor.sso.JwtFilter</filter-class>
+		<init-param>
+			<param-name>servicesAuth</param-name>
+			<param-value>http://sso.at.the.host:8989/login</param-value>
+		</init-param>
+
+	</filter>
+	<filter-mapping>
+		<filter-name>authFilterCheck</filter-name>
+		<url-pattern>/</url-pattern>
+		<!--   <url-pattern>/*.free</url-pattern> -->
+	</filter-mapping>
+
+	<filter>
+		<filter-name>ETagFilter</filter-name>
+		<filter-class>cc.co.llabor.http.ETagFilter</filter-class>
+		<init-param>
+			<param-name>exclude</param-name>
+			<param-value>/main.htm</param-value>
+		</init-param>
+	</filter>
 
 	<!-- /rrd/src/main/java/ws/rrd/logback/ServletListener.java -->
 	<listener>
@@ -35,6 +52,111 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/n
   <url-pattern>*</url-pattern>
 </filter-mapping> 
  -->
+ 
+ 
+ 
+ <servlet>
+  <servlet-name>freemarker</servlet-name>
+  <servlet-class>freemarker.ext.servlet.FreemarkerServlet</servlet-class>
+
+  <!--
+    Init-param documentation:
+    http://freemarker.org/docs/api/freemarker/ext/servlet/FreemarkerServlet.html
+  -->
+
+  <!-- FreemarkerServlet settings: -->
+  <init-param>
+    <param-name>TemplatePath</param-name>
+    <param-value>/</param-value>
+  </init-param>
+  <init-param>
+    <param-name>NoCache</param-name>
+    <param-value>true</param-value>
+  </init-param>
+  <!-- 
+  <init-param>
+    <param-name>ResponseCharacterEncoding</param-name>
+    Use the output_encoding setting of FreeMarker:
+    <param-value>fromTemplate</param-value>
+  </init-param>
+   -->
+
+  <!-- FreeMarker engine settings: -->
+  <init-param>
+    <param-name>incompatible_improvements</param-name>
+    <param-value>2.3.25</param-value>
+    <!--
+      Recommended to set to a high value.
+      See: http://freemarker.org/docs/pgui_config_incompatible_improvements.html
+    -->
+  </init-param>
+  <init-param>
+    <param-name>template_exception_handler</param-name>
+    <!-- Use "html_debug" during development! -->
+    <param-value>rethrow</param-value>
+  </init-param>
+ 
+  <init-param>
+    <param-name>default_encoding</param-name>
+    <!-- The encoding of the template files: -->
+    <param-value>UTF-8</param-value>
+  </init-param>
+  <init-param>
+    <param-name>output_encoding</param-name>
+    <!-- The encoding of the template output; Note that you must set
+         "ResponseCharacterEncodring" to "fromTemplate" for this to work! -->
+    <param-value>UTF-8</param-value>
+  </init-param>
+  <init-param>
+    <param-name>locale</param-name>
+    <!-- Influences number and date/time formatting, etc. -->
+    <param-value>en_US</param-value>
+  </init-param>
+  <init-param>
+    <param-name>number_format</param-name>
+    <param-value>0.##########</param-value>
+  </init-param>
+
+  <load-on-startup>1</load-on-startup>
+</servlet>
+
+ <servlet>
+  <servlet-name>Free</servlet-name>
+  <servlet-class>cc.co.llabor.sso.FreemarkerServlet</servlet-class>
+</servlet>
+<!--   Missing login :(Step_B)  -->
+ <servlet>
+  <servlet-name>LogIn</servlet-name>
+  <servlet-class>cc.co.llabor.sso.LoginServlet</servlet-class>
+		<init-param>
+			<param-name>servicesAuth</param-name>
+			<param-value>http://sso.at.the.host:8989/login</param-value>
+		</init-param>  
+</servlet>
+
+
+<servlet-mapping>
+  <servlet-name>LogIn</servlet-name>
+  <url-pattern>*.in</url-pattern> 
+</servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>Free</servlet-name>
+  <url-pattern>*.free</url-pattern> 
+</servlet-mapping>
+ 
+<!--   Missing login :(Step_B)
+ -->
+<servlet-mapping>
+  <servlet-name>freemarker</servlet-name>
+  <url-pattern>*.ftl</url-pattern>
+  <!-- HTML and XML auto-escaped if incompatible_improvements >= 2.3.24: -->
+  <url-pattern>*.ftlh</url-pattern>
+  <url-pattern>*.ftlx</url-pattern>
+</servlet-mapping>
+ 
+ 
+ 
 	<servlet>
 		<servlet-name>StartStopServlet</servlet-name>
 		<servlet-class>cc.co.llabor.system.StartStopServlet</servlet-class> 
@@ -128,6 +250,8 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/n
   <servlet-mapping>
  	<servlet-name>mvc-dispatcher</servlet-name>
         <url-pattern>*.htm</url-pattern>
+        <url-pattern>/login</url-pattern>
+        <url-pattern>/logout</url-pattern>
   </servlet-mapping>
   
   
@@ -270,5 +394,54 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/n
 <!-- [INSERT FRAGMENT HERE] -->
 
 <!--[disabled FRAGMENT HERE]-->
+
+
+
+<!--
+  Prevent the visiting of MVC Views from outside the servlet container.
+  RequestDispatcher.forward/include should, and will still work.
+  Removing this may open security holes!
+-->
+<security-constraint>
+  <web-resource-collection>
+    <web-resource-name>FreeMarker MVC Views</web-resource-name>
+    <url-pattern>*.ftl</url-pattern>
+    <url-pattern>*.ftlh</url-pattern>
+    <url-pattern>*.ftlx</url-pattern>
+  </web-resource-collection>
+  <auth-constraint>
+    <!-- Nobody is allowed to visit these directly. --> 
+  </auth-constraint>
+</security-constraint>
+
+ <!--
+
+<login-config>
+    <auth-method>FORM</auth-method>
+    <form-login-config>
+        <form-login-page>/login.jsp</form-login-page>
+        <form-error-page>/login-failed.jsp</form-error-page>
+    </form-login-config>
+</login-config>
+
+
+<security-constraint>
+  <web-resource-collection>
+    <web-resource-name>FreeMarker MVC Views</web-resource-name>
+    <url-pattern>*.fEEEree</url-pattern>
+  </web-resource-collection>
+  <auth-constraint>
+    < ! - - all registered is allowed to visit these directly. - - > 
+    <role-name>user</role-name> 
+  </auth-constraint>
+</security-constraint>
+ -->
+<!-- Missing login :(Step_A) 
+<error-page>
+      
+    <error-code>403</error-code>
+    <location>/log.in</location>
+</error-page>
+-->
 
 </web-app>

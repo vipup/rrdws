@@ -26,11 +26,26 @@
 	<packaging>war</packaging>
 
 	<dependencies>
+	<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
+	<dependency>
+	    <groupId>io.jsonwebtoken</groupId>
+	    <artifactId>jjwt</artifactId>
+	    <version>0.6.0</version>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
+	<dependency>
+	    <groupId>org.freemarker</groupId>
+	    <artifactId>freemarker</artifactId>
+	    <version>2.3.20</version>
+	</dependency>
+	
 		<!-- JSTL -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
 			<version>${jstl.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Spring MVC framework -->
@@ -423,6 +438,7 @@
 			<artifactId>gwt-servlet</artifactId>
 			<version>${gwt.version}</version>
 			<scope>${gae.api.scope}</scope>
+			
 		</dependency>
 
 		<dependency>
