@@ -26,6 +26,13 @@
 	<packaging>war</packaging>
 
 	<dependencies>
+<!-- https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-websocket -->
+<dependency>
+    <groupId>org.apache.tomcat.embed</groupId>
+    <artifactId>tomcat-embed-websocket</artifactId>
+    <version>8.5.15</version>
+    <scope>provided</scope>
+</dependency>	
 	<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
 	<dependency>
 	    <groupId>io.jsonwebtoken</groupId>
@@ -449,19 +456,14 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!--
-			J2EE Servlet API. We need it to compile IndexServlet class.
-			You can probably remove it, if you don't explicitly use
-			Servlets
-		-->
-		<dependency>
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-servlet_2.5_spec</artifactId>
-			<version>1.2</version>
-<!-- 			 			  -->
+<!-- https://mvnrepository.com/artifact/javax.servlet/servlet-api -->
+  <dependency>
+    <groupId>javax</groupId>
+    <artifactId>javaee-web-api</artifactId>
+    <version>6.0</version>
+    <scope>provided</scope>
+  </dependency>
 
-			<scope>provided</scope>
-		</dependency>
  
 		<!--
 			Make use of JSP tags. Remove, if you don't use JSPs
@@ -1249,6 +1251,12 @@
 	</profiles>
 
 	<repositories>
+        <repository>
+			<id>java.net2</id>
+			<name>Repository hosting the jee6 artifacts</name>
+			<url>http://download.java.net/maven/2</url>
+		</repository>
+	
 		<!-- We go to mvnsearch.org after latest GAE SDK artifacts 
 		<repository>
 			<id>mvnsearch.org</id>

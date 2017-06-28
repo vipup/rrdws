@@ -4,6 +4,7 @@ package cc.co.llabor.http;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 public class ETagResponseStream extends ServletOutputStream
 {
@@ -64,4 +65,15 @@ public class ETagResponseStream extends ServletOutputStream
 
     private boolean closed;
     private OutputStream stream;
+	@Override
+	public boolean isReady() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setWriteListener(WriteListener arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }

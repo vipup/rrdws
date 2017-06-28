@@ -3,10 +3,13 @@ package ws.rrd.server;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Locale;
 
-import javax.servlet.ServletOutputStream; 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 /** 
  * <b>Description:TODO</b>
@@ -17,7 +20,7 @@ import javax.servlet.http.Cookie;
  * 
  * Creation:  08.07.2010::20:16:35<br> 
  */
-public class FakeServletResponse implements javax.servlet.http.HttpServletResponse {
+public class FakeServletResponse implements HttpServletResponse {
 	ByteArrayOutputStream baos = new ByteArrayOutputStream(111);
 	private String ct = "text/html";
 	private Locale l = Locale.JAPANESE;
@@ -54,11 +57,27 @@ public class FakeServletResponse implements javax.servlet.http.HttpServletRespon
 
 	@Override
 	public ServletOutputStream getOutputStream() throws IOException {
-		return new ServletOutputStream(){ 
+		return new ServletOutputStream() {
+			
+			@Override
 			public void write(int b) throws IOException {
 				baos.write(b);
 				cl++;
-			}};
+				
+			}
+			
+			@Override
+			public void setWriteListener(WriteListener arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public boolean isReady() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+		}; 
 	}
 
 	@Override
@@ -226,6 +245,36 @@ public class FakeServletResponse implements javax.servlet.http.HttpServletRespon
 		if (1==2)throw new RuntimeException("not yet implemented since 08.07.2010");
 		else {
 		}
+	}
+
+	@Override
+	public void setContentLengthLong(long arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getHeader(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<String> getHeaderNames() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<String> getHeaders(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getStatus() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
