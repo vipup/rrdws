@@ -8,7 +8,7 @@ public class TestApp {
     public static void main(String[] args) {
         try {
             // open websocket
-            final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://aws1.blky.eu:8080/rrdsaas/websocket/chat"));
+            final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://sso.at.the.host:8080/rrdsaas/websocket/chat"));
 
             // add listener
             clientEndPoint.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {

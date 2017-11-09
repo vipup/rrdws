@@ -134,6 +134,18 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/n
 		</init-param>  
 </servlet>
 
+<!--   Missing login :(Step_B)  -->
+ <servlet>
+  <servlet-name>rrdUpdateed</servlet-name>
+  <servlet-class>cc.co.llabor.sso.RrdUdateServlet</servlet-class> 
+</servlet>
+
+
+
+<servlet-mapping>
+  <servlet-name>rrdUpdateed</servlet-name>
+  <url-pattern>*.rrd</url-pattern> 
+</servlet-mapping>
 
 <servlet-mapping>
   <servlet-name>LogIn</servlet-name>

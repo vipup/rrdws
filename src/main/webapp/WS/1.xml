@@ -1,0 +1,21 @@
+<small data-timestamp="2017-06-28T13:39:33.909Z">15:39:33</small>
+<div>
+	<a class="label" href="#">1111111111</a>
+	<span class="spacer">▸</span>
+	<img class="emoticon" alt="<3 " title="<3 "
+		src="../res/img/emoticons/Heart.png"> hehe
+</div>
+
+
+<div>
+	<a class="label" href="#">1111111111</a>
+	<span class="spacer">▸</span>
+	<img class="emoticon" alt="<3 " title="<3 "
+		src="../res/img/emoticons/Heart.png"> hehe </img>
+</div>
+
+"<small data-timestamp=\"2017-06-28T13:39:33.909Z\">15:39:33</small>"+
+	"<div><a class=\"label\" href=\"#\">1111111111</a>"+
+	"<span class=\"spacer\">▸</span>"+
+	"<img class=\"emoticon\" alt=\"<3 \" title=\"<3 \""+
+	" src=\"../res/img/emoticons/Heart.png\"> hehe</div>"
