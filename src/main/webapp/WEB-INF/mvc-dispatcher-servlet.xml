@@ -26,6 +26,8 @@
 	</bean>
 
 	<bean name="/logout" class="cc.co.llabor.sso.ResourceController" />
+	<!-- shopuld be already enabled over ANNOTATIONs 
 	<bean name="/protected-resource" class="cc.co.llabor.sso.ResourceController" />
+	 -->
 
 </beans>
