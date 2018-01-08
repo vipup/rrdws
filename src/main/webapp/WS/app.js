@@ -43,6 +43,7 @@ Chat.initialize = function() {
 	}
 };
 
+// On-Post-New-text-in chat
 Chat.sendMessage = (function() {
 	var message = document.getElementById('chat').value;
 	if (message != '') {
@@ -52,7 +53,7 @@ Chat.sendMessage = (function() {
 });
 
 var ChatConsole = {};
-
+// create initial Chat-panel
 ChatConsole.log = (function(message) {
 	var usernameTmp =  message.slice(0,message.indexOf(":"));
 	var textTmp =  message.slice(message.indexOf(":")+1);
@@ -61,24 +62,29 @@ ChatConsole.log = (function(message) {
 	var p = document.createElement('p');
 	p.style.wordWrap = 'break-word';
 	p.innerHTML = message;
-	ViewConsole.appendChild(p);
-	while (ViewConsole.childNodes.length > 11) {
-		ViewConsole.removeChild(ViewConsole.firstChild);
-	}
+	ViewConsole.insertBefore(p, ViewConsole.childNodes[0]) ;
 	ViewConsole.scrollTop = ViewConsole.scrollHeight;
 	// add into message-pane
-	var messagePanel = document.getElementById('messagePanel');
-	var messageTmp = "<div>" +
-			"<a class=\"label\" href=\"#\">"+usernameTmp+"</a> " +
-			"<img src=\"/rrdsaas/speed.gif\"/>"+
-			"<p>" + textTmp + "</p>"+
-			"</div>";
-	var liTmp = document.createElement('li');
-	liTmp.innerHTML = messageTmp;
-	messagePanel.prepend(liTmp); 
-	for( i=3; i<messagePanel.children.length;i++){
-		console.log("del "+(messagePanel.children[i]));
-		messagePanel.children[i].remove();
+	if (" rrd" == textTmp){
+		var messageTmp = "<div>" +
+				"<a class=\"label\" href=\"#\">"+usernameTmp+"</a> " +
+				"<img src=\"/rrdsaas/speed.gif\"/>"+
+				"<p>" + textTmp + "</p>"+
+				"</div>";
+		var liTmp = document.createElement('li');
+		liTmp.innerHTML = messageTmp;
+		ViewConsole.insertBefore(liTmp, ViewConsole.childNodes[0]) ;
+	}
+	
+	var toDEL = ViewConsole.childElementCount - 10;
+	for( i=0; i<toDEL;i++ ){ // kill the last
+	    var theNEXT = ViewConsole.childNodes [ViewConsole.childElementCount-1];
+		console.log("del "+theNEXT);
+		try{
+			ViewConsole.removeChild(theNEXT);
+		}catch(err){
+			console.log("del ERROR!"+err);
+		}
 	};
 });
 

@@ -53,7 +53,9 @@
 		   			<h1>TODOs</h1>
 		   			<h2><a href="XXX/Advanced_JSON_Editor_Example_files/xxx/advanced.jsp">Advanced_JSON_Editor_Example_files</a></h2>
 		   			<h2><a href="XXX/ui-forms.html">ui-forms.html </a></h2>
-		   			<h2><a href="XXX/AvenxoAdminTheme.html">AvenxoAdminTheme.html</a></h2>		   			
+		   			<h2><a href="XXX/AvenxoAdminTheme.html">AvenxoAdminTheme.html</a></h2>
+		   			<h2><a href="WS/index.xhtml">WebSocketDEMO</a></h2>		
+		   			
 		   			
 		   			
 		   </tr>
