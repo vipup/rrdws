@@ -27,6 +27,7 @@ package org.jrobin.cmd;
 
 import org.jrobin.core.RrdException;
 
+ 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +53,17 @@ public class RrdCommander {
  
 			
 	};
+
+	public static String getRrdCommands() {
+		String cmdList="";
+		String suffix="";
+		for (RrdToolCmd next:rrdCommands) {
+			cmdList+=suffix;
+			cmdList+=next.getCmdType();
+			suffix=",";
+		}		
+		return cmdList;
+	}
 
 	/**
 	 * Checks if the output from any RRDTool command will be visible on the standard output device
