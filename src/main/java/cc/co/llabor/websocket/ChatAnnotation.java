@@ -86,12 +86,9 @@ public class ChatAnnotation {
 	    			String command = message;
 	    			command = command.replaceAll("\\\\", " ");
 	    			Object xxx = RrdCommander.execute(command);
-	    			// for ex.: rrdtool dump test.rrd
 	    			if (xxx instanceof RrdGraphInfo) {
-	    				//SEND BACK ::: graph - --color BACK#11111111 --only-graph -o -h  32  -w  64  --start=end-1week DEF:dbdata=X1228639772.rrd:data:AVERAGE  LINE2:dbdata#44EE4499  LINE1:dbdata#003300AA
 	    				String magicTAG = "GIFGENGIFGEN";
-	    				//session.getBasicRemote().sendText(magicTAG+":"+HTMLFilter_filter(command.toString()));
-	    				session.getBasicRemote().sendText(magicTAG+":"+command.toString()  );
+	    				session.getBasicRemote().sendText(magicTAG+":"+command.toString());
 	    			}else {
 	    				session.getBasicRemote().sendText("RRDTOOL result :"+HTMLFilter_filter(xxx.toString()));
 	    			}
