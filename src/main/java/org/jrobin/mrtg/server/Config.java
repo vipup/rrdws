@@ -84,7 +84,7 @@ public class Config implements MrtgConstants {
 		return  System.getProperty( "rrd.home",
 				System.getProperty("catalina.base", 
 				System.getProperty("user.dir")))
-				+ (System.getProperty("catalina.base") == null ? null
+				+ (System.getProperty("catalina.base") == null ? "/target/rrd.workdir" // not a tomcat - > eclipse|maven|ant? --> "./target"
 						: "/work/Catalina/localhost/rrdsaas");
 	}
 
