@@ -13,7 +13,7 @@ public class TestApp {
             // add listener
             clientEndPoint.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
                 public void handleMessage(String message) {
-                    System.out.println(message);
+                    System.out.println("<<<<<<<<"+message);
                 }
             });
 

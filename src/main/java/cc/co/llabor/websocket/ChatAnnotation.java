@@ -80,32 +80,9 @@ public class ChatAnnotation {
     		}
     	} 
     	else if ((""+message).toLowerCase().startsWith("rrdtool")) {
-    		try {
-    			session.getBasicRemote().sendText("RRDTOOL command:"+HTMLFilter_filter(message.toString()));
-	    		try {
-	    			String command = message;
-	    			command = command.replaceAll("\\\\", " ");
-	    			Object xxx = RrdCommander.execute(command);
-	    			if (xxx instanceof RrdGraphInfo) {
-	    				String magicTAG = "GIFGENGIFGEN";
-	    				session.getBasicRemote().sendText(magicTAG+":"+command.toString());
-	    			}else {
-	    				session.getBasicRemote().sendText("RRDTOOL result :"+HTMLFilter_filter(xxx.toString()));
-	    			}
-	    		}catch(RuntimeException e) {
-	    			// Ignore
-	    			session.getBasicRemote().sendText("RRDTOOL ERROR! :"+e.getMessage());
-	    		}catch(IOException e) {
-	    			// Ignore
-	    			session.getBasicRemote().sendText("RRDTOOL ioEx! :"+e.getMessage());
-	    			e.printStackTrace();
-	    		} catch (RrdException e) {
-						session.getBasicRemote().sendText("ERROR"+e.getMessage());e.printStackTrace();
-				}
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}	    		
+    		tryExecuteRRDToolCommand(message);	    		
+    	}else if (RrdCommander.getRrdCommands().indexOf((""+message).split("")[0].toLowerCase())>=0 ) {
+    		tryExecuteRRDToolCommand("rrdtool "+message);	    		
     	}    	else if ("help mama".equals(message)) {
     		try {
     			session.getBasicRemote().sendText("mama mia!");
@@ -126,6 +103,36 @@ public class ChatAnnotation {
 	        broadcast(filteredMessage);
     	}
     }
+
+
+	private void tryExecuteRRDToolCommand(String message) {
+		try {
+			session.getBasicRemote().sendText("RRDTOOL command:"+HTMLFilter_filter(message.toString()));
+			try {
+				String command = message;
+				command = command.replaceAll("\\\\", " ");
+				Object xxx = RrdCommander.execute(command);
+				if (xxx instanceof RrdGraphInfo) {
+					String magicTAG = "GIFGENGIFGEN";
+					session.getBasicRemote().sendText(magicTAG+":"+command.toString());
+				}else {
+					session.getBasicRemote().sendText("RRDTOOL result :"+HTMLFilter_filter(xxx.toString()));
+				}
+			}catch(RuntimeException e) {
+				// Ignore
+				session.getBasicRemote().sendText("RRDTOOL ERROR! :"+e.getMessage());
+			}catch(IOException e) {
+				// Ignore
+				session.getBasicRemote().sendText("RRDTOOL ioEx! :"+e.getMessage());
+				e.printStackTrace();
+			} catch (RrdException e) {
+					session.getBasicRemote().sendText("ERROR"+e.getMessage());e.printStackTrace();
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
 
 
 
