@@ -223,6 +223,7 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 		// TODO Auto-generated method stub
 		if (1==1)throw new RuntimeException("not yet implemented since 07.09.2011");
 		else {
+			System.out.println(":))");
 		}
 	}
 	@Override
