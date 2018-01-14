@@ -17,6 +17,8 @@ import org.apache.juli.logging.LogFactory;
 import org.jrobin.cmd.RrdCommander;
 import org.jrobin.core.RrdException;
 import org.jrobin.graph.RrdGraphInfo;
+
+import ws.rrd.csv.RrdUpdateAction;
   
 
 //import util.HTMLFilter;
@@ -79,7 +81,14 @@ public class ChatAnnotation {
     			// Ignore
     		}
     	} 
-    	else if ((""+message).toLowerCase().startsWith("rrdtool")) {
+    	else if ((""+message).toLowerCase().startsWith("checkreg")) {
+    		try {
+    			String xpath = message.split(" ")[1];
+    			session.getBasicRemote().sendText("xpath2hash: "+RrdUpdateAction.xpath2Hash(xpath) );
+    		}catch(IOException e) {
+    			// Ignore
+    		}    		
+    	}else if ((""+message).toLowerCase().startsWith("rrdtool")) {
     		tryExecuteRRDToolCommand(message);	    		
     	}else if (RrdCommander.getRrdCommands().indexOf((""+message).split("")[0].toLowerCase())>=0 ) {
     		tryExecuteRRDToolCommand("rrdtool "+message);	    		

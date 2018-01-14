@@ -64,6 +64,24 @@ public class WebsocketClientEndpoint_V2 {
     @OnClose
     public void onClose(Session userSession, CloseReason reason) {
         System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
         this.userSession = null;
     }
 
