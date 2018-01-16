@@ -14,6 +14,7 @@
 	<bean name="/welcome.htm" class="eu.blky.springmvc.HelloWorldController" />
 	<!-- http://localhost:8080/rrdsaas/gifgen.jsp ... -->
 	<bean name="/gifgen.htm" class="eu.blky.springmvc.GifgenRenderingController" />
+	<bean name="/mvel.htm" class="eu.blky.springmvc.MVELController" />
 
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
