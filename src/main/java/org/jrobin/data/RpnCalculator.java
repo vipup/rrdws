@@ -487,13 +487,13 @@ class RpnCalculator {
 						push(Math.floor(pop() * Math.random()));
 						break;
 					default:
-						throw new RrdException("Unexpected RPN token encountered, token.id=" + token.id);
+						throw new RrdException("Unexpected RPN token encountered, token.id=" , token.id);
 				}
 			}
 			calculatedValues[slot] = pop();
 			// check if stack is empty only on the first try
 			if (slot == 0 && !isStackEmpty()) {
-				throw new RrdException("Stack not empty at the end of calculation. " +
+				throw new RrdException("Stack not empty at the end of calculation. " ,
 						"Probably bad RPN expression [" + rpnExpression + "]");
 			}
 		}
@@ -532,7 +532,7 @@ class RpnCalculator {
 
 		void push(double x) throws RrdException {
 			if (pos >= MAX_STACK_SIZE) {
-				throw new RrdException("PUSH failed, RPN stack full [" + MAX_STACK_SIZE + "]");
+				throw new RrdException("PUSH failed, RPN stack full ","[" + MAX_STACK_SIZE + "]");
 			}
 			stack[pos++] = x;
 		}

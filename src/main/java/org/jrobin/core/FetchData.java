@@ -165,7 +165,7 @@ public class FetchData implements ConsolFuns {
 				return getValues(dsIndex);
 			}
 		}
-		throw new RrdException("Datasource [" + dsName + "] not found");
+		throw new RrdException("Datasource not found ",   dsName  );
 	}
 
 	/**

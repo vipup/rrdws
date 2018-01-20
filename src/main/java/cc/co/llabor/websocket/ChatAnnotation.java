@@ -135,7 +135,7 @@ public class ChatAnnotation {
 				session.getBasicRemote().sendText("RRDTOOL ioEx! :"+e.getMessage());
 				e.printStackTrace();
 			} catch (RrdException e) {
-					session.getBasicRemote().sendText("ERROR"+e.getMessage());e.printStackTrace();
+					session.getBasicRemote().sendText("ERROR: "+e.getMessage());
 			}
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block

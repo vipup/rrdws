@@ -114,7 +114,7 @@ class RrdWriter  implements Runnable, MrtgConstants {
 		String pathTmp = Server.calPath2RRDb ( rawSample.getHost(),  ifDescr);
 		Object retval = a.perform(  pathTmp , string , value );
 		if (retval instanceof RrdException){
-			throw new RrdException( (Exception)retval);
+			throw new RrdException("private void process(RawSample rawSample) throws IOException, RrdException {", (Exception)retval);
 		}else if (retval instanceof Exception){
 				throw new IOException("RRD RawProcessing error with "+ifDescr+" =={"+value+"}",(Exception)retval);
 		}else{

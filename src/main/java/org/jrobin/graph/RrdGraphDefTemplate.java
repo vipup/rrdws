@@ -811,7 +811,7 @@ public class RrdGraphDefTemplate extends XmlTemplate implements RrdGraphConstant
 		else if (firstDayOfWeek.equalsIgnoreCase("saturday")) {
 			return SATURDAY;
 		}
-		throw new RrdException("Never heard for this day of week: " + firstDayOfWeek);
+		throw new RrdException("Never heard for this day of week: " , firstDayOfWeek);
 	}
 
 	private void resolveFonts(Node parentNode) throws RrdException {
@@ -980,6 +980,6 @@ public class RrdGraphDefTemplate extends XmlTemplate implements RrdGraphConstant
 		else if (unit.equalsIgnoreCase("year")) {
 			return RrdGraphConstants.YEAR;
 		}
-		throw new RrdException("Unknown time unit specified: " + unit);
+		throw new RrdException("Unknown time unit specified: " , unit);
 	}
 }

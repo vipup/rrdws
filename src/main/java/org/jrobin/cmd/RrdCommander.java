@@ -27,7 +27,8 @@ package org.jrobin.cmd;
 
 import org.jrobin.core.RrdException;
 
- 
+import ws.rrd.csv.RrdKeeper;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -162,10 +163,17 @@ public class RrdCommander {
 		}
 		for (RrdToolCmd rrdCommand : rrdCommands) {
 			if (cmd.startsWith(rrdCommand.getCmdType() + " ")) { 
-				return rrdCommand.executeCommand(cmd);
+				try {
+					Object executeCommand = rrdCommand.executeCommand(cmd);
+					RrdKeeper.getInstance().success();	
+					return executeCommand;
+				}catch (RrdException e) {
+					e.collectError();	
+					throw e;
+				}
 			}
 		}
-		throw new RrdException("Unknown RRDTool command: " + command);
+		throw new RrdException("Unknown RRDTool command: " , command);
 	}
 
 	/**

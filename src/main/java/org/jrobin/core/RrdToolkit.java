@@ -215,7 +215,7 @@ public class RrdToolkit {
 					datasources = new Datasource[] {rrd.getDatasource(dsName)};
 				}
 				else {
-					throw new RrdException("Could not find datasource [" + dsName + "] in file " + sourcePath);
+					throw new RrdException("Could not find datasource "," [" + dsName + "] in file " + sourcePath);
 				}
 			}
 			int count = 0;

@@ -301,7 +301,7 @@ public class Datasource implements RrdUpdater, DsTypes {
 	public void copyStateTo(RrdUpdater other) throws IOException, RrdException {
 		if (!(other instanceof Datasource)) {
 			throw new RrdException(
-					"Cannot copy Datasource object to " + other.getClass().getName());
+					"Cannot copy Datasource object to " , other.getClass().getName());
 		}
 		Datasource datasource = (Datasource) other;
 		if (!datasource.dsName.get().equals(dsName.get())) {

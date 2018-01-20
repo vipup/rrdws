@@ -93,7 +93,7 @@ public class RrdDbPool {
 				} 
 			}
 			catch (InterruptedException e) {
-				throw new RrdException(e);
+				throw new RrdException("RRD DB ERROR",e);
 			}
 		}
 		if (rrdMap.containsKey(poolKey)) {
@@ -135,7 +135,7 @@ public class RrdDbPool {
 				wait();
 			}
 			catch (InterruptedException e) {
-				throw new RrdException(e);
+				throw new RrdException("RrdDb requestRrdDb",e);
 			}
 		}
 		RrdDb rrdDb = new RrdDb(rrdDef);
@@ -169,7 +169,7 @@ public class RrdDbPool {
 				wait();
 			}
 			catch (InterruptedException e) {
-				throw new RrdException(e);
+				throw new RrdException(" RrdDb requestRrdDb", e);
 			}
 		}
 		RrdDb rrdDb = new RrdDb(poolKey, sourcePath);

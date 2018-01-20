@@ -133,7 +133,7 @@ public abstract class RrdBackendFactory {
 			return factory;
 		}
 		else {
-			throw new RrdException("No backend factory found with the name specified [" + name + "]");
+			throw new RrdException("No backend factory found with the name specified"," [" + name + "]");
 		}
 	}
 

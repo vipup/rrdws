@@ -127,7 +127,7 @@ public class Aggregates implements ConsolFuns {
 			return total;
 		}
 		else {
-			throw new RrdException("Unknown consolidation function: " + consolFun);
+			throw new RrdException("Unknown consolidation function: ", consolFun);
 		}
 	}
 

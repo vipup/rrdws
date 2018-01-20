@@ -114,7 +114,7 @@ public class ArcState implements RrdUpdater {
 	public void copyStateTo(RrdUpdater other) throws IOException, RrdException {
 		if (!(other instanceof ArcState)) {
 			throw new RrdException(
-					"Cannot copy ArcState object to " + other.getClass().getName());
+					"Cannot copy ArcState object to " , other.getClass().getName());
 		}
 		ArcState arcState = (ArcState) other;
 		arcState.accumValue.set(accumValue.get());

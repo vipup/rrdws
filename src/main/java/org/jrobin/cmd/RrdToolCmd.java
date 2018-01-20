@@ -95,7 +95,7 @@ abstract class RrdToolCmd {
 			return Long.parseLong(value);
 		}
 		catch (NumberFormatException nfe) {
-			throw new RrdException(nfe);
+			throw new RrdException("static long parseLong(String value) throws RrdException {",nfe);
 		}
 	}
 
@@ -104,7 +104,7 @@ abstract class RrdToolCmd {
 			return Integer.parseInt(value);
 		}
 		catch (NumberFormatException nfe) {
-			throw new RrdException(nfe);
+			throw new RrdException("static int parseInt(String value) throws RrdException {",nfe);
 		}
 	}
 
@@ -116,7 +116,7 @@ abstract class RrdToolCmd {
 			return Double.parseDouble(value);
 		}
 		catch (NumberFormatException nfe) {
-			throw new RrdException(nfe);
+			throw new RrdException("static double parseDouble(String value) throws RrdException {",nfe);
 		}
 	}
 

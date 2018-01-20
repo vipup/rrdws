@@ -212,7 +212,7 @@ public class Robin implements RrdUpdater {
 	public void copyStateTo(RrdUpdater other) throws IOException, RrdException {
 		if (!(other instanceof Robin)) {
 			throw new RrdException(
-					"Cannot copy Robin object to " + other.getClass().getName());
+					"Cannot copy Robin object to " , other.getClass().getName());
 		}
 		Robin robin = (Robin) other;
 		int rowsDiff = rows - robin.rows;

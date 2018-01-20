@@ -70,6 +70,7 @@ public class RrdDef {
 	private long step = DEFAULT_STEP;
 	private ArrayList<DsDef> dsDefs = new ArrayList<DsDef>();
 	private ArrayList<ArcDef> arcDefs = new ArrayList<ArcDef>();
+	private boolean overwriteExistingEnabled;
 
 	/**
 	 * <p>Creates new RRD definition object with the given path.
@@ -97,7 +98,7 @@ public class RrdDef {
 	public RrdDef(String path, long step) throws RrdException {
 		this(path);
 		if (step <= 0) {
-			throw new RrdException("Invalid RRD step specified: " + step);
+			throw new RrdException("Invalid RRD step specified: " , step);
 		}
 		this.step = step;
 	}
@@ -114,7 +115,7 @@ public class RrdDef {
 	public RrdDef(String path, long startTime, long step) throws RrdException {
 		this(path, step);
 		if (startTime < 0) {
-			throw new RrdException("Invalid RRD start time specified: " + startTime);
+			throw new RrdException("Invalid RRD start time specified: " , startTime);
 		}
 		this.startTime = startTime;
 	}
@@ -200,7 +201,7 @@ public class RrdDef {
 	 */
 	public void addDatasource(DsDef dsDef) throws RrdException {
 		if (dsDefs.contains(dsDef)) {
-			throw new RrdException("Datasource already defined: " + dsDef.dump());
+			throw new RrdException("Datasource already defined: " , dsDef.dump());
 		}
 		dsDefs.add(dsDef);
 	}
@@ -249,7 +250,7 @@ public class RrdDef {
 	 */
 	public void addDatasource(String rrdToolDsDef) throws RrdException {
 		RrdException rrdException = new RrdException(
-				"Wrong rrdtool-like datasource definition: " + rrdToolDsDef);
+				"Wrong rrdtool-like datasource definition: " , rrdToolDsDef);
 		StringTokenizer tokenizer = new StringTokenizer(rrdToolDsDef, ":");
 		if (tokenizer.countTokens() != 6) {
 			throw rrdException;
@@ -312,7 +313,7 @@ public class RrdDef {
 	 */
 	public void addArchive(ArcDef arcDef) throws RrdException {
 		if (arcDefs.contains(arcDef)) {
-			throw new RrdException("Archive already defined: " + arcDef.dump());
+			throw new RrdException("Archive already defined: ",  arcDef.dump());
 		}
 		arcDefs.add(arcDef);
 	}
@@ -369,7 +370,7 @@ public class RrdDef {
 	 */
 	public void addArchive(String rrdToolArcDef) throws RrdException {
 		RrdException rrdException = new RrdException(
-				"Wrong rrdtool-like archive definition: " + rrdToolArcDef);
+				"Wrong rrdtool-like archive definition: ", rrdToolArcDef);
 		StringTokenizer tokenizer = new StringTokenizer(rrdToolArcDef, ":");
 		if (tokenizer.countTokens() != 5) {
 			throw rrdException;
@@ -413,6 +414,8 @@ public class RrdDef {
 		if (arcDefs.size() == 0) {
 			throw new RrdException("No RRD archive specified. At least one is needed.");
 		}
+		
+		
 	}
 
 	/**
@@ -483,7 +486,7 @@ public class RrdDef {
 				return;
 			}
 		}
-		throw new RrdException("Could not find datasource named '" + dsName + "'");
+		throw new RrdException("Could not find datasource named '" , dsName + "'");
 	}
 
 	void saveSingleDatasource(String dsName) {
@@ -499,7 +502,7 @@ public class RrdDef {
 	void removeArchive(String consolFun, int steps) throws RrdException {
 		ArcDef arcDef = findArchive(consolFun, steps);
 		if (!arcDefs.remove(arcDef)) {
-			throw new RrdException("Could not remove archive " + consolFun + "/" + steps);
+			throw new RrdException("Could not remove archive " ,  consolFun + "/" + steps);
 		}
 	}
 
@@ -509,7 +512,7 @@ public class RrdDef {
 				return arcDef;
 			}
 		}
-		throw new RrdException("Could not find archive " + consolFun + "/" + steps);
+		throw new RrdException("Could not find archive " , consolFun + "/" + steps);
 	}
 
 	/**
@@ -670,5 +673,15 @@ public class RrdDef {
 	 */
 	public void removeArchives() {
 		arcDefs.clear();
+	}
+
+	public boolean isOverwriteExistingEnabled() {
+		
+		return this.overwriteExistingEnabled;
+	}
+
+	public void setOverwriteExistingEnabled(boolean isOwerwriteDisabled) {
+		overwriteExistingEnabled = isOwerwriteDisabled;
+		
 	}
 }

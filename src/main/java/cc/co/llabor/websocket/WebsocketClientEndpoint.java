@@ -37,7 +37,7 @@ public class WebsocketClientEndpoint {
      */
     @OnOpen
     public void onOpen(Session userSession) {
-        System.out.println("opening websocket");
+        System.out.println("opening websocket:"+this);
         this.userSession = userSession;
     }
 
@@ -49,7 +49,7 @@ public class WebsocketClientEndpoint {
      */
     @OnClose
     public void onClose(Session userSession, CloseReason reason) {
-        System.out.println("closing websocket");
+        System.out.println("closing websocket :::"+this);
         this.userSession = null;
     }
 

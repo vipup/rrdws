@@ -25,6 +25,8 @@
 
 package org.jrobin.core;
 
+import ws.rrd.csv.RrdKeeper;
+
 /**
  * Class to represent various JRobin checked exceptions.
  * JRobin code can throw only <code>RrdException</code>
@@ -35,11 +37,14 @@ package org.jrobin.core;
  */
 public class RrdException extends Exception {
 	private static final long serialVersionUID = 1L;
+	private String message;
+	private Object errorObject;
 
 	/**
 	 * Creates new RrdException with the supplied message in it.
 	 *
 	 * @param message Error message.
+	 * @deprecated
 	 */
 	public RrdException(String message) {
 		super(message);
@@ -50,8 +55,31 @@ public class RrdException extends Exception {
 	 *
 	 * @param e Exception object
 	 */
-	public RrdException(Exception e) {
+	private RrdException(Exception e) {
 		super(e);
+	}
+
+	public RrdException(String string, String command) {
+		this(string, (Object)command);
+	}
+	public RrdException(String string, Object errorObject) {
+		this.message = string;
+		this.errorObject = errorObject ;
+		
+	}	
+	
+	public String toString () {
+		return this.message + ""+ errorObject;
+	}
+
+	static String ENABLED_THIS ="11111111111111111111111";
+	public void collectError() {
+		if (ENABLED_THIS.length() >11)RrdKeeper.getInstance().error(this);		
+	}
+
+	public String getUUID() {
+		 
+		return ""+(""+this.message).hashCode();
 	}
 
 }

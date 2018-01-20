@@ -258,11 +258,11 @@ public class RrdGraphCmd extends RrdToolCmd implements RrdGraphConstants {
 	private void parseLine(String word) throws RrdException {
 		String[] tokens1 = new ColonSplitter(word).split();
 		if (tokens1.length != 2 && tokens1.length != 3) {
-			throw new RrdException("Invalid LINE statement: " + word);
+			throw new RrdException("Invalid LINE statement: " , word);
 		}
 		String[] tokens2 = tokens1[1].split("#");
 		if (tokens2.length != 1 && tokens2.length != 2) {
-			throw new RrdException("Invalid LINE statement: " + word);
+			throw new RrdException("Invalid LINE statement: " , word);
 		}
 		float width = Integer.parseInt(tokens1[0].substring(tokens1[0].length() - 1));
 		String name = tokens2[0];
@@ -274,11 +274,11 @@ public class RrdGraphCmd extends RrdToolCmd implements RrdGraphConstants {
 	private void parseArea(String word) throws RrdException {
 		String[] tokens1 = new ColonSplitter(word).split();
 		if (tokens1.length != 2 && tokens1.length != 3) {
-			throw new RrdException("Invalid AREA statement: " + word);
+			throw new RrdException("Invalid AREA statement: " , word);
 		}
 		String[] tokens2 = tokens1[1].split("#");
 		if (tokens2.length != 1 && tokens2.length != 2) {
-			throw new RrdException("Invalid AREA statement: " + word);
+			throw new RrdException("Invalid AREA statement: " , word);
 		}
 		String name = tokens2[0];
 		Paint color = tokens2.length == 2 ? Util.parseColor(tokens2[1]) : BLIND_COLOR;
@@ -304,11 +304,11 @@ public class RrdGraphCmd extends RrdToolCmd implements RrdGraphConstants {
 	private void parseHRule(String word) throws RrdException {
 		String[] tokens1 = new ColonSplitter(word).split();
 		if (tokens1.length < 2 || tokens1.length > 3) {
-			throw new RrdException("Invalid HRULE statement: " + word);
+			throw new RrdException("Invalid HRULE statement: " , word);
 		}
 		String[] tokens2 = tokens1[1].split("#");
 		if (tokens2.length != 2) {
-			throw new RrdException("Invalid HRULE statement: " + word);
+			throw new RrdException("Invalid HRULE statement: " , word);
 		}
 		double value = parseDouble(tokens2[0]);
 		Paint color = Util.parseColor(tokens2[1]);
@@ -332,7 +332,7 @@ public class RrdGraphCmd extends RrdToolCmd implements RrdGraphConstants {
 	private void parseComment(String word) throws RrdException {
 		String[] tokens = new ColonSplitter(word).split();
 		if (tokens.length != 2) {
-			throw new RrdException("Invalid COMMENT specification: " + word);
+			throw new RrdException("Invalid COMMENT specification: " , word);
 		}
 		gdef.comment(tokens[1]);
 	}
@@ -341,7 +341,7 @@ public class RrdGraphCmd extends RrdToolCmd implements RrdGraphConstants {
 	private void parseDef(String word) throws RrdException {
 		String[] tokens1 = new ColonSplitter(word).split();
 		if (tokens1.length != 4) {
-			throw new RrdException("Invalid DEF specification: " + word);
+			throw new RrdException("Invalid DEF specification: " , word);
 		}
 		String[] tokens2 = tokens1[1].split("=");
 		if (tokens2.length != 2) {
@@ -353,11 +353,11 @@ public class RrdGraphCmd extends RrdToolCmd implements RrdGraphConstants {
 	private void parseCDef(String word) throws RrdException {
 		String[] tokens1 = new ColonSplitter(word).split();
 		if (tokens1.length != 2) {
-			throw new RrdException("Invalid CDEF specification: " + word);
+			throw new RrdException("Invalid CDEF specification: " , word);
 		}
 		String[] tokens2 = tokens1[1].split("=");
 		if (tokens2.length != 2) {
-			throw new RrdException("Invalid DEF specification: " + word);
+			throw new RrdException("Invalid DEF specification: " , word);
 		}
 		gdef.datasource(tokens2[0], tokens2[1]);
 	}
@@ -373,7 +373,7 @@ public class RrdGraphCmd extends RrdToolCmd implements RrdGraphConstants {
 	private void parseGPrint(String word) throws RrdException {
 		String[] tokens = new ColonSplitter(word).split();
 		if (tokens.length != 4) {
-			throw new RrdException("Invalid GPRINT specification: " + word);
+			throw new RrdException("Invalid GPRINT specification: " , word);
 		}
 		gdef.gprint(tokens[1], tokens[2], tokens[3]);
 	}
@@ -385,7 +385,7 @@ public class RrdGraphCmd extends RrdToolCmd implements RrdGraphConstants {
 		for (String colorOption : colorOptions) {
 			String[] tokens = colorOption.split("#");
 			if (tokens.length != 2) {
-				throw new RrdException("Invalid COLOR specification: " + colorOption);
+				throw new RrdException("Invalid COLOR specification: " , colorOption);
 			}
 			String colorName = tokens[0];
 			Paint paint = Util.parseColor(tokens[1]);

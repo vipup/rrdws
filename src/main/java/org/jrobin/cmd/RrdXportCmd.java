@@ -121,11 +121,11 @@ class RrdXportCmd extends RrdToolCmd implements RrdGraphConstants {
 		// DEF:vname=rrd:ds-name:CF
 		String[] tokens1 = new ColonSplitter(word).split();
 		if (tokens1.length != 4) {
-			throw new RrdException("Invalid DEF syntax: " + word);
+			throw new RrdException("Invalid DEF syntax: " , word);
 		}
 		String[] tokens2 = tokens1[1].split("=");
 		if (tokens2.length != 2) {
-			throw new RrdException("Invalid DEF syntax: " + word);
+			throw new RrdException("Invalid DEF syntax: " , word);
 		}
 		dproc.addDatasource(tokens2[0], tokens2[1], tokens1[2], tokens1[3]);
 	}
@@ -134,11 +134,11 @@ class RrdXportCmd extends RrdToolCmd implements RrdGraphConstants {
 		// CDEF:vname=rpn-expression
 		String[] tokens1 = new ColonSplitter(word).split();
 		if (tokens1.length != 2) {
-			throw new RrdException("Invalid CDEF syntax: " + word);
+			throw new RrdException("Invalid CDEF syntax: " , word);
 		}
 		String[] tokens2 = tokens1[1].split("=");
 		if (tokens2.length != 2) {
-			throw new RrdException("Invalid CDEF syntax: " + word);
+			throw new RrdException("Invalid CDEF syntax: " , word);
 		}
 		dproc.addDatasource(tokens2[0], tokens2[1]);
 	}

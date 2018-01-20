@@ -261,7 +261,7 @@ public class RrdGraph implements RrdGraphConstants {
 				}
 				else {
 					// should not be here
-					throw new RrdException("Unknown plot source: " + source.getClass().getName());
+					throw new RrdException("Unknown plot source: " , source.getClass().getName());
 				}
 				lastY = y;
 			}

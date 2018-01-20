@@ -144,7 +144,7 @@ class RrdCmdScanner {
 					return value;
 				}
 				else {
-					throw new RrdException("Value for option " + fullForm + " expected but not found");
+					throw new RrdException("Value for option " , fullForm + " expected but not found");
 				}
 			}
 			if (word.startsWith(fullForm)) {

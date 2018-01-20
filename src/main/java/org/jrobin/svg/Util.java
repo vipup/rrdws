@@ -367,7 +367,7 @@ public class Util {
 	public static Paint parseColor(String valueStr) throws RrdException {
 		String c = valueStr.startsWith("#") ? valueStr.substring(1) : valueStr;
 		if (c.length() != 6 && c.length() != 8) {
-			throw new RrdException("Invalid color specification: " + valueStr);
+			throw new RrdException("Invalid color specification: " , valueStr);
 		}
 		String r = c.substring(0, 2), g = c.substring(2, 4), b = c.substring(4, 6);
 		if (c.length() == 6) {
@@ -518,7 +518,7 @@ public class Util {
 			if (childs.length > 0) {
 				return childs[0];
 			}
-			throw new RrdException("XML Error, no such child: " + childName);
+			throw new RrdException("XML Error, no such child: " ,  childName);
 		}
 
 		public static boolean hasChildNode(Node parentNode, String childName) {
@@ -539,7 +539,7 @@ public class Util {
 					return getValue(child, trim);
 				}
 			}
-			throw new RrdException("XML Error, no such child: " + childName);
+			throw new RrdException("XML Error, no such child: " , childName);
 		}
 
 		// -- Wrapper around getValue with trim
@@ -609,10 +609,10 @@ public class Util {
 				return doc.getDocumentElement();
 			}
 			catch (ParserConfigurationException e) {
-				throw new RrdException(e);
+				throw new RrdException("public static Element getRootElement(InputSource inputSource) throws RrdException, IOException {",e);
 			}
 			catch (SAXException e) {
-				throw new RrdException(e);
+				throw new RrdException("catch (SAXException e) {",e);
 			}
 		}
 

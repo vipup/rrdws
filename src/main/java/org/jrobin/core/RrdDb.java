@@ -30,11 +30,13 @@ import java.net.URI;
 import java.net.URISyntaxException; 
 import java.util.Date;
 
+import org.jrobin.core.jrrd.RRDException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cc.co.llabor.cache.MemoryFileCache;
 import cc.co.llabor.cache.MemoryFileItem;
+import ws.rrd.csv.RrdKeeper;
  
  
 
@@ -184,7 +186,12 @@ public class RrdDb implements RrdUpdater {
 	 */
 	public RrdDb(RrdDef rrdDef, RrdBackendFactory factory) throws RrdException, IOException {
 		rrdDef.validate();
+		
 		String path = rrdDef.getPath();
+		if (factory.exists(path) && rrdDef.isOverwriteExistingEnabled()) {
+			throw new RrdException("Error on creating! Overwrite is not enabled! ", path );
+		}
+		
 		backend = factory.open(path, false);
 		try {
 			backend.setLength(rrdDef.getEstimatedSize());
@@ -434,7 +441,7 @@ public class RrdDb implements RrdUpdater {
 				reader = new XmlReader(uriTmp );
 			} catch (URISyntaxException e) {
 				// e.  printStackTrace();
-				throw new RrdException(e);
+				throw new RrdException("public RrdDb(String rrdPath, String externalPath, RrdBackendFactory factory)",e);
 			}
 			
 		}else if (externalPath.startsWith(PREFIX_RRDTool)) {
@@ -633,13 +640,14 @@ public class RrdDb implements RrdUpdater {
 			double diffM = diffS/60;
 			double diffH = diffM/60;
 			double diffD = diffH/60;
-			String msgTmp = "Bad sample timestamp " + newTime +"["+ newDate +"]"+
+			String msgTmp = ""+ newTime +"["+ newDate +"]"+
 					". Last update time was " + lastTime + "{"+lastDate+"}, at least one second step is required. Diff is "
 					+diffS+" secs|"
 					+diffM+"mins|"
 					+diffH+"hours|"
 					+diffD+"days";
-			throw new RrdException(msgTmp);
+			RrdKeeper.getInstance().error();
+			throw new RrdException("Bad sample timestamp ", msgTmp);
 		}
 		double[] newValues = sample.getValues();
 		for (int i = 0; i < datasources.length; i++) {
@@ -701,7 +709,7 @@ public class RrdDb implements RrdUpdater {
 			return bestPartialMatch;
 		}
 		else {
-			throw new RrdException("RRD file does not contain RRA:" + consolFun + " archive");
+			throw new RrdException("RRD file does not contain RRA:" , consolFun + " archive");
 		}
 	}
 
@@ -983,7 +991,7 @@ public class RrdDb implements RrdUpdater {
 	 */
 	public synchronized void copyStateTo(RrdUpdater other) throws IOException, RrdException {
 		if (!(other instanceof RrdDb)) {
-			throw new RrdException("Cannot copy RrdDb object to " + other.getClass().getName());
+			throw new RrdException("Cannot copy RrdDb object to " , other.getClass().getName());
 		}
 		RrdDb otherRrd = (RrdDb) other;
 		header.copyStateTo(otherRrd.header);
@@ -1035,7 +1043,7 @@ public class RrdDb implements RrdUpdater {
 				return i;
 			}
 		}
-		throw new RrdException("Could not find archive " + consolFun + "/" + steps);
+		throw new RrdException("Could not find archive " , consolFun + "/" + steps);
 	}
 
 	/**

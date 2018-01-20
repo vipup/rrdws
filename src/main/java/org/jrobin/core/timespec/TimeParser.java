@@ -189,7 +189,7 @@ public class TimeParser {
 				year -= 1900;
 			}
 			else {
-				throw new RrdException("Invalid year " + year +
+				throw new RrdException("Invalid year " ,  year +
 						" (should be either 00-99 or >1900)");
 			}
 		}
@@ -297,7 +297,7 @@ public class TimeParser {
 				}
 				mon--;
 				if (mon < 0 || mon > 11) {
-					throw new RrdException("Did you really mean month " + (mon + 1));
+					throw new RrdException("Did you really mean month " , (mon + 1));
 				}
 				if (mday < 1 || mday > 31) {
 					throw new RrdException("I'm afraid that " + mday +

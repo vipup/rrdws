@@ -629,7 +629,7 @@ public class RrdGraphDef implements RrdGraphConstants {
         if (colorTag >= 0 && colorTag < colors.length) {
             colors[colorTag] = color;
         } else {
-            throw new RrdException("Invalid color index specified: " + colorTag);
+            throw new RrdException("Invalid color index specified: " , colorTag);
         }
     }
 
@@ -652,7 +652,7 @@ public class RrdGraphDef implements RrdGraphConstants {
 				return i;
 			}
 		}
-		throw new RrdException("Unknown color name specified: " + colorName);
+		throw new RrdException("Unknown color name specified: " , colorName);
 	}
 
 	/**

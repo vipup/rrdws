@@ -95,8 +95,16 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 		double beatVal = ((double)beatDiff)/(double)beatCounter;
 		String data = beatCounter==0?(""+beatDiff):(""+beatVal);
 		Object retval = rrdUpdateAction.perform(  rrdUID ,  timeMs , data);
+		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/updateCounter" ,  timeMs , ""+updateCounter ); 
+		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/warningCounter" ,  timeMs , ""+warningCounter ); 
+		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/createCounter" ,  timeMs , ""+createCounter ); 
+		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/fatalCounter" ,  timeMs , ""+fatalCounter ); 
+		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/errorCounter" ,  timeMs , ""+errorCounter ); 
+		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/successCounter" ,  timeMs , ""+successCounter );
+		
 		double  rrdPerSec = 1.0D/((double)(1+lastBeat- System.currentTimeMillis())); 
 		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/rrdPerSec" ,  timeMs , ""+rrdPerSec ); 
+ 		// IT IS REALLY BAD :(
 		if (retval instanceof RrdException){
 			rrdUID = "rrdws/heartbeat/RIP";
 		}else { 
@@ -559,9 +567,41 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 		Notification notification = new //Notification(data, xpath,  timestamp );
 		Notification("xpath", xpath, this.updateCounter, timestamp, data);
 		super.sendNotification(notification );
-	}	
+	}
+	 
+	
+	Map<String, Long> exceptionsRTRepo = new HashMap<String, Long>(); 
+	
+	static long lastUpdated = 0;
+	
+	public void error(RrdException rrdException) {
+		this.error();
+		String uuid= rrdException.getUUID();
+		Long exCounter = getAndIncrementCounter(uuid);		
+		if ( System.currentTimeMillis()  < (lastUpdated +1000)    ) {
+			return;
+		}else {
+			Action rrdUpdateAction =  new RrdUpdateAction();  
+			String timeMs = ""+System.currentTimeMillis();
+			//TODO rrdUpdateAction.perform(   "rrdws/heartbeat/"+uuid ,  timeMs  , ""+exCounter );
+			System.out.println( "rrdws/heartbeat/"+uuid +"::"+ timeMs  + "::::"+exCounter);
+			lastUpdated  = System.currentTimeMillis();
+		}
+	}
+	private Long getAndIncrementCounter(String key) {
+		Long exCounter = new Long(-1);
+		synchronized (exceptionsRTRepo) {
+			exCounter = exceptionsRTRepo.get(key);
+			if (exCounter == null) {
+				exCounter = new Long(1);
+			}else {
+				exCounter = new Long(exCounter .longValue()+1);
+			}
+			exceptionsRTRepo.put(key, exCounter);
+		}
+		
+		return exCounter;
+	}
 
 }
-
-
  

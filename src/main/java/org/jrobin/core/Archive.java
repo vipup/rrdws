@@ -360,7 +360,7 @@ public class Archive implements RrdUpdater, ConsolFuns {
 	public void copyStateTo(RrdUpdater other) throws IOException, RrdException {
 		if (!(other instanceof Archive)) {
 			throw new RrdException(
-					"Cannot copy Archive object to " + other.getClass().getName());
+					"Cannot copy Archive object to " , other.getClass().getName());
 		}
 		Archive arc = (Archive) other;
 		if (!arc.consolFun.get().equals(consolFun.get())) {

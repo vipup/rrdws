@@ -79,7 +79,7 @@ public class TimeSpec {
 		}
 		// how would I guess what time it was?
 		else {
-			throw new RrdException("Relative times like '" +
+			throw new RrdException("Relative times like '" ,
 					dateString + "' require proper absolute context to be evaluated");
 		}
 		gc.add(Calendar.YEAR, dyear);

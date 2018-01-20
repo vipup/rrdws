@@ -100,7 +100,7 @@ public class DataProcessor implements ConsolFuns {
 		else {
 			Date sDate = new Date(startTime);
 			Date eDate = new Date(endTime);
-			throw new RrdException("Invalid timestamps specified: " + startTime + ", " + endTime +"{"+sDate +"-"+eDate+"}");
+			throw new RrdException("Invalid timestamps specified: " ,  startTime + ", " + endTime +"{"+sDate +"-"+eDate+"}");
 		}
 	}
 
@@ -273,7 +273,7 @@ public class DataProcessor implements ConsolFuns {
 		Source source = getSource(sourceName);
 		double[] values = source.getValues();
 		if (values == null) {
-			throw new RrdException("Values not available for source [" + sourceName + "]");
+			throw new RrdException("Values not available for source",   sourceName  );
 		}
 		return values;
 	}
@@ -362,7 +362,7 @@ public class DataProcessor implements ConsolFuns {
 	 */
 	public double getPercentile(String sourceName, double percentile) throws RrdException {
 		if (percentile <= 0.0 || percentile > 100.0) {
-			throw new RrdException("Invalid percentile [" + percentile + "], should be between 0 and 100");
+			throw new RrdException("Invalid percentile", " [" + percentile + "], should be between 0 and 100");
 		}
 		Source source = getSource(sourceName);
 		return source.getPercentile(tStart, tEnd, percentile);
@@ -403,7 +403,7 @@ public class DataProcessor implements ConsolFuns {
 		if (source != null) {
 			return source;
 		}
-		throw new RrdException("Unknown source: " + sourceName);
+		throw new RrdException("Unknown source: " ,  sourceName);
 	}
 
 	/////////////////////////////////////////////////////////////////

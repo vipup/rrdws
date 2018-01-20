@@ -72,7 +72,7 @@ public class Header implements RrdUpdater {
 		this(parentDb, (RrdDef) null);
 		String version = reader.getVersion();
 		if (!version.equals(RRDTOOL_VERSION)) {
-			throw new RrdException("Could not unserilalize xml version " + version);
+			throw new RrdException("Could not unserilalize xml version " , version);
 		}
 		signature.set(DEFAULT_SIGNATURE);
 		step.set(reader.getStep());
@@ -178,7 +178,7 @@ public class Header implements RrdUpdater {
 	public void copyStateTo(RrdUpdater other) throws IOException, RrdException {
 		if (!(other instanceof Header)) {
 			throw new RrdException(
-					"Cannot copy Header object to " + other.getClass().getName());
+					"Cannot copy Header object to " , other.getClass().getName());
 		}
 		Header header = (Header) other;
 		header.signature.set(signature.get());

@@ -43,16 +43,26 @@ class RrdCreateCmd extends RrdToolCmd {
 	}
 
 	Object execute() throws RrdException, IOException {
+		
 		String startStr = getOptionValue("b", "start", DEFAULT_START);
 		long start = Util.getTimestamp(startStr);
 		String stepStr = getOptionValue("s", "step", DEFAULT_STEP);
 		long step = parseLong(stepStr);
+		// synch with https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html#___top
+		String templateTmp = getOptionValue("t", "template",  "not	inmplemented");
+		String daemonTmp = getOptionValue("d", "daemon",  "not	inmplemented");
+		// source|-r
+		String sourceTmp = getOptionValue("r", "source",  "not	inmplemented");
+		boolean isOwerwriteDisabled = getBooleanOption("O", "no-overwrite" );
+
+		
 		String[] words = getRemainingWords();
 		if (words.length < 2) {
 			throw new RrdException("RRD file path not specified");
 		}
 		String path = words[1];
-		rrdDef = new RrdDef(path, start, step);
+		rrdDef = new RrdDef(path, start, step);  
+		rrdDef.setOverwriteExistingEnabled(isOwerwriteDisabled);
 		for (int i = 2; i < words.length; i++) {
 			if (words[i].startsWith("DS:")) {
 				parseDef(words[i]);
@@ -61,7 +71,7 @@ class RrdCreateCmd extends RrdToolCmd {
 				parseRra(words[i]);
 			}
 			else {
-				throw new RrdException("Invalid rrdcreate syntax: " + words[i]);
+				throw new RrdException("Invalid rrdcreate syntax: " , words[i]);
 			}
 		}
 		return createRrdDb();
@@ -71,7 +81,7 @@ class RrdCreateCmd extends RrdToolCmd {
 		// DEF:name:type:heratbeat:min:max
 		String[] tokens = new ColonSplitter(word).split();
 		if (tokens.length < 6) {
-			throw new RrdException("Invalid DS definition: " + word);
+			throw new RrdException("Invalid DS definition: " , word);
 		}
 		String dsName = tokens[1];
 		String dsType = tokens[2];
