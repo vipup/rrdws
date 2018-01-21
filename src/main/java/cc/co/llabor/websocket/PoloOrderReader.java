@@ -28,16 +28,17 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author Jiji_Sasidharan
  */
 @ClientEndpoint
-public class WebsocketClientEndpoint_V2 {
+public class PoloOrderReader {
 
     Session userSession = null;
-    private MessageHandler messageHandler = new WebsocketClientEndpoint_V2.MessageHandler() {
+    private MessageHandler_A messageHandler = new PoloOrderReader.MessageHandler_A() {
         public void handleMessage(String message) {
             System.out.println("<<<<<<<<"+message);
         }
     };
+	private String pairName = "USDT_BTC";
 
-    public WebsocketClientEndpoint_V2(URI endpointURI) {
+    public PoloOrderReader(URI endpointURI) {
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             container.setDefaultMaxBinaryMessageBufferSize(1116*1024);
@@ -65,15 +66,15 @@ public class WebsocketClientEndpoint_V2 {
         System.out.println("opening websocket");
         this.userSession = userSession;
         
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1001}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_BTC\"}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_XMR\"}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETH\"}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_REP\"}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETC\"}");
-        
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1002}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1003}");
+        //userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1001}");
+        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\""+this.getPairName() +"\"}");
+        //userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_XMR\"}");
+//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETH\"}");
+//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_REP\"}");
+//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETC\"}");
+//        
+        //userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1002}");
+        //userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1003}");
         
     }
 
@@ -116,48 +117,15 @@ public class WebsocketClientEndpoint_V2 {
     public void onMessage(String message) {
         if (this.messageHandler != null) {
         	try {
-        		
-//        		InputStream inStream = this.getClass().getClassLoader().getResourceAsStream("cc/co/llabor/websocket/polo.csv");
-//				BufferedReader in= new BufferedReader( new InputStreamReader(  inStream ));
-//				// put some known
-// 				pairs.put("USDT_BTC", "121");
-//				pairs.put("USDT_XMR", "126");
-//				pairs.put("USDT_ETH", "149");
-//				pairs.put("USDT_REP", "175");
-//				pairs.put("USDT_ETC", "173");
-//        		String lineTmp = in.readLine();
-//        		while(lineTmp!=null) {
-//        			if (lineTmp.startsWith("Name")) {
-//        				lineTmp = in.readLine();
-//        				continue;
-//        			}
-//        			else {
-//        				String pairTMP = lineTmp.split("\t")[0];
-//        				pairTMP = pairTMP .replaceAll("/", "_");
-//        				String pairID = pairs.get(pairTMP);
-//        				if (pairID == null) { // unknown pair
-//        					pairs.put("TODO", pairTMP);
-//        					// subscribe
-//        					userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\""+pairTMP+"\"}");
-//        					userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\"BTC_XRP\"}");
-//        					
-//        					// cansel till next time
-//        					break;
-//        				}else {
-//        					// ignore
-//        					
-//        				}
-//        				lineTmp = in.readLine();
-//        			}
-//        		}
+
         		this.messageHandler.handleMessage(message); 
         	}catch(ErrorProcessingException e) {
         		if (e.getMessage().contains("1001,")) return;
         		if (e.getMessage().contains("1002,")) return;
         		if (e.getMessage().contains("1003,")) return;
         		//pairs.get("TODO")
-        		userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\"USDT_ETC\"}");
-        		System.err.println(e.getMessage());
+        		//userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\""+this.getPairName()+"\"}");
+        		//System.err.println(e.getMessage());
         	} 
 //        	catch (IOException e) {
 //				// TODO Auto-generated catch block
@@ -166,14 +134,13 @@ public class WebsocketClientEndpoint_V2 {
         }
     }
     
-    Map<String, String> pairs= new HashMap<String, String>();
 
     /**
      * register message handler
      *
      * @param msgHandler
      */
-    public void addMessageHandler(MessageHandler msgHandler) {
+    public void addMessageHandler(MessageHandler_A msgHandler) {
         this.messageHandler = msgHandler;
     }
 
@@ -183,7 +150,7 @@ public class WebsocketClientEndpoint_V2 {
      * @param message
      */
     public void sendMessage(String message) {
-    	System.out.println(3);
+    	System.out.println(3); 
         this.userSession.getAsyncRemote().sendText(message);
     }
 
@@ -192,8 +159,19 @@ public class WebsocketClientEndpoint_V2 {
      *
      * @author Jiji_Sasidharan
      */
-    public static interface MessageHandler {
+    public static interface MessageHandler_A {
 
         public void handleMessage(String message) throws ErrorProcessingException;
     }
+
+	public String getPairName() {
+		// TODO Auto-generated method stub
+		return this.pairName;
+	}
+
+	public void setPairName(String pairName) {
+		//userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\""+this.getPairName() +"\"}");
+		this.pairName = pairName;
+		userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\""+this.getPairName() +"\"}");
+	}
 }
