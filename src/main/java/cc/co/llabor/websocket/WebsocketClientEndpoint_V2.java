@@ -1,13 +1,11 @@
 package cc.co.llabor.websocket;
 
-import java.io.BufferedReader;
+  
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.InputStream; 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Enumeration;
+import java.util.Properties;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
@@ -17,11 +15,7 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
-
-import org.apache.batik.dom.util.HashTable;
-
-import com.fasterxml.jackson.databind.JsonNode;
-
+ 
 /**
  * ChatServer Client
  *
@@ -66,16 +60,50 @@ public class WebsocketClientEndpoint_V2 {
         this.userSession = userSession;
         
         userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1001}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_BTC\"}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_XMR\"}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETH\"}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_REP\"}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETC\"}");
-        
         userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1002}");
         userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1003}");
+//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_BTC\"}");
+//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_XMR\"}");
+//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETH\"}");
+//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_REP\"}");
+//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETC\"}");
+ 
+        Enumeration<String> e = (Enumeration<String>) pairs.propertyNames();
+
+        while (e.hasMoreElements()) {
+          String key = e.nextElement();
+          String value = pairs.getProperty(key);
+          System.out.println(key + " -- " + pairs.getProperty(key));
+          userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\""+key+"\"}");
+        }
+      
         
     }
+    
+    Properties pairs= new Properties();
+    Properties id2pairs= new Properties();
+    
+    {
+    	try {
+			initPairsFromFile() ;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+	private void initPairsFromFile() throws IOException {
+		
+		InputStream inStream = PoloPairListener.class.getClassLoader().getResourceAsStream("cc/co/llabor/websocket/polo.txt");
+		pairs.load(inStream);
+		Enumeration keys= pairs.propertyNames();
+		while(keys.hasMoreElements()) {
+			String key = (String) keys.nextElement();
+			String value =  pairs.getProperty(key);
+			id2pairs.put(value, key );
+		}
+	}
+    
 
     /**
      * Callback hook for Connection close events.
@@ -116,57 +144,17 @@ public class WebsocketClientEndpoint_V2 {
     public void onMessage(String message) {
         if (this.messageHandler != null) {
         	try {
-        		
-//        		InputStream inStream = this.getClass().getClassLoader().getResourceAsStream("cc/co/llabor/websocket/polo.csv");
-//				BufferedReader in= new BufferedReader( new InputStreamReader(  inStream ));
-//				// put some known
-// 				pairs.put("USDT_BTC", "121");
-//				pairs.put("USDT_XMR", "126");
-//				pairs.put("USDT_ETH", "149");
-//				pairs.put("USDT_REP", "175");
-//				pairs.put("USDT_ETC", "173");
-//        		String lineTmp = in.readLine();
-//        		while(lineTmp!=null) {
-//        			if (lineTmp.startsWith("Name")) {
-//        				lineTmp = in.readLine();
-//        				continue;
-//        			}
-//        			else {
-//        				String pairTMP = lineTmp.split("\t")[0];
-//        				pairTMP = pairTMP .replaceAll("/", "_");
-//        				String pairID = pairs.get(pairTMP);
-//        				if (pairID == null) { // unknown pair
-//        					pairs.put("TODO", pairTMP);
-//        					// subscribe
-//        					userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\""+pairTMP+"\"}");
-//        					userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\"BTC_XRP\"}");
-//        					
-//        					// cansel till next time
-//        					break;
-//        				}else {
-//        					// ignore
-//        					
-//        				}
-//        				lineTmp = in.readLine();
-//        			}
-//        		}
         		this.messageHandler.handleMessage(message); 
         	}catch(ErrorProcessingException e) {
         		if (e.getMessage().contains("1001,")) return;
         		if (e.getMessage().contains("1002,")) return;
         		if (e.getMessage().contains("1003,")) return;
-        		//pairs.get("TODO")
-        		userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\"USDT_ETC\"}");
         		System.err.println(e.getMessage());
         	} 
-//        	catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
         }
     }
     
-    Map<String, String> pairs= new HashMap<String, String>();
+ 
 
     /**
      * register message handler
@@ -196,4 +184,9 @@ public class WebsocketClientEndpoint_V2 {
 
         public void handleMessage(String message) throws ErrorProcessingException;
     }
+
+
+	public String getPairNameByID(String theID) {
+		return  this.id2pairs.getProperty(theID);
+	}
 }

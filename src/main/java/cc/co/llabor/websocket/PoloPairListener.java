@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  
 
 public class PoloPairListener {
-	static Map<String, String> pairs= new HashMap<String, String>();
+
 	static Set<String> valutas= new  HashSet<String>();
 	static Set<String> bases= new  HashSet<String>();
     
@@ -106,7 +106,7 @@ public class PoloPairListener {
 		}
 	}
 
-
+	static Map<String, String> pairs= new HashMap<String, String>();
 	private static void initPairsFromFile() throws IOException {
 		
 		// put some known

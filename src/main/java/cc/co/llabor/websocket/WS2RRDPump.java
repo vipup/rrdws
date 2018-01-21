@@ -49,6 +49,7 @@ public class WS2RRDPump {
 
 					try {
 						JsonNode nodeTmp = mapper.readTree(message);
+						if (message.length()>1000) System.out.println("["+message.length()+"]:::"+nodeTmp);
 						String theType = "" + nodeTmp.get(0);
 						boolean existPairs = false;
 						try{
@@ -61,19 +62,9 @@ public class WS2RRDPump {
 							process1001(rrdWS,  nodeTmp);
 						} else if (nodeTmp.get(2).size()==1 && existPairs)
 							process121(rrdWS,  nodeTmp);
-						else if ("121".equals(theType)) {
-							process121_O(rrdWS, nodeTmp);
-							
-						} else if ("126".equals(theType)) {
-							process126_O(rrdWS, nodeTmp);
-						} else if ("149".equals(theType)) {
-							process149_O(rrdWS, nodeTmp);
-//149							
-// 175							USDT_REP AUGUR
-						} else if ("175".equals(theType)) {
-							process175_O(rrdWS, nodeTmp);
-						} else if ("173".equals(theType)) {
-							process173_O(rrdWS, nodeTmp);
+						else if (poloWS.getPairNameByID(theType) != null ) {
+							String MARKET_PAIR = poloWS.getPairNameByID(theType);
+							processXXXYYY(rrdWS, MARKET_PAIR, nodeTmp);;
 						} else if ("1002".equals(theType)) {
 							process1002(rrdWS,  nodeTmp);
 						} else {
@@ -168,35 +159,11 @@ public class WS2RRDPump {
 						String cmdTmp = makeUpdateCMD(""+valueTMP, timestampTmp, XPATH_PMIN);
 						rrdWS.sendMessage(cmdTmp);
 					}
-					
-					
-					//System.out.println("TODO 1002:" + xxx);
-					 
+ 
 				 
 				}				
 
-				//TODO 121_O:["o",0,"11917.31200000","0.00000000"]
-				//TODO 121_O:["o",1,"11633.70000000","0.05000000"]
-				//TODO 121_O:["o",0,"11893.76000000","0.00000000"]
-				//TODO 121_O:["o",1,"11731.00000006","0.00000000"]
-				// OrderProcessing
-				private void process121_O(WebsocketClientEndpoint rrdWS, JsonNode nodeTmp) {
-					processXXXYYY(rrdWS, "USDT_BTC", nodeTmp);
-				}
-				//USDT_XMR
-				private void process126_O(WebsocketClientEndpoint rrdWS, JsonNode nodeTmp) {
-					processXXXYYY(rrdWS, "USDT_XMR", nodeTmp);
-				}				//USDT_XMR
-				private void process149_O(WebsocketClientEndpoint rrdWS, JsonNode nodeTmp) {
-					processXXXYYY(rrdWS, "USDT_ETH", nodeTmp);
-				}
-				private void process175_O(WebsocketClientEndpoint rrdWS, JsonNode nodeTmp) {
-					processXXXYYY(rrdWS, "USDT_REP", nodeTmp);
-				}				
-				private void process173_O(WebsocketClientEndpoint rrdWS, JsonNode nodeTmp) {
-					processXXXYYY(rrdWS, "USDT_ETC", nodeTmp);
-				}
-				
+ 
 
 				
 				private void processXXXYYY(WebsocketClientEndpoint rrdWS, String MARKET_PAIR, JsonNode nodeTmp) {
