@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -166,16 +168,45 @@ public class WS2RRDPump {
 					}
 					
 					
-					System.out.println("TODO 1002:" + xxx);
+					//System.out.println("TODO 1002:" + xxx);
 					 
 				 
 				}				
 
+				//TODO 121_O:["o",0,"11917.31200000","0.00000000"]
+				//TODO 121_O:["o",1,"11633.70000000","0.05000000"]
+				//TODO 121_O:["o",0,"11893.76000000","0.00000000"]
+				//TODO 121_O:["o",1,"11731.00000006","0.00000000"]
+				// OrderProcessing
 				private void process121_O(WebsocketClientEndpoint rrdWS, String mARKET_PAIR, JsonNode nodeTmp) {
-					// rrdWS.sendMessage("update " + MARKET_PAIR + ".rrd " + " 920804700:12345 ");
 					JsonNode xxx = nodeTmp.get(2).get(0);
-					System.out.println("TODO 121_O:" + xxx);
-
+					if ("o".equals( xxx.get(0).asText() ) ) {
+						String typeTMP = xxx.get(1).asText() ;
+						BigDecimal priceTMP = new BigDecimal(xxx.get(2).asText()); 
+						BigDecimal volTMP = new BigDecimal(xxx.get(3).asText());
+						Long timestampTmp = System.currentTimeMillis();
+						// PRICE
+						String XPATH_PRICE = PO_LO + "/121_O/" +MARKET_PAIR +"/"+ typeTMP + "/price" ;
+						createRRDandPushXpathToRegistry(rrdWS, XPATH_PRICE );
+						
+						String cmdTmp = makeUpdateCMD(""+priceTMP, timestampTmp, XPATH_PRICE );
+						rrdWS.sendMessage(cmdTmp);
+						// PRICE
+						String XPATH_VOL = PO_LO + "/121_O/" +MARKET_PAIR +"/"+ typeTMP + "/vol" ;
+						createRRDandPushXpathToRegistry(rrdWS, XPATH_VOL );
+						  cmdTmp = makeUpdateCMD(""+volTMP, timestampTmp, XPATH_VOL );
+						rrdWS.sendMessage(cmdTmp);
+						// TOTAL
+						String XPATH_TOTAL = PO_LO + "/121_O/" +MARKET_PAIR +"/"+ typeTMP + "/total" ;
+						createRRDandPushXpathToRegistry(rrdWS, XPATH_TOTAL );
+						  cmdTmp = makeUpdateCMD(""+priceTMP.multiply(volTMP), timestampTmp, XPATH_TOTAL );
+						rrdWS.sendMessage(cmdTmp);
+						
+					}else {
+						System.out.println("TODO 121_O:" + xxx);
+					}
+					
+					
  					 
 				}				
 
@@ -248,7 +279,8 @@ public class WS2RRDPump {
  					}
 			});
 			// wait 5 seconds for messages from websocket
-			Thread.sleep(511131000);
+			for (int i=0;i<111111;i++)
+				Thread.sleep(511131000);
 
 		} catch (InterruptedException ex) {
 			System.err.println("InterruptedException exception: " + ex.getMessage());
@@ -256,16 +288,28 @@ public class WS2RRDPump {
 			System.err.println("URISyntaxException exception: " + ex.getMessage());
 		}
 	}
-
+	
+	
+	static Map<String, String> xpathREPO = new HashMap<String, String>();
+	
 	private static void createRRDandPushXpathToRegistry(final WebsocketClientEndpoint rrdWS, String xpath2rrd) {
 		// TODO : here we are using the common rrd-create command with the same hash-function for 
 		// transformation XPATH->X-FILENAME.rrd
 		// after creating the same xpath have to be "synchronized with rrd-registry
-		String cmdCreateTmp = makeCreateCMD(System.currentTimeMillis(), xpath2rrd );
-		System.err.println(cmdCreateTmp);
-		rrdWS.sendMessage(cmdCreateTmp);
-		// TODO: currently it is not 100% fullproof sync - rrd will get the xpath and push it into REG
-		rrdWS.sendMessage("checkreg "+xpath2rrd);
+		
+		String cmp =   xpathREPO .get(xpath2rrd);
+		if (cmp == null) {
+		
+			String cmdCreateTmp = makeCreateCMD(System.currentTimeMillis(), xpath2rrd );
+			//System.err.println(cmdCreateTmp);
+			rrdWS.sendMessage(cmdCreateTmp);
+			xpathREPO.put(xpath2rrd, cmdCreateTmp);
+			// TODO: currently it is not 100% fullproof sync - rrd will get the xpath and push it into REG
+			rrdWS.sendMessage("checkreg "+xpath2rrd);
+		}else {
+			// 
+		}
+		
 	}
 
 	/**
