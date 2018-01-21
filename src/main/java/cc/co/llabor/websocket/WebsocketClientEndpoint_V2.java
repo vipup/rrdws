@@ -68,14 +68,29 @@ public class WebsocketClientEndpoint_V2 {
 //        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_REP\"}");
 //        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETC\"}");
  
-        Enumeration<String> e = (Enumeration<String>) pairs.propertyNames();
+		InputStream inStream = PoloPairListener.class.getClassLoader().getResourceAsStream("cc/co/llabor/websocket/polo.txt");
+		Properties pairsToSubscribe= new Properties();
+		try {
+			pairsToSubscribe.load(inStream);
 
-        while (e.hasMoreElements()) {
-          String key = e.nextElement();
-          String value = pairs.getProperty(key);
-          System.out.println(key + " -- " + pairs.getProperty(key));
-          userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\""+key+"\"}");
-        }
+	        Enumeration<String> e = (Enumeration<String>) pairsToSubscribe.propertyNames();
+	
+	        while (e.hasMoreElements()) {
+	          String key = e.nextElement();
+	          String value = pairs.getProperty(key);
+	          System.out.println(key + " -- " + pairs.getProperty(key));
+	          userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\""+key+"\"}");
+	          try {
+				Thread.sleep(5);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	        }
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
       
         
     }
@@ -94,7 +109,7 @@ public class WebsocketClientEndpoint_V2 {
     
 	private void initPairsFromFile() throws IOException {
 		
-		InputStream inStream = PoloPairListener.class.getClassLoader().getResourceAsStream("cc/co/llabor/websocket/polo.txt");
+		InputStream inStream = PoloPairListener.class.getClassLoader().getResourceAsStream("cc/co/llabor/websocket/poloALL.txt");
 		pairs.load(inStream);
 		Enumeration keys= pairs.propertyNames();
 		while(keys.hasMoreElements()) {

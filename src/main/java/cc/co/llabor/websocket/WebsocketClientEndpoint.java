@@ -80,8 +80,24 @@ public class WebsocketClientEndpoint {
      * @param message
      */
     public void sendMessage(String message) {
+    	messageCunter ++; messagesPerSec++; sizePerSec+=message.length();
+		if ( System.currentTimeMillis() -1000 >lastHandledTimestamp ) {
+			
+			System.out.println("SENDED:<<<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   "+messageCunter + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message" );
+			lastHandledTimestamp = System.currentTimeMillis();
+			messagesPerSec = 0;
+			sizePerSec =0;
+		}
         this.userSession.getAsyncRemote().sendText(message);
     }
+    
+	long lastHandledTimestamp = 0;
+	long messageCunter = 0;
+	long messagesPerSec = 0;
+	long sizePerSec = 0;
+	 
+		
+    
 
     /**
      * Message handler.

@@ -36,7 +36,19 @@ public class WS2RRDPump {
 					new URI("wss://api2.poloniex.com"));
 			// add listener - parce and "distribute
 			poloWS.addMessageHandler(new WebsocketClientEndpoint_V2.MessageHandler() {
+				long lastHandledTimestamp = 0;
+				long messageCunter = 0;
+				long messagesPerSec = 0;
+				long sizePerSec = 0;
 				public void handleMessage(String message) throws ErrorProcessingException {
+					messageCunter ++; messagesPerSec++; sizePerSec+=message.length();
+					if ( System.currentTimeMillis() -1000 >lastHandledTimestamp ) {
+						
+						System.out.println("DIFFF:>>"+(lastHandledTimestamp-System.currentTimeMillis())+"<<   "+messageCunter + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message" );
+						lastHandledTimestamp = System.currentTimeMillis();
+						messagesPerSec = 0;
+						sizePerSec =0;
+					}
 					// The channels are:
 					// 1001 = trollbox (you will get nothing but a heartbeat)
 					// 1002 = ticker
@@ -49,7 +61,7 @@ public class WS2RRDPump {
 
 					try {
 						JsonNode nodeTmp = mapper.readTree(message);
-						if (message.length()>1000) System.out.println("["+message.length()+"]:::"+nodeTmp);
+						//if (message.length()>1000) System.out.println("["+message.length()+"]:::"+nodeTmp);
 						String theType = "" + nodeTmp.get(0);
 						boolean existPairs = false;
 						try{
@@ -119,6 +131,7 @@ public class WS2RRDPump {
  						rrdWS.sendMessage(cmd2Tmp);
  						String cmd3Tmp = makeUpdateCMD(""+totalTmp, timestampTmp, TOTAL_XPATH);
  						rrdWS.sendMessage(cmd3Tmp);
+ 						break; // TODO -  only one per sec is possible
  					}
  					
 
@@ -138,17 +151,10 @@ public class WS2RRDPump {
 				private void process1002(WebsocketClientEndpoint rrdWS,  JsonNode nodeTmp) {
 					// rrdWS.sendMessage("update " + MARKET_PAIR + ".rrd " + " 920804700:12345 ");
 					JsonNode xxx = nodeTmp.get(2);
-					Properties ID2VALUTAPAIR = new Properties();
-					Properties PROP2INDEX = new Properties();
-					ID2VALUTAPAIR .put("69", "NXT_BTC");
-					ID2VALUTAPAIR .put("7", "REP_BTC");
 					String CID = xxx.get(0).asText();
-					CID = ID2VALUTAPAIR.getProperty(CID, CID);
+					CID = poloWS.getPairNameByID(CID);
 					String PROPS[] = {"N/A", "PRICELAST", "priceMax","PriceMin","PriceDiff", "volume24H","volumeTotal", "hight24H","low24H"};
-					int ind=0;
-					for (String pr:PROPS) {
-						PROP2INDEX.put(pr ,""+ind++);
-					}
+ 
 					
 					for (int i=1;i<PROPS.length;i++) {
 						BigDecimal valueTMP = new BigDecimal(xxx.get(i).asText());
@@ -157,7 +163,7 @@ public class WS2RRDPump {
 						createRRDandPushXpathToRegistry(rrdWS, XPATH_PMIN);
 						Long timestampTmp = System.currentTimeMillis();
 						String cmdTmp = makeUpdateCMD(""+valueTMP, timestampTmp, XPATH_PMIN);
-						rrdWS.sendMessage(cmdTmp);
+						rrdWS.sendMessage(cmdTmp);						
 					}
  
 				 
