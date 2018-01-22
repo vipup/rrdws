@@ -116,7 +116,7 @@ public class ChatAnnotation {
 
 	private void tryExecuteRRDToolCommand(String message) {
 		try {
-			session.getBasicRemote().sendText("RRDTOOL command:"+HTMLFilter_filter(message.toString()));
+			//session.getBasicRemote().sendText("RRDTOOL command:"+HTMLFilter_filter(message.toString()));
 			try {
 				String command = message;
 				command = command.replaceAll("\\\\", " ");
@@ -129,7 +129,8 @@ public class ChatAnnotation {
 				}
 			}catch(RuntimeException e) {
 				// Ignore
-				session.getBasicRemote().sendText("RRDTOOL ERROR! :"+e.getMessage());
+				String msgTmp = e.getMessage();
+				if (null!=msgTmp) session.getBasicRemote().sendText("RRDTOOL ERROR! :"+msgTmp);
 			}catch(IOException e) {
 				// Ignore
 				session.getBasicRemote().sendText("RRDTOOL ioEx! :"+e.getMessage());

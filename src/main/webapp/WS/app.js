@@ -46,8 +46,11 @@ Chat.initialize = function() {
 // On-Post-New-text-in chat
 Chat.sendMessage = (function() {
 	var message = document.getElementById('chat').value;
-	if (message != '') {
+	if (message != '' &&  'rrd' != message  ) {
 		Chat.socket.send(message);
+		document.getElementById('chat').value = '';
+	}else{
+		ChatConsole.log(message);
 		document.getElementById('chat').value = '';
 	}
 });
@@ -60,9 +63,9 @@ ChatConsole.log = (function(message) {
 	var ViewConsole = document.getElementById('ViewConsole');
 		
 	// add into message-pane
-	if (" rrd" == textTmp){
+	if ("rrd" == textTmp){
 		var messageTmp = "<div>" +
-				"<a class=\"label\" href=\"#\">"+usernameTmp+"</a> " +
+				"<a class=\"label\" href=\"#\">"+"_"+"</a> " +
 				"<img src=\"/rrdsaas/speed.gif\"/>"+
 				"<p>" + textTmp + "</p>"+
 				"</div>";

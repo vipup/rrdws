@@ -26,7 +26,22 @@ public class WS2RRDPump {
 					new URI("ws://sso.at.the.host:8080/rrdsaas/websocket/chat"));
 			// add listener - just print + ignore
 			rrdWS.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
+			
+				long lastHandledTimestamp = 0;
+				long messageCunter = 0;
+				long messagesPerSec = 0;
+				long sizePerSec = 0;
+				 
 				public void handleMessage(String message) {
+			    	messageCunter ++; messagesPerSec++; sizePerSec+=message.length();
+					if ( System.currentTimeMillis() -1000 >lastHandledTimestamp ) {
+						
+						System.out.println("RRDRCVD:<<<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   " + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message["+messageCunter  );
+						lastHandledTimestamp = System.currentTimeMillis();
+						messagesPerSec = 0;
+						sizePerSec =0;
+						System.out.println(">>>>RRD>>>>" + message);
+					}						
 					//System.out.println(">>>>RRD>>>>" + message);
 				}
 			}); 
@@ -44,7 +59,7 @@ public class WS2RRDPump {
 					messageCunter ++; messagesPerSec++; sizePerSec+=message.length();
 					if ( System.currentTimeMillis() -1000 >lastHandledTimestamp ) {
 						
-						System.out.println("DIFFF:>>"+(lastHandledTimestamp-System.currentTimeMillis())+"<<   "+messageCunter + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message" );
+						System.out.println("WSRECEIVE:<"+(lastHandledTimestamp-System.currentTimeMillis())+"<<<   " + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message[" +messageCunter );
 						lastHandledTimestamp = System.currentTimeMillis();
 						messagesPerSec = 0;
 						sizePerSec =0;

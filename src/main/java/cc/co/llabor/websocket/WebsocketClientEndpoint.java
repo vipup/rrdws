@@ -83,7 +83,7 @@ public class WebsocketClientEndpoint {
     	messageCunter ++; messagesPerSec++; sizePerSec+=message.length();
 		if ( System.currentTimeMillis() -1000 >lastHandledTimestamp ) {
 			
-			System.out.println("SENDED:<<<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   "+messageCunter + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message" );
+			System.out.println("RRDSENDED:<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   " + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message["+messageCunter );
 			lastHandledTimestamp = System.currentTimeMillis();
 			messagesPerSec = 0;
 			sizePerSec =0;
