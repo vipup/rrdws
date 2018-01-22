@@ -47,12 +47,14 @@ Chat.initialize = function() {
 Chat.sendMessage = (function() {
 	var message = document.getElementById('chat').value;
 	if (message != '' &&  'rrd' != message  ) {
+		ChatConsole.log("> : "+message);
 		Chat.socket.send(message);
-		document.getElementById('chat').value = '';
 	}else{
 		ChatConsole.log(message);
-		document.getElementById('chat').value = '';
 	}
+	
+	document.getElementById('chat').value = '';
+
 });
 
 var ChatConsole = {};
