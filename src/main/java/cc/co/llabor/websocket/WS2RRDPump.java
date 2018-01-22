@@ -303,6 +303,7 @@ public class WS2RRDPump {
 		// after creating the same xpath have to be "synchronized with rrd-registry
 		
 		String cmp =   xpathREPO .get(xpath2rrd);
+		String alloweddebugging1= "1111"; 
 		if (cmp == null) {
 		
 			String cmdCreateTmp = makeCreateCMD(System.currentTimeMillis(), xpath2rrd );
@@ -312,6 +313,10 @@ public class WS2RRDPump {
 			// TODO: currently it is not 100% fullproof sync - rrd will get the xpath and push it into REG
 			rrdWS.sendMessage("checkreg "+xpath2rrd);
 		}else {
+			if (alloweddebugging1.length()>10)
+			for (String key:xpathREPO.keySet()) {
+				System.out.println(key);
+			}
 			// 
 			//System.out.println("skipped");xpathREPO.clear();
 		}

@@ -22,29 +22,15 @@ public class PoloPairListener {
 
 	static Set<String> valutas= new  HashSet<String>();
 	static Set<String> bases= new  HashSet<String>();
+	static Set<String> allpossiblepairs= new  HashSet<String>();
     
-	static int x=0;
-	static int y=0;
+	static int lastCcheched=0;
+	
 	
     
 	public static final String getNextUnknownPair() {
-		x+=1;
-		if (x>bases.size()-1) {
-			x=0;
-			y+=1;
-		}
-		if (y>valutas.size()-1) { // roll it
-			x=0;
-			y=0;
-		}
-		String srcTMP = ""+bases.toArray()[x];
-		String  tarTMP = ""+valutas.toArray()[y];
-		while (tarTMP .equals(srcTMP)) {
-			y++;
-			if (y>valutas.size()-1)break;
-			tarTMP = ""+valutas.toArray()[y];
-		}
-		return srcTMP+"_"+tarTMP;
+		String retval = (String) allpossiblepairs.toArray()[lastCcheched++]; 
+		return retval;
 	}  
     
 
@@ -88,6 +74,7 @@ public class PoloPairListener {
 					}
 					
 					String nextUnknownPair = getNextUnknownPair();
+					//System.out.println("------------------------------"+nextUnknownPair);
 					poloWS.setPairName(nextUnknownPair); 
 
 				}
@@ -110,7 +97,7 @@ public class PoloPairListener {
 	private static void initPairsFromFile() throws IOException {
 		
 		// put some known
-		bases.add( "USDT");
+		bases.add("USDT");
 		bases.add("BTC" );
 		bases.add("ETH" );
 		bases.add("XMR" );
@@ -135,6 +122,16 @@ public class PoloPairListener {
 			}
 		}
 		System.out.println(valutas);
+		
+		for (int i=0; i<bases.size();i++) {
+			for (int j=0; j<valutas.size();j++) {
+				String tarTMP = (String) bases.toArray()[i];
+				String srcTMP =(String) valutas.toArray()[j];
+				allpossiblepairs.add(srcTMP+"_"+tarTMP);
+				//allpossiblepairs.add(tarTMP+"_"+srcTMP);
+			}			
+		}
+		System.out.println(allpossiblepairs);
 	}
 	
 	
