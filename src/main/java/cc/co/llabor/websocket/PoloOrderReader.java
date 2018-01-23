@@ -1,13 +1,6 @@
 package cc.co.llabor.websocket;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+ 
+import java.net.URI; 
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
@@ -16,11 +9,7 @@ import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-
-import org.apache.batik.dom.util.HashTable;
-
-import com.fasterxml.jackson.databind.JsonNode;
+import javax.websocket.WebSocketContainer; 
 
 /**
  * ChatServer Client

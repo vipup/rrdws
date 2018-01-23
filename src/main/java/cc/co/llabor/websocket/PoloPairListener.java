@@ -5,11 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader; 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.net.URISyntaxException; 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.HashSet; 
 import java.util.Map;
 import java.util.Set;
 
@@ -115,7 +113,7 @@ public class PoloPairListener {
 			else {
 				String pairTMP = lineTmp.split("\t")[0];
 				pairTMP = pairTMP .replaceAll("/", "_");
-				String pairID = pairs.get(pairTMP);
+				
 				valutas.add(pairTMP.split("_")[0]);
 				valutas.add(pairTMP.split("_")[1]);
 				lineTmp = in.readLine();

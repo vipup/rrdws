@@ -27,10 +27,25 @@ public class DestroyableWebSocketClientEndpoint {
     Session userSession = null;
 	
     public void destroy() throws IOException {
+    	MessageHandler bak = this.messageHandler ;
+    	System.err.println(bak);
+    	this.messageHandler = null; 
     	WebSocketContainer container = userSession.getContainer();
-		container.setDefaultMaxTextMessageBufferSize(1);
+    	for (Session sessionTmp : userSession.getOpenSessions()) {
+    		sessionTmp .close();
+    	}
+    	container.setDefaultMaxTextMessageBufferSize(1);
+    	container.setDefaultMaxBinaryMessageBufferSize(1);
+    	container.setDefaultMaxSessionIdleTimeout(1);
     	CloseReason reason = new CloseReason(CloseCodes.CLOSED_ABNORMALLY,  "destroyed by owner");
-    	userSession.close( reason  );
+    	try {
+    		userSession.close( reason  );
+    	}catch(Throwable e) {
+    		e.printStackTrace();
+    	}
+    	
+    	this.userSession = null;
+    	
     }
 
     protected MessageHandler messageHandler ;
