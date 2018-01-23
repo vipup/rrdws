@@ -9,13 +9,13 @@ public class HelloPixWS2 {
     public static void main(String[] args) {
         try {
             // open websocket
-            final WebsocketClientEndpoint_V2 clientEndPoint = new WebsocketClientEndpoint_V2(new URI("wss://api2.poloniex.com"));
+            final PoloWebsocketClientEndpoint clientEndPoint = new PoloWebsocketClientEndpoint(new URI("wss://api2.poloniex.com"));
             
 
  System.out.println(1);
             
             // add listener
-            clientEndPoint.addMessageHandler(new WebsocketClientEndpoint_V2.MessageHandler() {
+            clientEndPoint.addMessageHandler(new PoloWebsocketClientEndpoint.MessageHandler() {
                 public void handleMessage(String message) {
                     System.out.println("<<<<<<<<"+message);
                 }

@@ -8,7 +8,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 
 import javax.websocket.ClientEndpoint;
-import javax.websocket.CloseReason;
+import javax.websocket.CloseReason; 
 import javax.websocket.ContainerProvider;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -22,16 +22,12 @@ import javax.websocket.WebSocketContainer;
  * @author Jiji_Sasidharan
  */
 @ClientEndpoint
-public class WebsocketClientEndpoint_V2 {
+public class PoloWebsocketClientEndpoint extends DestroyableWebSocketClientEndpoint{
 
-    Session userSession = null;
-    private MessageHandler messageHandler = new WebsocketClientEndpoint_V2.MessageHandler() {
-        public void handleMessage(String message) {
-            System.out.println("<<<<<<<<"+message);
-        }
-    };
 
-    public WebsocketClientEndpoint_V2(URI endpointURI) {
+ 
+
+    public PoloWebsocketClientEndpoint(URI endpointURI) {
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             container.setDefaultMaxBinaryMessageBufferSize(1116*1024);
@@ -41,6 +37,7 @@ public class WebsocketClientEndpoint_V2 {
             throw new RuntimeException(e);
         }
     }
+
 
     /**
      * Callback hook for Connection open events.
@@ -169,38 +166,8 @@ public class WebsocketClientEndpoint_V2 {
         }
     }
     
+
  
-
-    /**
-     * register message handler
-     *
-     * @param msgHandler
-     */
-    public void addMessageHandler(MessageHandler msgHandler) {
-        this.messageHandler = msgHandler;
-    }
-
-    /**
-     * Send a message.
-     *
-     * @param message
-     */
-    public void sendMessage(String message) {
-    	System.out.println(3);
-        this.userSession.getAsyncRemote().sendText(message);
-    }
-
-    /**
-     * Message handler.
-     *
-     * @author Jiji_Sasidharan
-     */
-    public static interface MessageHandler {
-
-        public void handleMessage(String message) throws ErrorProcessingException;
-    }
-
-
 	public String getPairNameByID(String theID) {
 		return  this.id2pairs.getProperty(theID);
 	}

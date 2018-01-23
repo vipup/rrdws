@@ -8,10 +8,10 @@ public class TestApp {
     public static void main(String[] args) {
         try {
             // open websocket
-            final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://sso.at.the.host:8080/rrdsaas/websocket/chat"));
+            final RRDWebsocketClientEntPoint clientEndPoint = new RRDWebsocketClientEntPoint(new URI("ws://sso.at.the.host:8080/rrdsaas/websocket/chat"));
 
             // add listener
-            clientEndPoint.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
+            clientEndPoint.addMessageHandler(new RRDWebsocketClientEntPoint.MessageHandler() {
                 public void handleMessage(String message) {
                     System.out.println("<<<<<<<<"+message);
                 }

@@ -1,35 +1,40 @@
 package cc.co.llabor.websocket;
 
-import java.net.URI;
+import java.io.IOException;
+
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
-import javax.websocket.ContainerProvider;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
+import javax.websocket.CloseReason.CloseCodes;
+ 
 
-/**
- * ChatServer Client
- *
- * @author Jiji_Sasidharan
- */
 @ClientEndpoint
-public class WebsocketClientEndpoint {
+public class DestroyableWebSocketClientEndpoint {
+    /**
+     * Message handler.
+     *
+     * @author Jiji_Sasidharan
+     */
+    public static interface MessageHandler {
 
+        public void handleMessage(String message) throws ErrorProcessingException;
+    }
+ 
     Session userSession = null;
-    private MessageHandler messageHandler;
-
-    public WebsocketClientEndpoint(URI endpointURI) {
-        try {
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            container.connectToServer(this, endpointURI);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+	
+    public void destroy() throws IOException {
+    	WebSocketContainer container = userSession.getContainer();
+		container.setDefaultMaxTextMessageBufferSize(1);
+    	CloseReason reason = new CloseReason(CloseCodes.CLOSED_ABNORMALLY,  "destroyed by owner");
+    	userSession.close( reason  );
     }
 
+    protected MessageHandler messageHandler ;
+    
     /**
      * Callback hook for Connection open events.
      *
@@ -57,9 +62,10 @@ public class WebsocketClientEndpoint {
      * Callback hook for Message Events. This method will be invoked when a client send a message.
      *
      * @param message The text message
+     * @throws ErrorProcessingException 
      */
     @OnMessage
-    public void onMessage(String message) {
+    public void onMessage(String message) throws ErrorProcessingException {
         if (this.messageHandler != null) {
             this.messageHandler.handleMessage(message);
         }
@@ -74,6 +80,8 @@ public class WebsocketClientEndpoint {
         this.messageHandler = msgHandler;
     }
 
+    
+    
     /**
      * Send a message.
      *
@@ -95,17 +103,6 @@ public class WebsocketClientEndpoint {
 	long messageCunter = 0;
 	long messagesPerSec = 0;
 	long sizePerSec = 0;
-	 
-		
+	     
     
-
-    /**
-     * Message handler.
-     *
-     * @author Jiji_Sasidharan
-     */
-    public static interface MessageHandler {
-
-        public void handleMessage(String message);
-    }
 }
