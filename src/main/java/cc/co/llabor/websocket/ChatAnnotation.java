@@ -190,12 +190,15 @@ public class ChatAnnotation {
                     client.session.getBasicRemote().sendText(msg);
                 }
             } catch (IOException e) {
-                log.debug("Chat Error: Failed to send message to client", e);
+            	log.fatal("Chat Error: Failed to send message to client", e);
                 connections.remove(client);
                 try {
                     client.session.close();
                 } catch (IOException e1) {
                     // Ignore
+                	e1.printStackTrace();
+                	log.error("Chat Error: Failed to send message to client", e1);
+                	System.exit(-1111);
                 }
                 String message = String.format("* %s %s",
                         client.nickname, "has been disconnected.");

@@ -25,8 +25,13 @@ public class DestroyableWebSocketClientEndpoint {
     }
  
     Session userSession = null;
+	private DestroyTracker watchDog;
 	
-    public void destroy() throws IOException {
+    public DestroyableWebSocketClientEndpoint(DestroyTracker watchDog ) {
+		this.watchDog = watchDog;
+	}
+
+	public void destroy() throws IOException {
     	MessageHandler bak = this.messageHandler ;
     	System.err.println(bak);
     	this.messageHandler = null; 
@@ -45,7 +50,7 @@ public class DestroyableWebSocketClientEndpoint {
     	}
     	
     	this.userSession = null;
-    	
+    	watchDog.destroyed(this);
     }
 
     protected MessageHandler messageHandler ;
@@ -104,7 +109,8 @@ public class DestroyableWebSocketClientEndpoint {
      */
     public void sendMessage(String message) {
     	messageCunter ++; messagesPerSec++; sizePerSec+=message.length();
-		if ( System.currentTimeMillis() -1000 >lastHandledTimestamp ) {
+		if (errorCounter > 1000  || (lastHandledTimestamp>111111111111L && System.currentTimeMillis()  -lastHandledTimestamp  >100000 )) { // FULL Restart
+    	//	if ( System.currentTimeMillis() -1000 >lastHandledTimestamp ) {
 			
 			System.out.println("RRDSENDED:<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   " + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message["+messageCunter );
 			lastHandledTimestamp = System.currentTimeMillis();
@@ -118,6 +124,7 @@ public class DestroyableWebSocketClientEndpoint {
 	long messageCunter = 0;
 	long messagesPerSec = 0;
 	long sizePerSec = 0;
+	long errorCounter = 0;
 	     
     
 }

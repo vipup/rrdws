@@ -8,7 +8,7 @@ public class TestApp {
     public static void main(String[] args) {
         try {
             // open websocket
-            final RRDWebsocketClientEntPoint clientEndPoint = new RRDWebsocketClientEntPoint(new URI("ws://sso.at.the.host:8080/rrdsaas/websocket/chat"));
+            final RRDWebsocketClientEntPoint clientEndPoint = new RRDWebsocketClientEntPoint(new URI("ws://sso.at.the.host:8080/rrdsaas/websocket/chat"), null);
 
             // add listener
             clientEndPoint.addMessageHandler(new RRDWebsocketClientEntPoint.MessageHandler() {

@@ -25,7 +25,8 @@ public class PoloWebsocketClientEndpoint extends DestroyableWebSocketClientEndpo
 
  
 
-    public PoloWebsocketClientEndpoint(URI endpointURI) {
+    public PoloWebsocketClientEndpoint(URI endpointURI, DestroyTracker watchDog) {
+    	super(watchDog);
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             container.setDefaultMaxBinaryMessageBufferSize(1116*1024);

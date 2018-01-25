@@ -13,7 +13,8 @@ import javax.websocket.WebSocketContainer;
 @ClientEndpoint
 public class RRDWebsocketClientEntPoint extends DestroyableWebSocketClientEndpoint{
 
-	public RRDWebsocketClientEntPoint(URI endpointURI) {
+	public RRDWebsocketClientEntPoint(URI endpointURI, DestroyTracker watchDog) {
+		super(watchDog);
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             container.connectToServer(this, endpointURI);

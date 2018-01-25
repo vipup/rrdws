@@ -9,7 +9,7 @@ public class HelloPixWS2 {
     public static void main(String[] args) {
         try {
             // open websocket
-            final PoloWebsocketClientEndpoint clientEndPoint = new PoloWebsocketClientEndpoint(new URI("wss://api2.poloniex.com"));
+            final PoloWebsocketClientEndpoint clientEndPoint = new PoloWebsocketClientEndpoint(new URI("wss://api2.poloniex.com"), null);
             
 
  System.out.println(1);

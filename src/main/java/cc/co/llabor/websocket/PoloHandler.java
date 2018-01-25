@@ -25,11 +25,12 @@ public final class PoloHandler implements PoloWebsocketClientEndpoint.MessageHan
 	long messageCunter = 0;
 	long messagesPerSec = 0;
 	long sizePerSec = 0;
+	long errorCounter = 0;
 
 	public void handleMessage(String message) throws ErrorProcessingException {
 		messageCunter ++; messagesPerSec++; sizePerSec+=message.length();
 		if ( System.currentTimeMillis() -1000 >lastHandledTimestamp ) {
-			if (lastHandledTimestamp>111111111111L && System.currentTimeMillis()  -lastHandledTimestamp  >100000) { // FULL Restart
+			if (errorCounter > 1000  || (lastHandledTimestamp>111111111111L && System.currentTimeMillis()  -lastHandledTimestamp  >100000 )) { // FULL Restart
 				try {
 					PoloHandler.poloWS.destroy();
 				} catch (IOException e) {
@@ -83,6 +84,7 @@ public final class PoloHandler implements PoloWebsocketClientEndpoint.MessageHan
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (RuntimeException e) {
+			errorCounter++;
 			// ignore
 			System.out.println("error processing  message: "+message);
 			throw new ErrorProcessingException(message);

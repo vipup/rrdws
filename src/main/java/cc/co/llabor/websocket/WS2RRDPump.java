@@ -4,52 +4,88 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.Map; ;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit; ;
  
 
-public class WS2RRDPump {
+public class WS2RRDPump implements DestroyTracker {
 
 	private static final String WSS_API2_POLONIEX_COM = "wss://api2.poloniex.com";
 	private static final String WS_SSO_AT_THE_HOST_8080_RRDSAAS_WEBSOCKET_CHAT = "ws://sso.at.the.host:8080/rrdsaas/websocket/chat";
 	static final String PO_LO = "/PoLo";
 	RRDWebsocketClientEntPoint rrdWS ;
-	PoloWebsocketClientEndpoint poloWS; 
+	PoloWebsocketClientEndpoint poloWS;
+	private boolean alive;
+	@Override
+	public void destroyed(DestroyableWebSocketClientEndpoint destroyableWebSocketClientEndpoint) {
+		System.out.println("initially was DESTROYED:"+destroyableWebSocketClientEndpoint);
+		// close the rest...
+		this.destroy();
+		
+	}
+	
 	public WS2RRDPump () throws URISyntaxException {
-		// open RRD-websocket
-		createRRDWS();  
+				// open RRD-websocket
+		createRRDWS(this);  
 		// open POLO- websocket
-		createPoloWS();
+		createPoloWS(this);
+		this.alive = true;
 	}
 
-	private void createPoloWS() throws URISyntaxException {
+	private void createPoloWS(DestroyTracker watchDog) throws URISyntaxException {
 		URI endpointURI = new URI(WSS_API2_POLONIEX_COM);
-		poloWS = new PoloWebsocketClientEndpoint(endpointURI);
+		poloWS = new PoloWebsocketClientEndpoint(endpointURI, watchDog );
 					// add listener - parce and "distribute
 					poloWS.addMessageHandler(new PoloHandler(this));
 	}
 
-	private void createRRDWS() throws URISyntaxException {
+	private void createRRDWS(DestroyTracker watchDog) throws URISyntaxException {
 		URI endpointURI = new URI(WS_SSO_AT_THE_HOST_8080_RRDSAAS_WEBSOCKET_CHAT);
-		rrdWS = new RRDWebsocketClientEntPoint( endpointURI);
+		rrdWS = new RRDWebsocketClientEntPoint( endpointURI, watchDog );
 					// add listener - just print + ignore
 					rrdWS.addMessageHandler(new RRDHandler(this));
 	}
 
 	public static void main(String[] args) {
-		while (true) // never endet story...
-		try { 
-			WS2RRDPump pump = new WS2RRDPump ();  
-			// wait 1 hour for messages from websocket
-			Thread.sleep(1*60*60*10);
-			pump.destroy(); 
-		} catch (InterruptedException ex) {
-			System.err.println("InterruptedException exception: " + ex.getMessage());
-		} catch (URISyntaxException ex) {
-			System.err.println("URISyntaxException exception: " + ex.getMessage());
-		}
+        final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+        
+        ses.scheduleWithFixedDelay(new Runnable() {
+        	
+        	WS2RRDPump pump = null;
+            @Override
+            public void run() {
+                // Check pump any minute , and restart if something wrong
+            	if (pump == null) {
+            		try {
+            			System.out.println("new Pump created:"+pump);
+						pump = new WS2RRDPump ();
+					} catch (URISyntaxException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            	}
+            	if (!pump.isAlive()) { // check fo alive, and reInit
+            		pump = null;
+            		System.out.println("Pump should be GCed.. ");
+            		System.gc();
+            	}
+            	
+            	
+            }
+        }, 0, 1, TimeUnit.MINUTES);
 	}
 	
 	
+ 
+
+	protected boolean isAlive() { 
+		return alive;
+	}
+
 	private void destroy() {
 		try {
 			this.rrdWS.addMessageHandler(null);
@@ -73,7 +109,7 @@ public class WS2RRDPump {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		alive = false;
 	}
 
 
