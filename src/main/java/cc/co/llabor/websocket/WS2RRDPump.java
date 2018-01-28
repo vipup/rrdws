@@ -29,7 +29,11 @@ public class WS2RRDPump implements DestroyTracker {
 	}
 	
 	public WS2RRDPump () throws URISyntaxException {
-				// open RRD-websocket
+		// start();
+	}
+
+	private void start() throws URISyntaxException {
+		// open RRD-websocket
 		createRRDWS(this);  
 		// open POLO- websocket
 		createPoloWS(this);
@@ -62,7 +66,9 @@ public class WS2RRDPump implements DestroyTracker {
             	if (pump == null) {
             		try {
             			System.out.println("new Pump created:"+pump);
-						pump = new WS2RRDPump ();
+            			pump = new WS2RRDPump ();
+            			pump.start();
+            			
 					} catch (URISyntaxException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

@@ -117,7 +117,7 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
     private boolean isAlive = true;
      
     public void destroy(){
-    	isAlive=false;
+    	setAlive(false);
     }
     /**
      * starts local daemon-thread with never-ending-loop 
@@ -131,12 +131,12 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 				try {
 					System.out.println("**** RRDWS-Hearbeat ***** " );
 					Thread.sleep(initialDelay);
-					while (isAlive) { 
+					while (isAlive()) { 
 						beat();
 						Thread.sleep(period); 
 					}
 				} catch (InterruptedException e) {
-					isAlive = false;
+					setAlive(false);
 					log.error("+.. +. .+. .+  .+. .+. .+. .+ .+ +. .+ +   + RRDWS-Hearbeat is stopped:"+Thread.currentThread().getName(), e);
 				} catch (RuntimeException e){
 					e.printStackTrace();
@@ -309,7 +309,13 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
         return _metrics.get(name).getClass().getName();
     }
 
-    protected final String getAttributeDescription(String name) {
+    public boolean isAlive() {
+		return isAlive;
+	}
+	public void setAlive(boolean isAlive) {
+		this.isAlive = isAlive;
+	}
+	protected final String getAttributeDescription(String name) {
         return name + " Attribute";   
     }
     

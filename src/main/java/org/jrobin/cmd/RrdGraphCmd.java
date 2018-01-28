@@ -73,7 +73,11 @@ public class RrdGraphCmd extends RrdToolCmd implements RrdGraphConstants {
 		RrdGraph rrdGraph = new RrdGraph(gdef);
 		RrdGraphInfo info = rrdGraph.getRrdGraphInfo();
 		if (info.getFilename().equals(RrdGraphConstants.IN_MEMORY_IMAGE)) {
-			println("memImg:"+info.getImgInfo()); if (1==2) println(new String(info.getBytes()));
+			if ( ("".length()==2)) {
+				println("memImg:"+info.getImgInfo());  
+				println(new String(info.getBytes()));
+			}
+			
 		}
 		else {
 			println(info.getWidth() + "x" + info.getHeight());

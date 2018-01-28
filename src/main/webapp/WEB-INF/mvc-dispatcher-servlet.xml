@@ -12,6 +12,7 @@
 	<bean name="/xwin.htm" class="eu.blky.springmvc.RenderingController" />
 	<bean name="/xwin.jsp" class="eu.blky.springmvc.RenderingController" />
 	<bean name="/welcome.htm" class="eu.blky.springmvc.HelloWorldController" />
+	<bean name="/status.htm" class="eu.blky.springmvc.StatusController" />
 	<!-- http://localhost:8080/rrdsaas/gifgen.jsp ... -->
 	<bean name="/gifgen.htm" class="eu.blky.springmvc.GifgenRenderingController" />
 	<bean name="/mvel.htm" class="eu.blky.springmvc.MVELController" />
