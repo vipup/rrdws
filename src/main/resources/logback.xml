@@ -1,0 +1,28 @@
+<!--  https://wiki.base22.com/display/btg/How+to+setup+SLF4J+and+LOGBack+in+a+web+app+-+fast  --> 
+<configuration scan="true" debug="false">
+	<appender name="RRD-WS"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${catalina.base}/logs/rrdwsout.log</File>
+		<append>true</append>
+		<encoder>
+			<charset>utf-8</charset>
+			<pattern>%d{HH:mm:ss.SSS} %-5level {%thread} [%logger{40}] %msg%n
+			</pattern>
+		</encoder>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${catalina.base}/logs/archive/probe-%d{yyyyMMdd}-%i.log.zip
+			</fileNamePattern>
+			<maxHistory>10</maxHistory>
+			<cleanHistoryOnStart>true</cleanHistoryOnStart>
+			<maxFileSize>20MB</maxFileSize>
+		</rollingPolicy>
+	</appender>
+	<logger name="org.springframework.web.context.support" level="ERROR" />
+	<logger name="org.springframework.beans.factory.support" level="ERROR" /><!-- 
+		Reduce noise in case user runs with TRACE logging -->
+	<logger name="psiprobe.tools.ApplicationUtils" level="INFO" />
+	<root level="INFO">
+		<appender-ref ref="RRD-WS" />
+	</root>
+</configuration>

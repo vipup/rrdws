@@ -137,7 +137,10 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 					}
 				} catch (InterruptedException e) {
 					isAlive = false;
+					log.error("+.. +. .+. .+  .+. .+. .+. .+ .+ +. .+ +   + RRDWS-Hearbeat is stopped:"+Thread.currentThread().getName(), e);
 				} catch (RuntimeException e){
+					e.printStackTrace();
+					log.error("+.. +. .+. .+  .+. .+. .+. .+ .+ +. .+ +   + RRDWS-Hearbeat is stopped:"+Thread.currentThread().getName(), e);
 					System.out.println("+.. +. .+. .+  .+. .+. .+. .+ .+ +. .+ +   + RRDWS-Hearbeat is stopped:"+Thread.currentThread().getName());
 				}
 			}
