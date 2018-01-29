@@ -26,6 +26,20 @@
 	<packaging>war</packaging>
 
 	<dependencies>
+<!--
+	<dependency>
+		<groupId>ESPER_HelloWorld</groupId>
+		<artifactId>ESPER_HelloWorld</artifactId>
+		<version>0.0.2</version>
+
+	</dependency>  -->
+
+	<dependency>
+		<groupId>com.espertech</groupId>
+		<artifactId>esper</artifactId>
+		<version>7.0.0</version>
+	</dependency>
+	
 	<!--  https://wiki.base22.com/display/btg/How+to+setup+SLF4J+and+LOGBack+in+a+web+app+-+fast -->
 <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
 <dependency>

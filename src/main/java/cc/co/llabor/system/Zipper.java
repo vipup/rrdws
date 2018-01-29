@@ -102,4 +102,9 @@ public class Zipper {
 	    private String generateZipEntry(String file) {
 	        return file;
 	    }
+
+		public Object getData() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
