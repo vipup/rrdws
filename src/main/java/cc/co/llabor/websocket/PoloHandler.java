@@ -4,12 +4,19 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
+ 
 
-public final class PoloHandler implements PoloWebsocketClientEndpoint.MessageHandler {
+public final class PoloHandler implements MessageHandler {
+    /** Logger */
+    private static Logger LOG = LoggerFactory.getLogger(PoloHandler.class);
+	
 	/**
 	 * 
 	 */
@@ -38,7 +45,7 @@ public final class PoloHandler implements PoloWebsocketClientEndpoint.MessageHan
 					e.printStackTrace();
 				}
 			}
-			System.out.println("WSRECEIVE:<"+(lastHandledTimestamp-System.currentTimeMillis())+"<<<   " + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message[" +messageCunter );
+			LOG.debug( "WSRECEIVE:<"+(lastHandledTimestamp-System.currentTimeMillis())+"<<<   " + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message[" +messageCunter );
 			lastHandledTimestamp = System.currentTimeMillis();
 			messagesPerSec = 0;
 			
@@ -50,12 +57,12 @@ public final class PoloHandler implements PoloWebsocketClientEndpoint.MessageHan
 		// 1010 = heartbeat
 		// 'MARKET_PAIR' = market order books
 
-		//System.out.println("<<<<POLO<<<<" + message);
+		LOG.trace( "<<<<POLO<<<<" + message);
 		ObjectMapper mapper = new ObjectMapper();
 
 		try {
 			JsonNode nodeTmp = mapper.readTree(message);
-			//if (message.length()>1000) System.out.println("["+message.length()+"]:::"+nodeTmp);
+			//if (message.length()>1000) LOG.debug("["+message.length()+"]:::"+nodeTmp);
 			String theType = "" + nodeTmp.get(0);
 			boolean existPairs = false;
 			try{
@@ -86,7 +93,7 @@ public final class PoloHandler implements PoloWebsocketClientEndpoint.MessageHan
 		} catch (RuntimeException e) {
 			errorCounter++;
 			// ignore
-			System.out.println("error processing  message: "+message);
+			LOG.debug( "error processing  message: "+message);
 			throw new ErrorProcessingException(message);
 		}
 
@@ -182,7 +189,7 @@ public final class PoloHandler implements PoloWebsocketClientEndpoint.MessageHan
 			rrdWS.sendMessage(cmdTmp);
 			
 		}else {
-			System.out.println("TODO XXXYYY_O:" + xxx);
+			LOG.debug( "TODO XXXYYY_O:" + xxx);
 		}
 		
 		

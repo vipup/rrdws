@@ -2,8 +2,14 @@ package cc.co.llabor.websocket;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 // https://stackoverflow.com/questions/26452903/javax-websocket-client-simple-example
 public class TestApp {
+    /** Logger */
+    private static Logger LOG = LoggerFactory.getLogger(TestApp.class);	
+	
 
     public static void main(String[] args) {
         try {
@@ -11,9 +17,9 @@ public class TestApp {
             final RRDWebsocketClientEntPoint clientEndPoint = new RRDWebsocketClientEntPoint(new URI("ws://sso.at.the.host:8080/rrdsaas/websocket/chat"), null);
 
             // add listener
-            clientEndPoint.addMessageHandler(new RRDWebsocketClientEntPoint.MessageHandler() {
+            clientEndPoint.addMessageHandler(new MessageHandler() {
                 public void handleMessage(String message) {
-                    System.out.println("<<<<<<<<"+message);
+                    LOG.debug("<<<<<<<<"+message);
                 }
             });
 

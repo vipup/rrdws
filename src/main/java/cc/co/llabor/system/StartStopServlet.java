@@ -57,6 +57,90 @@ public class StartStopServlet extends HttpServlet {
 	
 	public void init(ServletConfig config) throws ServletException{
 		// restore prev RRDDB, if any
+		restoreDBfromBackup();
+		
+		initShutdownHookPROC();	
+		
+		initCollectD();		
+		
+		initMRTG();
+		 
+		initAlerter(); 
+		
+		System.out.println("................................." );
+		System.out.println("................................." );
+		System.out.println(".   status :"+status  );
+		System.out.println("................................." );
+		System.out.println("................................." );
+		super.init(config); 
+	}
+
+
+	private void initAlerter() {
+		// do exactly the same as prev-WatchDog, but otherwise
+//		Cache tholdRepo = Manager.getCache("thold");
+//		Object tholdProps = tholdRepo.get("default.properties");//RRDHighLimitWatchDog
+		Thread.currentThread().setContextClassLoader(RrdKeeper.class.getClassLoader());
+		try {
+//			log.info(Repo.getBanner( "tholdHealthWatchDog"));
+//			
+//			Threshold watchDog  = ac.toThreshold(tholdProps );
+//			ac.register(  watchDog );
+//			lookInsideThold(tholdProps);
+			AlertCaptain ac = AlertCaptain.getInstance(ServletListener.getDefaultThreadGroup());
+			
+			ac.init();		
+			status.put("AlertCaptain", SUCCESSFUL );
+			 
+		} catch (Throwable e) {
+			status.put("AlertCaptain", BROCKEN+e.getMessage());
+			// TODO Auto-generated catch block
+			// e.  printStackTrace();
+		}
+	}
+
+
+	private void initMRTG() {
+		try{
+			 
+			status.put("MrtgServer (SNMP-backend)", startMrtgServer()  );
+				 
+		}catch(Throwable e){
+			status.put("MrtgServer (SNMP-backend)", BROCKEN+e.getMessage());
+			log.error("MrtgServer (SNMP-backend)", e.getMessage());		
+			// e.  printStackTrace();
+		}
+	}
+
+
+	private void initCollectD() {
+		if ( !isGAE()){
+				String[] arg0=new String[]{};
+			// collectd SERVER
+			status.put("collectd-SERVER", startCollectdServer(arg0) );
+			// collectd CLIENT (agent)
+			status.put("collectd-CLIENT", startColelctdClient() );
+			// start collectd queue-worker
+			status.put("collectd-Worker", startCollectdWorker() );
+		}
+	}
+
+
+	private void initShutdownHookPROC() {
+		try {
+			status.put("initShutdownHook", initShutdownHook()); 
+		} catch (Exception e) {
+			status.put("initShutdownHook", BROCKEN+e.getMessage());
+			log.error("RRD initShutdownHook : ", e);
+		}catch(Throwable e){
+			status.put("initShutdownHook", BROCKEN+e.getMessage());
+			log.error("RRD initShutdownHook : ", e);			
+			// e.  printStackTrace();
+		}
+	}
+
+
+	private void restoreDBfromBackup() {
 		try{
 			File workdirTmp = new File ( Config.CALC_DEFAULT_WORKDIR() );
 			File tmpdirTmp = new File (System.getProperty("java.io.tmpdir"));
@@ -90,65 +174,6 @@ public class StartStopServlet extends HttpServlet {
 			log.error("restoreDB", e);
 			status.put("restoreDB", "DB restore is not possible! New Server/instance/App/Node/DB?");
 		}
-		
-		try {
-			status.put("initShutdownHook", initShutdownHook()); 
-		} catch (Exception e) {
-			status.put("initShutdownHook", BROCKEN+e.getMessage());
-			log.error("RRD initShutdownHook : ", e);
-		}catch(Throwable e){
-			status.put("initShutdownHook", BROCKEN+e.getMessage());
-			log.error("RRD initShutdownHook : ", e);			
-			// e.  printStackTrace();
-		}	
-		
-		if ( !isGAE()){
-				String[] arg0=new String[]{};
-			// collectd SERVER
-			status.put("collectd-SERVER", startCollectdServer(arg0) );
-			// collectd CLIENT (agent)
-			status.put("collectd-CLIENT", startColelctdClient() );
-			// start collectd queue-worker
-			status.put("collectd-Worker", startCollectdWorker() );
-		}		
-		
-		try{
-			 
-			status.put("MrtgServer (SNMP-backend)", startMrtgServer()  );
-				 
-		}catch(Throwable e){
-			status.put("MrtgServer (SNMP-backend)", BROCKEN+e.getMessage());
-			log.error("MrtgServer (SNMP-backend)", e.getMessage());		
-			// e.  printStackTrace();
-		}
-		   
-		 
-		// do exactly the same as prev-WatchDog, but otherwise
-//		Cache tholdRepo = Manager.getCache("thold");
-//		Object tholdProps = tholdRepo.get("default.properties");//RRDHighLimitWatchDog
-		Thread.currentThread().setContextClassLoader(RrdKeeper.class.getClassLoader());
-		try {
-//			log.info(Repo.getBanner( "tholdHealthWatchDog"));
-//			
-//			Threshold watchDog  = ac.toThreshold(tholdProps );
-//			ac.register(  watchDog );
-//			lookInsideThold(tholdProps);
-			AlertCaptain ac = AlertCaptain.getInstance(ServletListener.getDefaultThreadGroup());
-			
-			ac.init();		
-			status.put("AlertCaptain", SUCCESSFUL );
-			 
-		} catch (Throwable e) {
-			status.put("AlertCaptain", BROCKEN+e.getMessage());
-			// TODO Auto-generated catch block
-			// e.  printStackTrace();
-		} 
-		System.out.println("................................." );
-		System.out.println("................................." );
-		System.out.println(".   status :"+status  );
-		System.out.println("................................." );
-		System.out.println("................................." );
-		super.init(config); 
 	}
  
 	
@@ -443,6 +468,6 @@ public class StartStopServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		resp.getWriter().write(""+this.status);
+		resp.getWriter().write(""+status);
 	}
 }

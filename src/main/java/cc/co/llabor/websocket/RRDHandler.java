@@ -2,7 +2,14 @@ package cc.co.llabor.websocket;
 
 import java.io.IOException;
 
-public final class RRDHandler implements RRDWebsocketClientEntPoint.MessageHandler {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public final class RRDHandler implements MessageHandler {
+    /** Logger */
+    private static Logger LOG = LoggerFactory.getLogger(PoloWebsocketClientEndpoint.class);	
+
+    
 	/**
 	 * 
 	 */
@@ -31,12 +38,12 @@ public final class RRDHandler implements RRDWebsocketClientEntPoint.MessageHandl
 					e.printStackTrace();
 				}
 			}						
-			System.out.println("RRDRCVD:<<<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   " + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message["+messageCunter  );
+			LOG.debug("RRDRCVD:<<<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   " + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message["+messageCunter  );
 			lastHandledTimestamp = System.currentTimeMillis();
 			messagesPerSec = 0;
 			sizePerSec =0;
-			System.out.println(">>>>RRD>>>>" + message);
+			LOG.trace(">>>>RRD>>>>" + message);
 		}						
-		//System.out.println(">>>>RRD>>>>" + message);
+		//LOG.debug(">>>>RRD>>>>" + message);
 	}
 }

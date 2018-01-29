@@ -11,12 +11,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper; 
  
 
 public class PoloPairListener {
+    /** Logger */
+    private static Logger LOG = LoggerFactory.getLogger(PoloPairListener.class);	
+ 		
 
 	static Set<String> valutas= new  HashSet<String>();
 	static Set<String> bases= new  HashSet<String>();
@@ -51,11 +57,11 @@ public class PoloPairListener {
 					
 					try {
 						JsonNode nodeTmp = mapper.readTree(message);
-						//System.out.println(nodeTmp);
+						//LOG.debug(nodeTmp);
 						String theType = "" + nodeTmp.get(0); 
 						pairs.put(poloWS.getPairName(), ""+theType);
 						String currencyPair = nodeTmp .get(2) .get(0).get(1).get("currencyPair").asText();//:"BTC_NEOS",
-						System.out.println(currencyPair +" == "+ theType);
+						LOG.debug(currencyPair +" == "+ theType);
 						pairs.put(currencyPair, ""+theType);
 
 
@@ -67,12 +73,12 @@ public class PoloPairListener {
 						e.printStackTrace();
 					} catch (RuntimeException e) {
 						// ignore
-						//System.out.println("error processing  message: "+message);
+						//LOG.debug("error processing  message: "+message);
 						//throw new ErrorProcessingException(message);
 					}
 					
 					String nextUnknownPair = getNextUnknownPair();
-					//System.out.println("------------------------------"+nextUnknownPair);
+					//LOG.debug("------------------------------"+nextUnknownPair);
 					poloWS.setPairName(nextUnknownPair); 
 
 				}
@@ -119,7 +125,7 @@ public class PoloPairListener {
 				lineTmp = in.readLine();
 			}
 		}
-		System.out.println(valutas);
+		LOG.debug("valutas::"+valutas);
 		
 		for (int i=0; i<bases.size();i++) {
 			for (int j=0; j<valutas.size();j++) {
@@ -129,7 +135,7 @@ public class PoloPairListener {
 				//allpossiblepairs.add(tarTMP+"_"+srcTMP);
 			}			
 		}
-		System.out.println(allpossiblepairs);
+		LOG.debug("allpossiblepairs:"+allpossiblepairs);
 	}
 	
 	

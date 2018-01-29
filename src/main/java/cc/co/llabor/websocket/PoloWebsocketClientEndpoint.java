@@ -13,6 +13,9 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
  
 /**
  * ChatServer Client
@@ -21,7 +24,9 @@ import javax.websocket.WebSocketContainer;
  */
 @ClientEndpoint
 public class PoloWebsocketClientEndpoint extends DestroyableWebSocketClientEndpoint{
-
+    /** Logger */
+    private static Logger LOG = LoggerFactory.getLogger(PoloWebsocketClientEndpoint.class);	
+ 
 
  
 
@@ -52,7 +57,7 @@ public class PoloWebsocketClientEndpoint extends DestroyableWebSocketClientEndpo
      */
     @OnOpen
     public void onOpen(Session userSession) {
-        System.out.println("opening websocket");
+        LOG.debug("opening websocket");
         this.userSession = userSession;
         
         userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1001}");
@@ -74,7 +79,7 @@ public class PoloWebsocketClientEndpoint extends DestroyableWebSocketClientEndpo
 	        while (e.hasMoreElements()) {
 	          String key = e.nextElement();
 	          String value = pairs.getProperty(key);
-	          System.out.println(key + " -- " + pairs.getProperty(key));
+	          LOG.debug(key + " -- " + pairs.getProperty(key));
 	          userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\""+key+"\"}");
 	          try {
 				Thread.sleep(5);

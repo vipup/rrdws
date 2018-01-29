@@ -9,10 +9,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit; ;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory; ;
  
 
 public class WS2RRDPump implements DestroyTracker {
+    /** Logger */
+    private static Logger LOG = LoggerFactory.getLogger(WS2RRDPump.class);	
+	
+	
 
 	private static final String WSS_API2_POLONIEX_COM = "wss://api2.poloniex.com";
 	private static final String WS_SSO_AT_THE_HOST_8080_RRDSAAS_WEBSOCKET_CHAT = "ws://sso.at.the.host:8080/rrdsaas/websocket/chat";
@@ -22,7 +29,7 @@ public class WS2RRDPump implements DestroyTracker {
 	private boolean alive;
 	@Override
 	public void destroyed(DestroyableWebSocketClientEndpoint destroyableWebSocketClientEndpoint) {
-		System.out.println("initially was DESTROYED:"+destroyableWebSocketClientEndpoint);
+		LOG.debug("initially was DESTROYED:"+destroyableWebSocketClientEndpoint);
 		// close the rest...
 		this.destroy();
 		
@@ -33,8 +40,10 @@ public class WS2RRDPump implements DestroyTracker {
 	}
 
 	private void start() throws URISyntaxException {
+		LOG.debug("start RRDWS...");
 		// open RRD-websocket
 		createRRDWS(this);  
+		LOG.debug("start poloWS...");
 		// open POLO- websocket
 		createPoloWS(this);
 		this.alive = true;
@@ -65,8 +74,8 @@ public class WS2RRDPump implements DestroyTracker {
                 // Check pump any minute , and restart if something wrong
             	if (pump == null) {
             		try {
-            			System.out.println("new Pump created:"+pump);
             			pump = new WS2RRDPump ();
+            			LOG.debug("new Pump created:"+pump);
             			pump.start();
             			
 					} catch (URISyntaxException e) {
@@ -76,7 +85,7 @@ public class WS2RRDPump implements DestroyTracker {
             	}
             	if (!pump.isAlive()) { // check fo alive, and reInit
             		pump = null;
-            		System.out.println("Pump should be GCed.. ");
+            		LOG.debug("Pump should be GCed.. ");
             		System.gc();
             	}
             	
@@ -115,6 +124,7 @@ public class WS2RRDPump implements DestroyTracker {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		xpathREPO.clear();
 		alive = false;
 	}
 
@@ -139,10 +149,10 @@ public class WS2RRDPump implements DestroyTracker {
 		}else {
 			if (alloweddebugging1.length()>10)
 			for (String key:xpathREPO.keySet()) {
-				System.out.println(key);
+				LOG.debug(key);
 			}
 			// 
-			//System.out.println("skipped");xpathREPO.clear();
+			//LOG.debug("skipped");xpathREPO.clear();
 		}
 		
 	}

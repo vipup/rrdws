@@ -9,7 +9,10 @@ import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.WebSocketContainer; 
+import javax.websocket.WebSocketContainer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory; 
 
 /**
  * ChatServer Client
@@ -18,11 +21,14 @@ import javax.websocket.WebSocketContainer;
  */
 @ClientEndpoint
 public class PoloOrderReader {
+    /** Logger */
+    private static Logger LOG = LoggerFactory.getLogger(PoloOrderReader.class);	
+ 	
 
     Session userSession = null;
     private MessageHandler_A messageHandler = new PoloOrderReader.MessageHandler_A() {
         public void handleMessage(String message) {
-            System.out.println("<<<<<<<<"+message);
+            LOG.debug("<<<<<<<<"+message);
         }
     };
 	private String pairName = "USDT_BTC";
@@ -52,7 +58,7 @@ public class PoloOrderReader {
      */
     @OnOpen
     public void onOpen(Session userSession) {
-        System.out.println("opening websocket");
+        LOG.debug("opening websocket");
         this.userSession = userSession;
         
         //userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1001}");
@@ -75,25 +81,25 @@ public class PoloOrderReader {
      */
     @OnClose
     public void onClose(Session userSession, CloseReason reason) {
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
-        System.out.println("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
+        LOG.debug("closing websocket. Reason:"+reason.getReasonPhrase());
         this.userSession = null;
     }
 
@@ -139,7 +145,7 @@ public class PoloOrderReader {
      * @param message
      */
     public void sendMessage(String message) {
-    	System.out.println(3); 
+    	LOG.debug(""+3); 
         this.userSession.getAsyncRemote().sendText(message);
     }
 

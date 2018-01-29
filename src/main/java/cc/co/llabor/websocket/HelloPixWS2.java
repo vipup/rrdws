@@ -2,9 +2,14 @@ package cc.co.llabor.websocket;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
  
 // https://stackoverflow.com/questions/26452903/javax-websocket-client-simple-example
 public class HelloPixWS2 {
+    /** Logger */
+    private static Logger LOG = LoggerFactory.getLogger(DestroyableWebSocketClientEndpoint.class);
 
     public static void main(String[] args) {
         try {
@@ -12,15 +17,15 @@ public class HelloPixWS2 {
             final PoloWebsocketClientEndpoint clientEndPoint = new PoloWebsocketClientEndpoint(new URI("wss://api2.poloniex.com"), null);
             
 
- System.out.println(1);
+ LOG.debug(""+1);
             
             // add listener
-            clientEndPoint.addMessageHandler(new PoloWebsocketClientEndpoint.MessageHandler() {
+            clientEndPoint.addMessageHandler(new MessageHandler() {
                 public void handleMessage(String message) {
-                    System.out.println("<<<<<<<<"+message);
+                    LOG.debug("<<<<<<<<"+message);
                 }
             });
-System.out.println(2);            
+LOG.debug(""+2);            
             
 
             // send message to websocket
