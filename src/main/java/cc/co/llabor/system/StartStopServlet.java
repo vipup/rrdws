@@ -75,11 +75,12 @@ public class StartStopServlet extends HttpServlet {
 		
 		initCollectD();		
 		
-		initMRTG();
-		 
 		initAlerter(); 
 		
-		initTschernoschima(); 
+		initTschernoschima();
+		
+//		initMRTG();
+		
 		
 		System.out.println("................................." );
 		System.out.println("................................." );

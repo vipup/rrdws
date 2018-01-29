@@ -41,7 +41,7 @@ public class MonitorEventSubscriber implements StatementSubscriber {
 		//Thread.currentThread().setContextClassLoader(RrdKeeper.class.getClassLoader());
 		Action rrdUpdateAction =  new RrdUpdateAction(); 
 		 
-		Object retval = rrdUpdateAction.perform(   "esper/helloworld/average10sec" ,  timeMs , ""+ avg );
+		Object retval = rrdUpdateAction.perform(   "esper/chernoshima/average10sec" ,  timeMs , ""+ avg );
 		LOG.trace("RRD action retval", retval);
 	
 	    StringBuilder sb = new StringBuilder();

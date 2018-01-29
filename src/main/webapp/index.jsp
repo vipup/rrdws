@@ -56,8 +56,8 @@
 		   			<h2><a href="XXX/AvenxoAdminTheme.html">AvenxoAdminTheme.html</a></h2>
 		   			<h2><a href="WS/index.xhtml">WebSocketDEMO</a></h2>
 		   			<h2><a href="rrdcalc.html">RRD CALC</a></h2>	
-		   			<h2><a href="/backup.htm">BACKUPRRD</a></h2>	
-		   			<h2><a href="/restore.htm">restore.RRD</a></h2>	
+		   			<h2><a href="backup.htm">BACKUPRRD</a></h2>	
+		   			<h2><a href="restore.htm">restore.RRD</a></h2>	
 		   			
 		   			
 		   			

@@ -55,9 +55,9 @@ public class WarningEventSubscriber implements StatementSubscriber {
 		//Thread.currentThread().setContextClassLoader(RrdKeeper.class.getClassLoader());
 		Action rrdUpdateAction =  new RrdUpdateAction(); 
 		 
-		Object retval = rrdUpdateAction.perform(   "esper/helloworld/warning/temp1"  ,  timeMs , ""+ temp1.getTemperature() );
+		Object retval = rrdUpdateAction.perform(   "esper/chernoshima/warning/temp1"  ,  timeMs , ""+ temp1.getTemperature() );
 		LOG.trace("RRD action retval", retval);
-		 retval = rrdUpdateAction.perform(   "esper/helloworld/warning/temp2"  ,  timeMs , ""+ temp2.getTemperature() );
+		 retval = rrdUpdateAction.perform(   "esper/chernoshima/warning/temp2"  ,  timeMs , ""+ temp2.getTemperature() );
 		LOG.trace("RRD action retval", retval);
 		        
 

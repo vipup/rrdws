@@ -65,13 +65,13 @@ public class CriticalEventSubscriber implements StatementSubscriber {
 		//Thread.currentThread().setContextClassLoader(RrdKeeper.class.getClassLoader());
 		Action rrdUpdateAction =  new RrdUpdateAction(); 
 		 
-		Object retval = rrdUpdateAction.perform(   "esper/helloworld/critical/temp1"  ,  timeMs , ""+ temp1.getTemperature() );
+		Object retval = rrdUpdateAction.perform(   "esper/chernoshima/critical/temp1"  ,  timeMs , ""+ temp1.getTemperature() );
 		LOG.trace("RRD action retval", retval);
-		 retval = rrdUpdateAction.perform(   "esper/helloworld/critical/temp2"  ,  timeMs , ""+ temp2.getTemperature() );
+		 retval = rrdUpdateAction.perform(   "esper/chernoshima/critical/temp2"  ,  timeMs , ""+ temp2.getTemperature() );
 		LOG.trace("RRD action retval", retval);
-		 retval = rrdUpdateAction.perform(   "esper/helloworld/critical/temp3"  ,  timeMs , ""+ temp3.getTemperature() );
+		 retval = rrdUpdateAction.perform(   "esper/chernoshima/critical/temp3"  ,  timeMs , ""+ temp3.getTemperature() );
 		LOG.trace("RRD action retval", retval);
-		 retval = rrdUpdateAction.perform(   "esper/helloworld/critical/temp4"  ,  timeMs , ""+ temp4.getTemperature() );
+		 retval = rrdUpdateAction.perform(   "esper/chernoshima/critical/temp4"  ,  timeMs , ""+ temp4.getTemperature() );
 		LOG.trace("RRD action retval", retval);
 		        
         
