@@ -24,9 +24,11 @@ public class WS2RRDPump implements DestroyTracker {
 	public void destroyed(DestroyableWebSocketClientEndpoint destroyableWebSocketClientEndpoint) {
 		System.out.println("initially was DESTROYED:"+destroyableWebSocketClientEndpoint);
 		// close the rest...
-		this.destroy();
+//		this.destroy();
 		
 	}
+	
+	long created = System.currentTimeMillis();
 	
 	public WS2RRDPump () throws URISyntaxException {
 		// start();
@@ -60,6 +62,10 @@ public class WS2RRDPump implements DestroyTracker {
         ses.scheduleWithFixedDelay(new Runnable() {
         	
         	WS2RRDPump pump = null;
+        	long inOUTMessageCounter = 0;//pump.rrdWS.inMessageCounter ); 
+        	long outOUTMessageCounter = 0;// pump.rrdWS.outMessageCounter ); 
+        	long outINMessageCounter = 0;//System.out.println( pump.poloWS.inMessageCounter ); 
+        	long inINMessageCounter = 0; //System.out.println( pump.poloWS.outMessageCounter );        	
             @Override
             public void run() {
                 // Check pump any minute , and restart if something wrong
@@ -78,11 +84,44 @@ public class WS2RRDPump implements DestroyTracker {
             		pump = null;
             		System.out.println("Pump should be GCed.. ");
             		System.gc();
-            	}
-            	
+            	}else if (System.currentTimeMillis() +5000 > pump.created ){ //
+            		System.out.println( "RRD:---<--"+pump.rrdWS.inMessageCounter  +"::---->"+ pump.rrdWS.outMessageCounter ); 
+            		System.out.println( "PLO <---  "+pump.poloWS.inMessageCounter +"!!---->"+ pump.poloWS.outMessageCounter );
+            		if (outOUTMessageCounter  > 1900 && outOUTMessageCounter == pump.rrdWS.outMessageCounter) {
+            			try {
+            				WS2RRDPump toDEL = pump;
+            				pump = null;
+            				toDEL.destroy();
+            				
+            				return;
+            			}catch(Throwable e) {
+            				e.printStackTrace();
+            			}
+            		}
+        		                                                                                          
+            		if (inINMessageCounter  > 1900 &&  inINMessageCounter == pump.poloWS.inMessageCounter) {
+            			try {
+            				WS2RRDPump toDEL = pump;
+            				pump = null;
+            				toDEL.destroy();
+            				
+            				return;
+            			}catch(Throwable e) {
+            				e.printStackTrace();
+            			}
+            		}
+            		outOUTMessageCounter = pump.rrdWS.outMessageCounter;
+            		inINMessageCounter  = pump.poloWS.inMessageCounter;
+            		// not insteresting
+            		inOUTMessageCounter =  pump.rrdWS.inMessageCounter;
+            		outINMessageCounter  = pump.poloWS.outMessageCounter;
+            		
+            		
+            		
+            	} 
             	
             }
-        }, 0, 1, TimeUnit.MINUTES);
+        }, 0, 11, TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
 	}
 	
 	

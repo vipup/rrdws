@@ -35,15 +35,16 @@ public class DestroyableWebSocketClientEndpoint {
     	MessageHandler bak = this.messageHandler ;
     	System.err.println(bak);
     	this.messageHandler = null; 
-    	WebSocketContainer container = userSession.getContainer();
-    	for (Session sessionTmp : userSession.getOpenSessions()) {
-    		sessionTmp .close();
-    	}
-    	container.setDefaultMaxTextMessageBufferSize(1);
-    	container.setDefaultMaxBinaryMessageBufferSize(1);
-    	container.setDefaultMaxSessionIdleTimeout(1);
-    	CloseReason reason = new CloseReason(CloseCodes.CLOSED_ABNORMALLY,  "destroyed by owner");
     	try {
+	    	WebSocketContainer container = userSession.getContainer();
+	    	for (Session sessionTmp : userSession.getOpenSessions()) {
+	    		sessionTmp .close();
+	    	}
+	    	container.setDefaultMaxTextMessageBufferSize(1);
+	    	container.setDefaultMaxBinaryMessageBufferSize(1);
+	    	container.setDefaultMaxSessionIdleTimeout(1);
+	    	CloseReason reason = new CloseReason(CloseCodes.CLOSED_ABNORMALLY,  "destroyed by owner");
+	
     		userSession.close( reason  );
     	}catch(Throwable e) {
     		e.printStackTrace();
@@ -86,6 +87,7 @@ public class DestroyableWebSocketClientEndpoint {
      */
     @OnMessage
     public void onMessage(String message) throws ErrorProcessingException {
+    	inMessageCounter ++;
         if (this.messageHandler != null) {
             this.messageHandler.handleMessage(message);
         }
@@ -108,11 +110,16 @@ public class DestroyableWebSocketClientEndpoint {
      * @param message
      */
     public void sendMessage(String message) {
-    	messageCunter ++; messagesPerSec++; sizePerSec+=message.length();
+    	outMessageCounter++; 
+    	messagesPerSec++; 
+    	sizePerSec+=message.length();
 		if (errorCounter > 1000  || (lastHandledTimestamp>111111111111L && System.currentTimeMillis()  -lastHandledTimestamp  >100000 )) { // FULL Restart
     	//	if ( System.currentTimeMillis() -1000 >lastHandledTimestamp ) {
 			
-			System.out.println("RRDSENDED:<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   " + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message["+messageCunter );
+			System.out.println("RRDSENDED:<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   " +
+			"/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::"			+
+			(sizePerSec/messagesPerSec) +" bytes/message["+inMessageCounter + "///"+ outMessageCounter 
+			);
 			lastHandledTimestamp = System.currentTimeMillis();
 			messagesPerSec = 0;
 			sizePerSec =0;
@@ -120,8 +127,9 @@ public class DestroyableWebSocketClientEndpoint {
         this.userSession.getAsyncRemote().sendText(message);
     }
     
-	long lastHandledTimestamp = 0;
-	long messageCunter = 0;
+    long lastHandledTimestamp = 0;
+    long outMessageCounter = 0;
+	long inMessageCounter = 0;
 	long messagesPerSec = 0;
 	long sizePerSec = 0;
 	long errorCounter = 0;

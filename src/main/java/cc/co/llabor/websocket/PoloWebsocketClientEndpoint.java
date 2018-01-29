@@ -125,7 +125,7 @@ public class PoloWebsocketClientEndpoint extends DestroyableWebSocketClientEndpo
     public void onMessage(String message) {
         if (this.messageHandler != null) {
         	try {
-        		this.messageHandler.handleMessage(message); 
+        		super.onMessage(message);
         	}catch(ErrorProcessingException e) {
         		if (e.getMessage().contains("1001,")) return;
         		if (e.getMessage().contains("1002,")) return;
