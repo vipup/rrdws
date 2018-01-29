@@ -9,17 +9,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory; ;
+import java.util.concurrent.TimeUnit; ;
  
 
 public class WS2RRDPump implements DestroyTracker {
-    /** Logger */
-    private static Logger LOG = LoggerFactory.getLogger(WS2RRDPump.class);	
-	
-	
 
 	private static final String WSS_API2_POLONIEX_COM = "wss://api2.poloniex.com";
 	private static final String WS_SSO_AT_THE_HOST_8080_RRDSAAS_WEBSOCKET_CHAT = "ws://sso.at.the.host:8080/rrdsaas/websocket/chat";
@@ -29,21 +22,21 @@ public class WS2RRDPump implements DestroyTracker {
 	private boolean alive;
 	@Override
 	public void destroyed(DestroyableWebSocketClientEndpoint destroyableWebSocketClientEndpoint) {
-		LOG.debug("initially was DESTROYED:"+destroyableWebSocketClientEndpoint);
+		System.out.println("initially was DESTROYED:"+destroyableWebSocketClientEndpoint);
 		// close the rest...
-		this.destroy();
+//		this.destroy();
 		
 	}
+	
+	long created = System.currentTimeMillis();
 	
 	public WS2RRDPump () throws URISyntaxException {
 		// start();
 	}
 
 	private void start() throws URISyntaxException {
-		LOG.debug("start RRDWS...");
 		// open RRD-websocket
 		createRRDWS(this);  
-		LOG.debug("start poloWS...");
 		// open POLO- websocket
 		createPoloWS(this);
 		this.alive = true;
@@ -69,13 +62,17 @@ public class WS2RRDPump implements DestroyTracker {
         ses.scheduleWithFixedDelay(new Runnable() {
         	
         	WS2RRDPump pump = null;
+        	long inOUTMessageCounter = 0;//pump.rrdWS.inMessageCounter ); 
+        	long outOUTMessageCounter = 0;// pump.rrdWS.outMessageCounter ); 
+        	long outINMessageCounter = 0;//System.out.println( pump.poloWS.inMessageCounter ); 
+        	long inINMessageCounter = 0; //System.out.println( pump.poloWS.outMessageCounter );        	
             @Override
             public void run() {
                 // Check pump any minute , and restart if something wrong
             	if (pump == null) {
             		try {
+            			System.out.println("new Pump created:"+pump);
             			pump = new WS2RRDPump ();
-            			LOG.debug("new Pump created:"+pump);
             			pump.start();
             			
 					} catch (URISyntaxException e) {
@@ -85,13 +82,46 @@ public class WS2RRDPump implements DestroyTracker {
             	}
             	if (!pump.isAlive()) { // check fo alive, and reInit
             		pump = null;
-            		LOG.debug("Pump should be GCed.. ");
+            		System.out.println("Pump should be GCed.. ");
             		System.gc();
-            	}
-            	
+            	}else if (System.currentTimeMillis() +5000 > pump.created ){ //
+            		System.out.println( "RRD:---<--"+pump.rrdWS.inMessageCounter  +"::---->"+ pump.rrdWS.outMessageCounter ); 
+            		System.out.println( "PLO <---  "+pump.poloWS.inMessageCounter +"!!---->"+ pump.poloWS.outMessageCounter );
+            		if (outOUTMessageCounter  > 1900 && outOUTMessageCounter == pump.rrdWS.outMessageCounter) {
+            			try {
+            				WS2RRDPump toDEL = pump;
+            				pump = null;
+            				toDEL.destroy();
+            				
+            				return;
+            			}catch(Throwable e) {
+            				e.printStackTrace();
+            			}
+            		}
+        		                                                                                          
+            		if (inINMessageCounter  > 1900 &&  inINMessageCounter == pump.poloWS.inMessageCounter) {
+            			try {
+            				WS2RRDPump toDEL = pump;
+            				pump = null;
+            				toDEL.destroy();
+            				
+            				return;
+            			}catch(Throwable e) {
+            				e.printStackTrace();
+            			}
+            		}
+            		outOUTMessageCounter = pump.rrdWS.outMessageCounter;
+            		inINMessageCounter  = pump.poloWS.inMessageCounter;
+            		// not insteresting
+            		inOUTMessageCounter =  pump.rrdWS.inMessageCounter;
+            		outINMessageCounter  = pump.poloWS.outMessageCounter;
+            		
+            		
+            		
+            	} 
             	
             }
-        }, 0, 1, TimeUnit.MINUTES);
+        }, 0, 11, TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
 	}
 	
 	
@@ -124,7 +154,6 @@ public class WS2RRDPump implements DestroyTracker {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		xpathREPO.clear();
 		alive = false;
 	}
 
@@ -149,10 +178,10 @@ public class WS2RRDPump implements DestroyTracker {
 		}else {
 			if (alloweddebugging1.length()>10)
 			for (String key:xpathREPO.keySet()) {
-				LOG.debug(key);
+				System.out.println(key);
 			}
 			// 
-			//LOG.debug("skipped");xpathREPO.clear();
+			//System.out.println("skipped");xpathREPO.clear();
 		}
 		
 	}
