@@ -10,11 +10,16 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import javax.websocket.CloseReason.CloseCodes;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
  
 
 @ClientEndpoint
 public class DestroyableWebSocketClientEndpoint {
- 
+    /** Logger */
+    private static Logger LOG = LoggerFactory.getLogger(DestroyableWebSocketClientEndpoint.class);	
+	
     Session userSession = null;
 	private DestroyTracker watchDog;
 	
@@ -54,7 +59,7 @@ public class DestroyableWebSocketClientEndpoint {
      */
     @OnOpen
     public void onOpen(Session userSession) {
-        System.out.println("opening websocket:"+this);
+    	LOG.debug("opening websocket:"+this);
         this.userSession = userSession;
     }
 
@@ -66,7 +71,7 @@ public class DestroyableWebSocketClientEndpoint {
      */
     @OnClose
     public void onClose(Session userSession, CloseReason reason) {
-        System.out.println("closing websocket :::"+this);
+        LOG.debug("closing websocket :::"+this);
         this.userSession = null;
     }
 
@@ -107,7 +112,7 @@ public class DestroyableWebSocketClientEndpoint {
 		if (errorCounter > 1000  || (lastHandledTimestamp>111111111111L && System.currentTimeMillis()  -lastHandledTimestamp  >100000 )) { // FULL Restart
     	//	if ( System.currentTimeMillis() -1000 >lastHandledTimestamp ) {
 			
-			System.out.println("RRDSENDED:<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   " +
+			LOG.debug("RRDSENDED:<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   " +
 			"/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::"			+
 			(sizePerSec/messagesPerSec) +" bytes/message["+inMessageCounter + "///"+ outMessageCounter 
 			);

@@ -13,12 +13,7 @@ import javax.websocket.WebSocketContainer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory; 
-
-/**
- * ChatServer Client
- *
- * @author Jiji_Sasidharan
- */
+ 
 @ClientEndpoint
 public class PoloOrderReader {
     /** Logger */
@@ -26,7 +21,7 @@ public class PoloOrderReader {
  	
 
     Session userSession = null;
-    private MessageHandler_A messageHandler = new PoloOrderReader.MessageHandler_A() {
+    private MessageHandler  messageHandler = new MessageHandler() {
         public void handleMessage(String message) {
             LOG.debug("<<<<<<<<"+message);
         }
@@ -59,18 +54,12 @@ public class PoloOrderReader {
     @OnOpen
     public void onOpen(Session userSession) {
         LOG.debug("opening websocket");
-        this.userSession = userSession;
+        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1001}");
+        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1002}");
+        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1003}"); 
         
-        //userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1001}");
+        this.userSession = userSession; 
         userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\""+this.getPairName() +"\"}");
-        //userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_XMR\"}");
-//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETH\"}");
-//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_REP\"}");
-//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETC\"}");
-//        
-        //userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1002}");
-        //userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1003}");
-        
     }
 
     /**
@@ -135,7 +124,7 @@ public class PoloOrderReader {
      *
      * @param msgHandler
      */
-    public void addMessageHandler(MessageHandler_A msgHandler) {
+    public void addMessageHandler(MessageHandler msgHandler) {
         this.messageHandler = msgHandler;
     }
 
@@ -149,15 +138,7 @@ public class PoloOrderReader {
         this.userSession.getAsyncRemote().sendText(message);
     }
 
-    /**
-     * Message handler.
-     *
-     * @author Jiji_Sasidharan
-     */
-    public static interface MessageHandler_A {
 
-        public void handleMessage(String message) throws ErrorProcessingException;
-    }
 
 	public String getPairName() {
 		// TODO Auto-generated method stub
@@ -165,8 +146,14 @@ public class PoloOrderReader {
 	}
 
 	public void setPairName(String pairName) {
-		//userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\""+this.getPairName() +"\"}");
+		unsubscribeCurrent();
 		this.pairName = pairName;
 		userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\""+this.getPairName() +"\"}");
+		
+	}
+
+	public void unsubscribeCurrent() {
+		userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\""+this.getPairName() +"\"}");
+		
 	}
 }

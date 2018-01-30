@@ -7,12 +7,8 @@ import org.slf4j.LoggerFactory;
 
 public final class RRDHandler implements MessageHandler {
     /** Logger */
-    private static Logger LOG = LoggerFactory.getLogger(PoloWebsocketClientEndpoint.class);	
+    private static Logger LOG = LoggerFactory.getLogger(RRDHandler.class);	
 
-    
-	/**
-	 * 
-	 */
 	private final WS2RRDPump RRDHandler;
 
 	/**

@@ -19,10 +19,7 @@ import org.jrobin.core.RrdException;
 import org.jrobin.graph.RrdGraphInfo;
 
 import ws.rrd.csv.RrdUpdateAction;
-  
-
-//import util.HTMLFilter;
-
+ 
 @ServerEndpoint(value = "/websocket/chat")
 public class ChatAnnotation {
 

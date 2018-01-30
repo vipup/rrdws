@@ -5,7 +5,12 @@ import java.net.URISyntaxException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-// https://stackoverflow.com/questions/26452903/javax-websocket-client-simple-example
+/**
+ * basic app for push one update over Websocket to rrdws.
+ * 
+ * @author i1
+ *
+ */
 public class TestApp {
     /** Logger */
     private static Logger LOG = LoggerFactory.getLogger(TestApp.class);	
@@ -14,7 +19,7 @@ public class TestApp {
     public static void main(String[] args) {
         try {
             // open websocket
-            final RRDWebsocketClientEntPoint clientEndPoint = new RRDWebsocketClientEntPoint(new URI("ws://sso.at.the.host:8080/rrdsaas/websocket/chat"), null);
+            final RRDWSEndpoint clientEndPoint = new RRDWSEndpoint(new URI("ws://sso.at.the.host:8080/rrdsaas/websocket/chat"), null);
 
             // add listener
             clientEndPoint.addMessageHandler(new MessageHandler() {

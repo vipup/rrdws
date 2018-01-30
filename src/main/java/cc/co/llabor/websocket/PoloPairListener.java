@@ -18,7 +18,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper; 
  
-
+/**
+ * this class will retrieve the info for content of 
+ * 						/rrd/src/main/resources/cc/co/llabor/websocket/poloALL.txt |polo.txt
+ * directli from service provider
+ * 
+ * @author i1
+ *
+ */
 public class PoloPairListener {
     /** Logger */
     private static Logger LOG = LoggerFactory.getLogger(PoloPairListener.class);	
@@ -33,38 +40,50 @@ public class PoloPairListener {
 	
     
 	public static final String getNextUnknownPair() {
-		String retval = (String) allpossiblepairs.toArray()[lastCcheched++]; 
+		int index = lastCcheched++;
+		if (index >allpossiblepairs.size()) {
+			try {
+				Thread.sleep(1111111);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		String retval = (String) allpossiblepairs.toArray()[index]; 
+		System.out.print(".");
+		try {
+			Thread.sleep(111);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return retval;
 	}  
     
 
-	public static void main(String[] args) throws IOException {
-		
-
+	public static void main(String[] args) throws IOException { 
 		initPairsFromFile();
 		try {
-			
-    		
-			
 			// open POLO- websocket
 			URI endpointURI = new URI("wss://api2.poloniex.com");
 			final PoloOrderReader poloWS = new PoloOrderReader(endpointURI);
 			// add listener - parce and "distribute
-			poloWS.addMessageHandler(new PoloOrderReader.MessageHandler_A() {
+			poloWS.addMessageHandler(new MessageHandler() {
 			
 				public void handleMessage(String message) throws ErrorProcessingException { 
-					ObjectMapper mapper = new ObjectMapper();
-					
+					ObjectMapper mapper = new ObjectMapper(); 
+					if ("{\"error\":\"Invalid channel.\"}".equals(message)) {
+						tryTheNextPair(poloWS);
+					}else
 					try {
 						JsonNode nodeTmp = mapper.readTree(message);
 						//LOG.debug(nodeTmp);
 						String theType = "" + nodeTmp.get(0); 
-						pairs.put(poloWS.getPairName(), ""+theType);
 						String currencyPair = nodeTmp .get(2) .get(0).get(1).get("currencyPair").asText();//:"BTC_NEOS",
-						LOG.debug(currencyPair +" == "+ theType);
-						pairs.put(currencyPair, ""+theType);
-
-
+						System.out.println(currencyPair +" == "+ theType);
+						pairs.put(currencyPair, ""+theType); 
+						// mined! :)
+						poloWS.unsubscribeCurrent();
 					} catch (JsonProcessingException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -75,12 +94,25 @@ public class PoloPairListener {
 						// ignore
 						//LOG.debug("error processing  message: "+message);
 						//throw new ErrorProcessingException(message);
+						//e.printStackTrace();
+						//poloWS.unsubscribeCurrent();
 					}
-					
-					String nextUnknownPair = getNextUnknownPair();
-					//LOG.debug("------------------------------"+nextUnknownPair);
-					poloWS.setPairName(nextUnknownPair); 
+					if (pairs.get(poloWS.getPairName())!=null) {
+						tryTheNextPair(poloWS); // "{"error":"Invalid channel."}"
+					}
 
+					
+				}
+
+				private void tryTheNextPair(final PoloOrderReader poloWS) {
+					try {
+						String nextUnknownPair = getNextUnknownPair();
+					//	LOG.debug("------------------------------"+nextUnknownPair);
+						poloWS.setPairName(nextUnknownPair);
+					}catch(Throwable e) {
+						// ignore
+						e.printStackTrace();
+					}
 				}
 
 
@@ -131,26 +163,13 @@ public class PoloPairListener {
 			for (int j=0; j<valutas.size();j++) {
 				String tarTMP = (String) bases.toArray()[i];
 				String srcTMP =(String) valutas.toArray()[j];
-				allpossiblepairs.add(srcTMP+"_"+tarTMP);
-				//allpossiblepairs.add(tarTMP+"_"+srcTMP);
+				allpossiblepairs.add(srcTMP+"_"+tarTMP); 
+				allpossiblepairs.add(tarTMP+"_"+srcTMP); 
 			}			
 		}
-		LOG.debug("allpossiblepairs:"+allpossiblepairs);
+		LOG.warn("allpossiblepairs:"+allpossiblepairs);
 	}
 	
-	
-	
-//	if (pairID == null) { // unknown pair
-//		pairs.put("TODO", pairTMP);
-//		// subscribe
-////			userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\""+pairTMP+"\"}");
-////			userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\"BTC_XRP\"}");
-//		// cansel till next time
-//		break;
-//	}else {
-//		// ignore
-//		
-//	}
-  
+	 
 
 }

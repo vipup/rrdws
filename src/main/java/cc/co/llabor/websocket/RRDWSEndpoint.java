@@ -11,9 +11,9 @@ import javax.websocket.WebSocketContainer;
  * @author Jiji_Sasidharan
  */
 @ClientEndpoint
-public class RRDWebsocketClientEntPoint extends DestroyableWebSocketClientEndpoint{
+public class RRDWSEndpoint extends DestroyableWebSocketClientEndpoint{
 
-	public RRDWebsocketClientEntPoint(URI endpointURI, DestroyTracker watchDog) {
+	public RRDWSEndpoint(URI endpointURI, DestroyTracker watchDog) {
 		super(watchDog);
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();

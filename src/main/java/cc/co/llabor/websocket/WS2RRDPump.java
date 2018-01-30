@@ -4,25 +4,30 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Map; 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit; ;
+import java.util.concurrent.TimeUnit; 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory; ;
  
 
 public class WS2RRDPump implements DestroyTracker {
+    /** Logger */
+    private static Logger LOG = LoggerFactory.getLogger(WS2RRDPump.class);	
+	
+	
+	 	
 
 	private static final String WSS_API2_POLONIEX_COM = "wss://api2.poloniex.com";
 	private static final String WS_SSO_AT_THE_HOST_8080_RRDSAAS_WEBSOCKET_CHAT = "ws://sso.at.the.host:8080/rrdsaas/websocket/chat";
 	static final String PO_LO = "/PoLo";
-	RRDWebsocketClientEntPoint rrdWS ;
-	PoloWebsocketClientEndpoint poloWS;
+	RRDWSEndpoint rrdWS ;
+	PoloWSEndpoint poloWS;
 	private boolean alive;
 	@Override
 	public void destroyed(DestroyableWebSocketClientEndpoint destroyableWebSocketClientEndpoint) {
-		System.out.println("initially was DESTROYED:"+destroyableWebSocketClientEndpoint);
+		LOG.debug("initially was DESTROYED:"+destroyableWebSocketClientEndpoint);
 		// close the rest...
 //		this.destroy();
 		
@@ -35,23 +40,24 @@ public class WS2RRDPump implements DestroyTracker {
 	}
 
 	private void start() throws URISyntaxException {
+		LOG.debug("start RRDWS...");
 		// open RRD-websocket
 		createRRDWS(this);  
+		LOG.debug("start poloWS...");
 		// open POLO- websocket
 		createPoloWS(this);
 		this.alive = true;
 	}
-
 	private void createPoloWS(DestroyTracker watchDog) throws URISyntaxException {
 		URI endpointURI = new URI(WSS_API2_POLONIEX_COM);
-		poloWS = new PoloWebsocketClientEndpoint(endpointURI, watchDog );
+		poloWS = new PoloWSEndpoint(endpointURI, watchDog );
 					// add listener - parce and "distribute
 					poloWS.addMessageHandler(new PoloHandler(this));
 	}
 
 	private void createRRDWS(DestroyTracker watchDog) throws URISyntaxException {
 		URI endpointURI = new URI(WS_SSO_AT_THE_HOST_8080_RRDSAAS_WEBSOCKET_CHAT);
-		rrdWS = new RRDWebsocketClientEntPoint( endpointURI, watchDog );
+		rrdWS = new RRDWSEndpoint( endpointURI, watchDog );
 					// add listener - just print + ignore
 					rrdWS.addMessageHandler(new RRDHandler(this));
 	}
@@ -62,16 +68,16 @@ public class WS2RRDPump implements DestroyTracker {
         ses.scheduleWithFixedDelay(new Runnable() {
         	
         	WS2RRDPump pump = null;
-        	long inOUTMessageCounter = 0;//pump.rrdWS.inMessageCounter ); 
-        	long outOUTMessageCounter = 0;// pump.rrdWS.outMessageCounter ); 
-        	long outINMessageCounter = 0;//System.out.println( pump.poloWS.inMessageCounter ); 
-        	long inINMessageCounter = 0; //System.out.println( pump.poloWS.outMessageCounter );        	
+        	long inOUTMessageCounter = 0;// not used 
+        	long outOUTMessageCounter = 0;// ->RRD 
+        	long outINMessageCounter = 0;// not used
+        	long inINMessageCounter = 0; // POLO->        	
             @Override
             public void run() {
                 // Check pump any minute , and restart if something wrong
             	if (pump == null) {
             		try {
-            			System.out.println("new Pump created:"+pump);
+            			LOG.debug("new Pump created:"+pump);
             			pump = new WS2RRDPump ();
             			pump.start();
             			
@@ -82,11 +88,11 @@ public class WS2RRDPump implements DestroyTracker {
             	}
             	if (!pump.isAlive()) { // check fo alive, and reInit
             		pump = null;
-            		System.out.println("Pump should be GCed.. ");
+            		LOG.debug("Pump should be GCed.. ");
             		System.gc();
             	}else if (System.currentTimeMillis() +5000 > pump.created ){ //
-            		System.out.println( "RRD:---<--"+pump.rrdWS.inMessageCounter  +"::---->"+ pump.rrdWS.outMessageCounter ); 
-            		System.out.println( "PLO <---  "+pump.poloWS.inMessageCounter +"!!---->"+ pump.poloWS.outMessageCounter );
+            		LOG.debug( "RRD:---<--"+pump.rrdWS.inMessageCounter  +"::---->"+ pump.rrdWS.outMessageCounter ); 
+            		LOG.debug("PLO <---  "+pump.poloWS.inMessageCounter +"!!---->"+ pump.poloWS.outMessageCounter );
             		if (outOUTMessageCounter  > 1900 && outOUTMessageCounter == pump.rrdWS.outMessageCounter) {
             			try {
             				WS2RRDPump toDEL = pump;
@@ -160,7 +166,7 @@ public class WS2RRDPump implements DestroyTracker {
 
 	static Map<String, String> xpathREPO = new HashMap<String, String>();
 	
-	static void createRRDandPushXpathToRegistry(final RRDWebsocketClientEntPoint rrdWS, String xpath2rrd) {
+	static void createRRDandPushXpathToRegistry(final RRDWSEndpoint rrdWS, String xpath2rrd) {
 		// TODO : here we are using the common rrd-create command with the same hash-function for 
 		// transformation XPATH->X-FILENAME.rrd
 		// after creating the same xpath have to be "synchronized with rrd-registry
@@ -178,7 +184,7 @@ public class WS2RRDPump implements DestroyTracker {
 		}else {
 			if (alloweddebugging1.length()>10)
 			for (String key:xpathREPO.keySet()) {
-				System.out.println(key);
+				LOG.debug(key);
 			}
 			// 
 			//System.out.println("skipped");xpathREPO.clear();

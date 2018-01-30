@@ -13,19 +13,19 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
  
-/**
- * ChatServer Client
- *
- * @author Jiji_Sasidharan
- */
+
 @ClientEndpoint
-public class PoloWebsocketClientEndpoint extends DestroyableWebSocketClientEndpoint{
+public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
 
-
+    /** Logger */
+    private static Logger LOG = LoggerFactory.getLogger(PoloWSEndpoint.class);	
  
 
-    public PoloWebsocketClientEndpoint(URI endpointURI, DestroyTracker watchDog) {
+    public PoloWSEndpoint(URI endpointURI, DestroyTracker watchDog) {
     	super(watchDog);
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
@@ -52,17 +52,8 @@ public class PoloWebsocketClientEndpoint extends DestroyableWebSocketClientEndpo
      */
     @OnOpen
     public void onOpen(Session userSession) {
-        System.out.println("opening websocket");
+    	LOG.debug("opening websocket");
         this.userSession = userSession;
-        
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1001}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1002}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1003}");
-//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_BTC\"}");
-//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_XMR\"}");
-//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETH\"}");
-//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_REP\"}");
-//        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\"USDT_ETC\"}");
  
 		InputStream inStream = PoloPairListener.class.getClassLoader().getResourceAsStream("cc/co/llabor/websocket/polo.txt");
 		Properties pairsToSubscribe= new Properties();
@@ -74,7 +65,7 @@ public class PoloWebsocketClientEndpoint extends DestroyableWebSocketClientEndpo
 	        while (e.hasMoreElements()) {
 	          String key = e.nextElement();
 	          String value = pairs.getProperty(key);
-	          System.out.println(key + " -- " + pairs.getProperty(key));
+	          LOG.debug(key + " -- " + pairs.getProperty(key));
 	          userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\""+key+"\"}");
 	          try {
 				Thread.sleep(5);
@@ -98,7 +89,6 @@ public class PoloWebsocketClientEndpoint extends DestroyableWebSocketClientEndpo
     	try {
 			initPairsFromFile() ;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
