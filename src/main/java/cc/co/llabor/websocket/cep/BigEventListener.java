@@ -10,7 +10,7 @@ public class BigEventListener implements UpdateListener {
 	public void update(EventBean[] newEvents, EventBean[] oldEvents) {
 		for (Object e:newEvents) {
 			MapEventBean eBean = (MapEventBean)e; 
-			System.out.println("++------------ ==:"+eBean.getProperties());
+			//System.out.println("++------------ ==:"+eBean.getProperties());
 		}
 
 	}

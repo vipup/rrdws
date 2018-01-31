@@ -21,7 +21,8 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import cc.co.llabor.websocket.cep.CEPListener;
 import cc.co.llabor.websocket.cep.Any3SecListener;
 import cc.co.llabor.websocket.cep.BigEventListener;
-import cc.co.llabor.websocket.cep.PoloTick; 
+import cc.co.llabor.websocket.cep.PoloTick;
+import cc.co.llabor.websocket.cep.RrdPusher; 
  
  
  
@@ -55,13 +56,24 @@ public final class PoloHandler implements MessageHandler {
 		cepRT = cep.getEPRuntime(); 
 	    cepAdm = cep.getEPAdministrator();
 	    int intPairCounter = 0;
+	    // TODO GOTO process1001	     
+	    RRDWSEndpoint rrdWS = this.poloHandler.rrdWS;
+	     
 	    for ( Object key : this.poloHandler.poloWS.id2pairs.keySet()) {
 	    	intPairCounter++;
-	    	if (intPairCounter<10)
+	    	//if (intPairCounter<10)
 	    	for (int pi=1; pi<esper1002PROPS.length;pi++) { // 
 	    		String properyNameTmp =  esper1002PROPS[pi];
 	    		String symTmp = (String) this.poloHandler.poloWS.id2pairs.get(key);
+	    		
 	    		String merticTmp = "_"+symTmp +"_"+properyNameTmp;
+	    		{// TODO GOTO process1001
+		    		String CID=symTmp;
+					String theNameOfProp=properyNameTmp;
+					
+					String XPATH_PMIN = calcXpath4RRD(CID, theNameOfProp);
+		    		WS2RRDPump.createRRDandPushXpathToRegistry(rrdWS, XPATH_PMIN);
+	    		}
 			    // step 1 : filter	    'AAPL'
 			    String eql1 = ""
 			    		//	+ "insert into AgregatingQueue  select symbol,price,avg(price) from " + "StockTick(symbol='AAPL').win:time(110 sec) ");	    
@@ -79,12 +91,32 @@ public final class PoloHandler implements MessageHandler {
 			    String eql2 = "insert into BigEvents "
 			    		+ "select '"+merticTmp+"' metric, sum(thecount) eventcount ,  "
 			    				+ " avg(theavg) avgA, count(theavg) coutA, min(theavg) minA , max(theavg) maxA "			    		
-				+ "from AgregatingQueue"+merticTmp+"( name='"+properyNameTmp+"').win:time_batch(3 sec) "; // TODO 33
+				+ "from AgregatingQueue"+merticTmp+"( name='"+properyNameTmp+"').win:time_batch(3 sec) "
+						+ ""; // TODO 33
 						
 			    //System.out.println(eql2);
 
 				EPStatement cepStatement3sec = cepAdm.createEPL(eql2); 
 				cepStatement3sec.addListener(new Any3SecListener(symTmp, properyNameTmp));
+				
+				
+			    // step 2a : print big events
+			    String eql3a = "select metric aMetric, eventcount,  sum(eventcount) itogo , avgA, minA,maxA,coutA  "
+			    		+ " from  BigEvents  "
+			    		+ " where "
+			    		+ " eventcount > 0 "
+			    		+ "AND "
+			    		+ "	metric =   '"+merticTmp+"'" 
+			    		+ " ";
+			    //System.out.println(eql3a);
+
+				
+			    EPStatement notNullEventsTmp = cepAdm.createEPL(eql3a); 
+				// TODO GOTO process1001
+//				String cmdTmp = WS2RRDPump.makeUpdateCMD(""+valueTMP, timestampTmp, XPATH_PMIN);
+//				rrdWS.sendMessage(cmdTmp);		
+			    notNullEventsTmp.addListener(new RrdPusher(symTmp,properyNameTmp, rrdWS));
+			    				
 			     
 	    	}
 	    }
@@ -95,8 +127,16 @@ public final class PoloHandler implements MessageHandler {
 	    EPStatement bigEventTmp = cepAdm.createEPL(eql3); 
 	    bigEventTmp.addListener(new BigEventListener());
 	    
+
+
+	    
 	    return cepRT;
 
+	}
+
+	public static final String calcXpath4RRD(String CID, String theNameOfProp) {
+		String XPATH_PMIN = WS2RRDPump.PO_LO + "/EQL3/" + CID + "/"+theNameOfProp;
+		return XPATH_PMIN;
 	}
 	long lastHandledTimestamp = 0;
 	long messageCounter = 0;
@@ -214,8 +254,14 @@ public final class PoloHandler implements MessageHandler {
 	//		TODO 1002:[175,"96.57521044","97.70007342","96.50036937","0.29284100","3167550.21052816","37226.26823435",0,"98.00000000","74.54091991"]
 	//		TICKER__ AUGUR???AUGUR???AUGUR???AUGUR???AUGUR???
 
+	// TODO remove at all this counter
+	long pro1002 = 0;
+	
 	private void process1002(RRDWSEndpoint rrdWS,  JsonNode nodeTmp) {
+		pro1002 ++;
+		if (pro1002%100 == 0)return;
 		// rrdWS.sendMessage("update " + MARKET_PAIR + ".rrd " + " 920804700:12345 ");
+		// TODO GOTO process1001
 		JsonNode xxx = nodeTmp.get(2);
 		String CID = xxx.get(0).asText();
 		CID = poloHandler.poloWS.getPairNameByID(CID);
@@ -227,6 +273,8 @@ public final class PoloHandler implements MessageHandler {
 			String theNameOfProp=  PROPS[i];
 			String XPATH_PMIN = WS2RRDPump.PO_LO + "/1002/" + CID + "/"+theNameOfProp;
 			WS2RRDPump.createRRDandPushXpathToRegistry(rrdWS, XPATH_PMIN);
+			
+			// TODO GOTO process1001
 			Long timestampTmp = System.currentTimeMillis();
 			String cmdTmp = WS2RRDPump.makeUpdateCMD(""+valueTMP, timestampTmp, XPATH_PMIN);
 			rrdWS.sendMessage(cmdTmp);						

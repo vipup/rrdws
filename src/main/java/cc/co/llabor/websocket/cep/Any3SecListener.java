@@ -21,7 +21,7 @@ public class Any3SecListener implements UpdateListener {
 		for (Object e:newEvents) {
 			MapEventBean eBean = (MapEventBean)e;
 			callCounter++;
-			System.out.println("++"+callCounter+"++"+symbol+":"+propertyName+" ==:"+eBean.getProperties());
+			//System.out.println("+"+callCounter+"+--:"+symbol+"."+propertyName+"  ==:"+eBean.getProperties());
 		}
 	}
 

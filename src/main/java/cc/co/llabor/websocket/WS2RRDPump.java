@@ -21,7 +21,7 @@ public class WS2RRDPump implements DestroyTracker {
 
 	private static final String WSS_API2_POLONIEX_COM = "wss://api2.poloniex.com";
 	private static final String WS_SSO_AT_THE_HOST_8080_RRDSAAS_WEBSOCKET_CHAT = "ws://sso.at.the.host:8080/rrdsaas/websocket/chat";
-	static final String PO_LO = "/PoLo";
+	public static final String PO_LO = "/PoLo";
 	RRDWSEndpoint rrdWS ;
 	PoloWSEndpoint poloWS;
 	private boolean alive;

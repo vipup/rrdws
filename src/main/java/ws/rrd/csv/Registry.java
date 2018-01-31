@@ -43,7 +43,7 @@ public class Registry implements Serializable{
 	Map<String, String> path2db = new TreeMap<String, String>();
 	
 	public Registry(Map<String, String> db2path2) {
-		this.db2path.putAll(db2path2);
+		this.db2path.putAll(db2path2);//db2path2.size()
 		for (String key :this.db2path.keySet()){
 			String value = this.db2path.get( key);
 			this.path2db.put(value ,key );
@@ -67,8 +67,9 @@ public class Registry implements Serializable{
 	public void unregister(String rrddb, String xpath) {
 		synchronized(Registry.class){
 			checkForUpdates();
-			db2path.remove(rrddb);
+			db2path.remove(rrddb);//db2path.size()
 			path2db.remove(xpath);
+			flush();
 			reset();
 		}
 	}
@@ -87,7 +88,7 @@ public class Registry implements Serializable{
 		}
 	}
 
-	public Map<String, String> getDb2path() {
+	public Map<String, String> getDb2path() {//db2path.size()
 			return Collections.unmodifiableMap(db2path);			
 	}
 
