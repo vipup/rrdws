@@ -2,7 +2,9 @@ package cc.co.llabor.websocket;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 import cc.co.llabor.websocket.cep.CEPListener;
+import cc.co.llabor.websocket.cep.OrderTick;
 import cc.co.llabor.websocket.cep.Any3SecListener;
 import cc.co.llabor.websocket.cep.BigEventListener;
 import cc.co.llabor.websocket.cep.PoloTick;
@@ -52,6 +55,9 @@ public final class PoloHandler implements MessageHandler {
 	    // The Configuration is meant only as an initialization-time object.
 	    Configuration cepConfig = new Configuration();
 	    cepConfig.addEventType("PoloTick", PoloTick.class.getName());	
+	    //
+	    cepConfig.addEventType("OrderTick", OrderTick.class.getName());	
+	    
 		EPServiceProvider cep = EPServiceProviderManager.getProvider("myCEPEngine", cepConfig);
 		cepRT = cep.getEPRuntime(); 
 	    cepAdm = cep.getEPAdministrator();
@@ -61,7 +67,7 @@ public final class PoloHandler implements MessageHandler {
 	     
 	    for ( Object key : this.poloHandler.poloWS.id2pairs.keySet()) {
 	    	intPairCounter++;
-	    	//if (intPairCounter<10)
+	    	// if (intPairCounter<10)
 	    	for (int pi=1; pi<esper1002PROPS.length;pi++) { // 
 	    		String properyNameTmp =  esper1002PROPS[pi];
 	    		String symTmp = (String) this.poloHandler.poloWS.id2pairs.get(key);
@@ -188,7 +194,8 @@ public final class PoloHandler implements MessageHandler {
 				process121(poloHandler.rrdWS,  nodeTmp);
 			else if (poloHandler.poloWS.getPairNameByID(theType) != null ) {
 				String MARKET_PAIR = poloHandler.poloWS.getPairNameByID(theType);
-				processXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);;
+				processXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
+				esperXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
 			} else if ("1002".equals(theType)) {
 				process1002(poloHandler.rrdWS,  nodeTmp);
 				esper1002(poloHandler.rrdWS,  nodeTmp);
@@ -256,10 +263,12 @@ public final class PoloHandler implements MessageHandler {
 
 	// TODO remove at all this counter
 	long pro1002 = 0;
+
+
 	
 	private void process1002(RRDWSEndpoint rrdWS,  JsonNode nodeTmp) {
 		pro1002 ++;
-		if (pro1002%100 == 0)return;
+		//if (pro1002%1 != 0)return;
 		// rrdWS.sendMessage("update " + MARKET_PAIR + ".rrd " + " 920804700:12345 ");
 		// TODO GOTO process1001
 		JsonNode xxx = nodeTmp.get(2);
@@ -306,9 +315,76 @@ public final class PoloHandler implements MessageHandler {
 	        cepRT.sendEvent(tick); 
 		}
 	 
-	}	
+	}
+	// http://www.espertech.com/esper/solution-patterns/#aggregate-3
+	// select avg(value) as avgValue, count(value) as countValue,
+	//min(value) as minValue, max(value) as maxValue from MyEvent#time(60 sec)
+	// TODO http://www.espertech.com/esper/solution-patterns/#triple-bottom-pattern
+	private void esperXXXYYY(RRDWSEndpoint rrdWS, String MARKET_PAIR, JsonNode nodeTmp) {
+		JsonNode xxx = nodeTmp.get(2).get(0);
+		if ("o".equals( xxx.get(0).asText() ) ) {
+			String typeTMP = xxx.get(1).asText() ;
+			BigDecimal priceTMP = new BigDecimal(xxx.get(2).asText()); 
+			BigDecimal volTMP = new BigDecimal(xxx.get(3).asText());
 
+			
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 10 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 10 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 10 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 60 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 60 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 60 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 300 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 300 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 300 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 600 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 600 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 600 );
+			
+			OrderTick order = new OrderTick(MARKET_PAIR, typeTMP, priceTMP, volTMP );
+			// processing Event
+		    cepRT.sendEvent(order); 
+
+		    
+	 
+			
+		}else {
+			LOG.debug( "TODO XXXYYY_O:" + xxx);
+		}		
+	}
+	
+	private Map<String, RrdOrderUpdater> updaterRepo = new HashMap<String, RrdOrderUpdater>();
+
+	private void registerRRDUpdaterIfAny(RRDWSEndpoint rrdWS, String MARKET_PAIR, String typeTMP, String propPar, int timeWindowAverage) {
+		String XPATH_PREFIX = WS2RRDPump.PO_LO + "/EQLOrder/" +MARKET_PAIR +"/"+ typeTMP ;
+		// PRICE
+		String nsTmp = XPATH_PREFIX + "/"+ propPar+"_"+timeWindowAverage+"sec";
+		// TODO even don't think about sync :)))
+		if (updaterRepo.get(nsTmp)== null) {
+		// step 1 : 
+			String AGGRSUFFIX = (""+XPATH_PREFIX.hashCode()).replaceAll("-", "_");
+			String eqlDEFsec = " insert into OrderTick"+AGGRSUFFIX+""
+					+ " select avg ("+propPar+") as data from OrderTick(pair='"+MARKET_PAIR+"').win:time_batch( "+timeWindowAverage+" sec) ";
+			EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsec);
+			
+			// step 2 : 10 sec
+			String eql10sec = " select  data from OrderTick"+AGGRSUFFIX+".win:time( 10 sec) ";
+			EPStatement cep10sec= cepAdm.createEPL(eql10sec);
+			
+			RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp);
+			cep10sec.addListener(rrdUpdaterTmp);
+			updaterRepo.put(nsTmp,rrdUpdaterTmp);
+		}
+	}
+
+ 
+	
+	long xxyyycallcounter = 0;
 	private void processXXXYYY(RRDWSEndpoint rrdWS, String MARKET_PAIR, JsonNode nodeTmp) {
+		// TODO 
+		xxyyycallcounter++;
+		if (xxyyycallcounter%17!=0) return;
+		
 		JsonNode xxx = nodeTmp.get(2).get(0);
 		if ("o".equals( xxx.get(0).asText() ) ) {
 			String typeTMP = xxx.get(1).asText() ;
@@ -331,6 +407,7 @@ public final class PoloHandler implements MessageHandler {
 			WS2RRDPump.createRRDandPushXpathToRegistry(rrdWS, XPATH_TOTAL );
 			  cmdTmp = WS2RRDPump.makeUpdateCMD(""+priceTMP.multiply(volTMP), timestampTmp, XPATH_TOTAL );
 			rrdWS.sendMessage(cmdTmp);
+			//System.out.println("["+XPATH_TOTAL+">>"+cmdTmp);
 			
 		}else {
 			LOG.debug( "TODO XXXYYY_O:" + xxx);
