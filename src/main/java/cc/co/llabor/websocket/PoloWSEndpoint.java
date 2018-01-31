@@ -54,6 +54,10 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
     public void onOpen(Session userSession) {
     	LOG.debug("opening websocket");
         this.userSession = userSession;
+        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1001}");
+        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1002}");
+        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1003}");
+        
  
 		InputStream inStream = PoloPairListener.class.getClassLoader().getResourceAsStream("cc/co/llabor/websocket/polo.txt");
 		Properties pairsToSubscribe= new Properties();
