@@ -7,10 +7,23 @@ import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.espertech.esper.client.Configuration;
+import com.espertech.esper.client.EPAdministrator;
+import com.espertech.esper.client.EPRuntime;
+import com.espertech.esper.client.EPServiceProvider;
+import com.espertech.esper.client.EPServiceProviderManager;
+import com.espertech.esper.client.EPStatement;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
+
+import cc.co.llabor.websocket.cep.CEPListener;
+import cc.co.llabor.websocket.cep.Any3SecListener;
+import cc.co.llabor.websocket.cep.BigEventListener;
+import cc.co.llabor.websocket.cep.PoloTick; 
+ 
+ 
  
 
 public final class PoloHandler implements MessageHandler {
@@ -27,6 +40,63 @@ public final class PoloHandler implements MessageHandler {
 	 */
 	PoloHandler(WS2RRDPump ws2rrdPump) {
 		poloHandler = ws2rrdPump;
+		initCEP();
+	}
+	
+	EPAdministrator cepAdm;
+	EPRuntime cepRT;
+	String esper1002PROPS[] = {"N/A", "PRICELAST", "priceMax","PriceMin","PriceDiff", "volume24H","volumeTotal", "hight24H","low24H"};
+	EPRuntime initCEP(){
+
+	    // The Configuration is meant only as an initialization-time object.
+	    Configuration cepConfig = new Configuration();
+	    cepConfig.addEventType("PoloTick", PoloTick.class.getName());	
+		EPServiceProvider cep = EPServiceProviderManager.getProvider("myCEPEngine", cepConfig);
+		cepRT = cep.getEPRuntime(); 
+	    cepAdm = cep.getEPAdministrator();
+	    int intPairCounter = 0;
+	    for ( Object key : this.poloHandler.poloWS.id2pairs.keySet()) {
+	    	intPairCounter++;
+	    	if (intPairCounter<10)
+	    	for (int pi=1; pi<esper1002PROPS.length;pi++) { // 
+	    		String properyNameTmp =  esper1002PROPS[pi];
+	    		String symTmp = (String) this.poloHandler.poloWS.id2pairs.get(key);
+	    		String merticTmp = "_"+symTmp +"_"+properyNameTmp;
+			    // step 1 : filter	    'AAPL'
+			    String eql1 = ""
+			    		//	+ "insert into AgregatingQueue  select symbol,price,avg(price) from " + "StockTick(symbol='AAPL').win:time(110 sec) ");	    
+		 	    		+ " insert into AgregatingQueue"+merticTmp+"  "
+		 	    		+ " select name, symbol, price, avg(price) as theavg , count( * ) thecount"
+		 	    		+ " from PoloTick(symbol='"+symTmp+"')"
+		 	    				+ ".win:time(10 sec) "
+		 	    				+ "group by PoloTick.name"
+		 	    				//+ "where  (propertyName='"+properyNameTmp+"')"
+		 	    				;
+			    //System.out.println(eql1);
+				EPStatement cepStatement = cepAdm.createEPL(eql1);	    
+			    cepStatement.addListener(new CEPListener());
+			    // step 2 :  split / agregate by 10 sec	    
+			    String eql2 = "insert into BigEvents "
+			    		+ "select '"+merticTmp+"' metric, sum(thecount) eventcount ,  "
+			    				+ " avg(theavg) avgA, count(theavg) coutA, min(theavg) minA , max(theavg) maxA "			    		
+				+ "from AgregatingQueue"+merticTmp+"( name='"+properyNameTmp+"').win:time_batch(3 sec) "; // TODO 33
+						
+			    //System.out.println(eql2);
+
+				EPStatement cepStatement3sec = cepAdm.createEPL(eql2); 
+				cepStatement3sec.addListener(new Any3SecListener(symTmp, properyNameTmp));
+			     
+	    	}
+	    }
+	    
+	    // step 3 : print big events
+	    String eql3 = "select metric aMetric, eventcount,  sum(eventcount) itogo , avgA, minA,maxA,coutA from  BigEvents where eventcount >10 group by metric";
+	    System.out.println(eql3);
+	    EPStatement bigEventTmp = cepAdm.createEPL(eql3); 
+	    bigEventTmp.addListener(new BigEventListener());
+	    
+	    return cepRT;
+
 	}
 	long lastHandledTimestamp = 0;
 	long messageCounter = 0;
@@ -43,8 +113,7 @@ public final class PoloHandler implements MessageHandler {
 				try {
 					poloHandler.poloWS.destroy();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOG.error("poloHandler.poloWS.destroy();", e);
 				}
 			}
 			LOG.debug( "WSRECEIVE:<"+(lastHandledTimestamp-System.currentTimeMillis())+"<<<   " + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message[" +messageCounter );
@@ -71,7 +140,7 @@ public final class PoloHandler implements MessageHandler {
 				((TextNode) nodeTmp.get(2).get(0).get(1).get("currencyPair")).textValue();
 				existPairs = true;
 			}catch(Exception e) {
-				
+				// ignore
 			}
 			if ("1001".equals(theType)) {
 				process1001(poloHandler.rrdWS,  nodeTmp);
@@ -82,16 +151,15 @@ public final class PoloHandler implements MessageHandler {
 				processXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);;
 			} else if ("1002".equals(theType)) {
 				process1002(poloHandler.rrdWS,  nodeTmp);
+				esper1002(poloHandler.rrdWS,  nodeTmp);
 			} else {
 				process1003(poloHandler.rrdWS,   nodeTmp);
 			}
 
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("public void handleMessage(String message) throws ErrorProcessingException {;", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("public void handleMessage(String message) throws ErrorProcessingException {;", e);
 		} catch (RuntimeException e) {
 			errorCounter++;
 			// ignore
@@ -165,6 +233,32 @@ public final class PoloHandler implements MessageHandler {
 		}
 	 
 	}
+	private void esper1002(RRDWSEndpoint rrdWS,  JsonNode nodeTmp) {
+		// rrdWS.sendMessage("update " + MARKET_PAIR + ".rrd " + " 920804700:12345 ");
+		JsonNode xxx = nodeTmp.get(2);
+		String CID = xxx.get(0).asText();
+		CID = poloHandler.poloWS.getPairNameByID(CID);
+		
+
+		
+		for (int i=1;i<esper1002PROPS.length;i++) {
+			BigDecimal valueTMP = new BigDecimal(xxx.get(i).asText());
+			String theNameOfProp=  esper1002PROPS[i];
+			String XPATH_PMIN = WS2RRDPump.PO_LO + "/ESPER/" + CID + "/"+theNameOfProp;
+			// TODO once per TickType
+			WS2RRDPump.createRRDandPushXpathToRegistry(rrdWS, XPATH_PMIN);
+			Long timestampTmp = System.currentTimeMillis();
+			//String cmdTmp = WS2RRDPump.makeUpdateCMD(""+valueTMP, timestampTmp, XPATH_PMIN);
+			//rrdWS.sendMessage(cmdTmp);
+			BigDecimal price = valueTMP;
+			String symbol = CID;
+			String propertyName = theNameOfProp;
+			PoloTick tick = new PoloTick (symbol, propertyName , price, timestampTmp); 
+	        //System.out.println("Sending tick:" + tick); 
+	        cepRT.sendEvent(tick); 
+		}
+	 
+	}	
 
 	private void processXXXYYY(RRDWSEndpoint rrdWS, String MARKET_PAIR, JsonNode nodeTmp) {
 		JsonNode xxx = nodeTmp.get(2).get(0);

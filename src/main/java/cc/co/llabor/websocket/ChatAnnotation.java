@@ -23,7 +23,7 @@ import ws.rrd.csv.RrdUpdateAction;
 @ServerEndpoint(value = "/websocket/chat")
 public class ChatAnnotation {
 
-    private static final Log log = LogFactory.getLog(ChatAnnotation.class);
+    private static final Log LOG = LogFactory.getLog(ChatAnnotation.class);
 
     private static final String GUEST_PREFIX = "Guest";
     private static final AtomicInteger connectionIds = new AtomicInteger(0);
@@ -131,13 +131,12 @@ public class ChatAnnotation {
 			}catch(IOException e) {
 				// Ignore
 				session.getBasicRemote().sendText("RRDTOOL ioEx! :"+e.getMessage());
-				e.printStackTrace();
+				LOG.error("session.getBasicRemote().sendText(\"RRDTOOL ioEx! :\"+e.getMessage());", e) ;
 			} catch (RrdException e) {
 					session.getBasicRemote().sendText("ERROR: "+e.getMessage());
 			}
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOG.error("private void tryExecuteRRDToolCommand(String message) {", e1) ;
 		}
 	}
 
@@ -176,7 +175,7 @@ public class ChatAnnotation {
 
 	@OnError
     public void onError(Throwable t) throws Throwable {
-        log.error("Chat Error: " + t.toString(), t);
+		LOG.error("Chat Error: " + t.toString(), t);
     }
 
 
@@ -187,15 +186,14 @@ public class ChatAnnotation {
                     client.session.getBasicRemote().sendText(msg);
                 }
             } catch (IOException e) {
-            	log.fatal("Chat Error: Failed to send message to client", e);
+            	LOG.fatal("Chat Error: Failed to send message to client", e);
                 connections.remove(client);
                 try {
                     client.session.close();
                 } catch (IOException e1) {
                     // Ignore
-                	e1.printStackTrace();
-                	log.error("Chat Error: Failed to send message to client", e1);
                 	System.exit(-1111);
+                	LOG.error("client.session.close();", e1);
                 }
                 String message = String.format("* %s %s",
                         client.nickname, "has been disconnected.");

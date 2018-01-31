@@ -47,7 +47,11 @@ public class DestroyableWebSocketClientEndpoint {
     	}
     	
     	this.userSession = null;
-    	watchDog.destroyed(this);
+    	if (watchDog!=null) {
+    		watchDog.destroyed(this);
+    	}else {
+    		System.err.println("watchDog is NULL....");
+    	}
     }
 
     protected MessageHandler messageHandler ;

@@ -77,13 +77,13 @@ public class WS2RRDPump implements DestroyTracker {
                 // Check pump any minute , and restart if something wrong
             	if (pump == null) {
             		try {
-            			LOG.debug("new Pump created:"+pump);
             			pump = new WS2RRDPump ();
+            			LOG.debug("new Pump created:"+pump);
             			pump.start();
+            			LOG.debug("..and started.");
             			
 					} catch (URISyntaxException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOG.error("LOG.debug(\"new Pump created:\"+pump);", e) ;
 					}
             	}
             	if (!pump.isAlive()) { // check fo alive, and reInit
@@ -101,7 +101,7 @@ public class WS2RRDPump implements DestroyTracker {
             				
             				return;
             			}catch(Throwable e) {
-            				e.printStackTrace();
+            				LOG.error("outOUTMessageCounter  > 1900 && outOUTMessageCounter == pump.rrdWS.outMessageCounter;", e) ;
             			}
             		}
         		                                                                                          
@@ -113,7 +113,7 @@ public class WS2RRDPump implements DestroyTracker {
             				
             				return;
             			}catch(Throwable e) {
-            				e.printStackTrace();
+            				LOG.error("inINMessageCounter  > 1900 &&  inINMessageCounter == pump.poloWS.inMessageCounter;", e) ;
             			}
             		}
             		outOUTMessageCounter = pump.rrdWS.outMessageCounter;
@@ -143,22 +143,18 @@ public class WS2RRDPump implements DestroyTracker {
 			this.rrdWS.destroy();
 			this.rrdWS = null;
 		} catch (RuntimeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("this.rrdWS.destroy();", e) ;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("this.rrdWS.destroy();", e) ;
 		}
 		try {
 			this.poloWS.addMessageHandler(null);
 			this.poloWS.destroy();
 			this.poloWS = null;
 		} catch (RuntimeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("this.poloWS.destroy();;", e) ;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("this.poloWS.destroy();;", e) ;
 		}
 		alive = false;
 	}

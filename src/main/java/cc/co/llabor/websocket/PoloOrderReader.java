@@ -110,11 +110,7 @@ public class PoloOrderReader {
         		//pairs.get("TODO")
         		//userSession.getAsyncRemote().sendText("{\"command\":\"unsubscribe\",\"channel\":\""+this.getPairName()+"\"}");
         		//System.err.println(e.getMessage());
-        	} 
-//        	catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+        	}  
         }
     }
     

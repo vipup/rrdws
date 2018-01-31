@@ -74,13 +74,11 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
 	          try {
 				Thread.sleep(5);
 			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				initPairsFromFile() ;;
 			}
 	        }
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (IOException e) {
+			LOG.error("this.poloWS.destroy();;", e) ;
 		}
       
         
@@ -93,7 +91,7 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
     	try {
 			initPairsFromFile() ;
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOG.error("initPairsFromFile() ;", e) ;
 		}
     }
     

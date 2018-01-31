@@ -30,8 +30,7 @@ public final class RRDHandler implements MessageHandler {
 				try {
 					RRDHandler.rrdWS.destroy();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOG.error("RRDHandler.rrdWS.destroy();", e) ;
 				}
 			}						
 			LOG.debug("RRDRCVD:<<<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   " + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message["+messageCunter  );
