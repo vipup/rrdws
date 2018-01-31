@@ -14,7 +14,7 @@
 			<fileNamePattern>${catalina.base}/logs/archive/probe-%d{yyyyMMdd}-%i.log.zip
 			</fileNamePattern>
 			<maxHistory>10</maxHistory>
-			<cleanHistoryOnStart>true</cleanHistoryOnStart>
+			<cleanHistoryOnStart>false</cleanHistoryOnStart>
 			<maxFileSize>20MB</maxFileSize>
 		</rollingPolicy>
 	</appender>
