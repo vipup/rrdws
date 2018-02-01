@@ -29,7 +29,7 @@ public class DestroyableWebSocketClientEndpoint {
 
 	public void destroy() throws IOException {
     	MessageHandler bak = this.messageHandler ;
-    	System.err.println(bak);
+    	System.err.println("BACK::"+bak);
     	this.messageHandler = null; 
     	try {
 	    	WebSocketContainer container = userSession.getContainer();
@@ -41,7 +41,7 @@ public class DestroyableWebSocketClientEndpoint {
 	    	container.setDefaultMaxSessionIdleTimeout(1);
 	    	CloseReason reason = new CloseReason(CloseCodes.CLOSED_ABNORMALLY,  "destroyed by owner");
 	
-    		userSession.close( reason  );
+    		//userSession.close( reason  );
     	}catch(Throwable e) {
     		e.printStackTrace();
     	}

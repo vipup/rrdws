@@ -62,6 +62,7 @@ public class WS2RRDPump implements DestroyTracker {
 					rrdWS.addMessageHandler(new RRDHandler(this));
 	}
 
+	static int restartCounter = 0;
 	public static void main(String[] args) {
         final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
         
@@ -74,6 +75,7 @@ public class WS2RRDPump implements DestroyTracker {
         	long inINMessageCounter = 0; // POLO->        	
             @Override
             public void run() {
+            	LOG.info("start#"+(restartCounter++)+" ...");
                 // Check pump any minute , and restart if something wrong
             	if (pump == null) {
             		try {
@@ -93,7 +95,7 @@ public class WS2RRDPump implements DestroyTracker {
             	}else if (System.currentTimeMillis() +5000 > pump.created ){ //
             		LOG.debug( "RRD:---<--"+pump.rrdWS.inMessageCounter  +"::---->"+ pump.rrdWS.outMessageCounter ); 
             		LOG.debug("PLO <---  "+pump.poloWS.inMessageCounter +"!!---->"+ pump.poloWS.outMessageCounter );
-            		if (outOUTMessageCounter  > 1900 && outOUTMessageCounter == pump.rrdWS.outMessageCounter) {
+            		if (System.currentTimeMillis() +25000 > pump.created  && outOUTMessageCounter == pump.rrdWS.outMessageCounter) {
             			try {
             				WS2RRDPump toDEL = pump;
             				pump = null;
@@ -105,7 +107,7 @@ public class WS2RRDPump implements DestroyTracker {
             			}
             		}
         		                                                                                          
-            		if (inINMessageCounter  > 1900 &&  inINMessageCounter == pump.poloWS.inMessageCounter) {
+            		if (System.currentTimeMillis() +25000 > pump.created &&  inINMessageCounter == pump.poloWS.inMessageCounter) {
             			try {
             				WS2RRDPump toDEL = pump;
             				pump = null;

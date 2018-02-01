@@ -122,7 +122,7 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
         		if (e.getMessage().contains("1001,")) return;
         		if (e.getMessage().contains("1002,")) return;
         		if (e.getMessage().contains("1003,")) return;
-        		System.err.println(e.getMessage());
+        		System.err.println("public void onMessage(String message) {"+e.getMessage());
         	} 
         }
     }
