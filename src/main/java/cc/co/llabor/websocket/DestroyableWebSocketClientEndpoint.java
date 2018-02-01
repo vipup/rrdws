@@ -91,7 +91,12 @@ public class DestroyableWebSocketClientEndpoint {
     public void onMessage(String message) throws ErrorProcessingException {
     	inMessageCounter ++;
         if (this.messageHandler != null) {
-            this.messageHandler.handleMessage(message);
+        	try {
+        		this.messageHandler.handleMessage(message);
+        	}catch(Throwable e) {
+        		LOG.error("public void onMessage(String message) throws ErrorProcessingException {",e);
+        		errorCounter++;
+        	}
         }
     }
 
@@ -126,7 +131,12 @@ public class DestroyableWebSocketClientEndpoint {
 			messagesPerSec = 0;
 			sizePerSec =0;
 		}
-        this.userSession.getAsyncRemote().sendText(message);
+		try {
+			this.userSession.getAsyncRemote().sendText(message);
+		}catch(Throwable e) {
+			errorCounter++;
+			LOG.error("public void sendMessage(String message) {",e);
+		} 
     }
     
     long lastHandledTimestamp = 0;

@@ -67,7 +67,7 @@ public final class PoloHandler implements MessageHandler {
 	     
 	    for ( Object key : this.poloHandler.poloWS.id2pairs.keySet()) {
 	    	intPairCounter++;
-	    	if (intPairCounter<10)
+	    	//if (intPairCounter<10)
 	    	for (int pi=1; pi<esper1002PROPS.length;pi++) { // 
 	    		String properyNameTmp =  esper1002PROPS[pi];
 	    		String symTmp = (String) this.poloHandler.poloWS.id2pairs.get(key);
@@ -97,7 +97,7 @@ public final class PoloHandler implements MessageHandler {
 			    String eql2 = "insert into BigEvents "
 			    		+ "select '"+merticTmp+"' metric, sum(thecount) eventcount ,  "
 			    				+ " avg(theavg) avgA, count(theavg) coutA, min(theavg) minA , max(theavg) maxA "			    		
-				+ "from AgregatingQueue"+merticTmp+"( name='"+properyNameTmp+"').win:time_batch(3 sec) "
+				+ "from AgregatingQueue"+merticTmp+"( name='"+properyNameTmp+"').win:time_batch(33 sec) "
 						+ ""; // TODO 33
 						
 			    //System.out.println(eql2);
@@ -368,7 +368,7 @@ public final class PoloHandler implements MessageHandler {
 			EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsec);
 			
 			// step 2 : 10 sec
-			String eql10sec = " select  data from OrderTick"+AGGRSUFFIX+".win:time( 10 sec) ";
+			String eql10sec = " select  data from OrderTick"+AGGRSUFFIX+".win:time( 57 sec) ";
 			EPStatement cep10sec= cepAdm.createEPL(eql10sec);
 			
 			RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp);

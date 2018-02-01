@@ -47,6 +47,7 @@ public class WS2RRDPump implements DestroyTracker {
 		// open POLO- websocket
 		createPoloWS(this);
 		this.alive = true;
+		LOG.info("started.");
 	}
 	private void createPoloWS(DestroyTracker watchDog) throws URISyntaxException {
 		URI endpointURI = new URI(WSS_API2_POLONIEX_COM);
@@ -75,10 +76,11 @@ public class WS2RRDPump implements DestroyTracker {
         	long inINMessageCounter = 0; // POLO->        	
             @Override
             public void run() {
-            	LOG.info("start#"+(restartCounter++)+" ...");
+            	
                 // Check pump any minute , and restart if something wrong
-            	if (pump == null) {
+            	while (pump == null) {
             		try {
+            			LOG.info("start#"+(restartCounter++)+" ...");
             			pump = new WS2RRDPump ();
             			LOG.debug("new Pump created:"+pump);
             			pump.start();
@@ -99,7 +101,7 @@ public class WS2RRDPump implements DestroyTracker {
             			try {
             				WS2RRDPump toDEL = pump;
             				pump = null;
-            				toDEL.destroy();
+            				toDEL.destroy("if (System.currentTimeMillis() +125000 > pump.created  && outOUTMessageCounter  > 1900 && outOUTMessageCounter == pump.rrdWS.outMessageCounter) {");
             				
             				return;
             			}catch(Throwable e) {
@@ -111,7 +113,7 @@ public class WS2RRDPump implements DestroyTracker {
             			try {
             				WS2RRDPump toDEL = pump;
             				pump = null;
-            				toDEL.destroy();
+            				toDEL.destroy("if (System.currentTimeMillis() +125000 > pump.created && inINMessageCounter  > 1900 &&  inINMessageCounter == pump.poloWS.inMessageCounter) {");
             				
             				return;
             			}catch(Throwable e) {
@@ -129,7 +131,7 @@ public class WS2RRDPump implements DestroyTracker {
             	} 
             	
             }
-        }, 0, 120, TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
+        }, 0, 13, TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
 	}
 	
 	
@@ -139,7 +141,9 @@ public class WS2RRDPump implements DestroyTracker {
 		return alive;
 	}
 
-	private void destroy() {
+	private void destroy(String reasonPar) {
+		System.out.println("Destroy initiated..[" +reasonPar +"]");
+		LOG.error("Destroy initiated..");
 		try {
 			this.rrdWS.addMessageHandler(null);
 			this.rrdWS.destroy();
