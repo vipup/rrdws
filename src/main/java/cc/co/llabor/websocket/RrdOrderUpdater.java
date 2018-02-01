@@ -8,12 +8,14 @@ public class RrdOrderUpdater implements UpdateListener {
 	private String nsTmp;
 	private RRDWSEndpoint rrdWS;
 	private int callCounter = 0;
+	private String propPar = "data";
 	static int commonCounter = 0;
 	
 
-	public RrdOrderUpdater(RRDWSEndpoint rrdWS, String nsTmp) {
+	public RrdOrderUpdater(RRDWSEndpoint rrdWS, String nsTmp, String propPar2) {
 		this.nsTmp = nsTmp;
 		this.rrdWS = rrdWS;
+		this.propPar = propPar2;
 		WS2RRDPump.createRRDandPushXpathToRegistry(rrdWS, nsTmp  ); 		
 	}
 
@@ -26,6 +28,9 @@ public class RrdOrderUpdater implements UpdateListener {
 			rrdWS.sendMessage(cmdTmp);
 			callCounter++;
 			commonCounter++;
+			if (nsTmp.contains("/BTC_ETH/")) { 
+				System.out.println("+"+nsTmp+"+--:"+e.get("data") );
+			}			
 			//System.out.println("+"+callCounter+"+--:"+symbol+"."+propertyName+"  ==:"+eBean.getProperties());			
 			//System.out.println("+"+callCounter+"/"+commonCounter+" ::update "+nsTmp.toString());
 		}

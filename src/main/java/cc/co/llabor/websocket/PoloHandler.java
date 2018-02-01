@@ -349,15 +349,16 @@ public final class PoloHandler implements MessageHandler {
 			// step 1 : 
 			String AGGRSUFFIX = (""+XPATH_PREFIX.hashCode()).replaceAll("-", "_");
 			String eqlDEFsec = " insert into OrderTick"+AGGRSUFFIX+"  \n"
-					+ " select (  sum ("+propPar+") / count("+propPar+") ) data \n"
+					+ " select (  sum ("+propPar+") / count("+propPar+") ) data , \n"
+							+ " '"+propPar+"' name \n"
 					+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time_batch( "+timeWindowAverage+" sec) \n";
 			EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsec);
 			
 			// step 2 : 10 sec
-			String eql10sec = " select  data from OrderTick"+AGGRSUFFIX+".win:time( 10 sec) ";
+			String eql10sec = " select  data from OrderTick"+AGGRSUFFIX+".win:time( 10 sec) where name ='"+propPar+"'";
 			EPStatement cep10sec= cepAdm.createEPL(eql10sec);
 			
-			RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp);
+			RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, propPar);
 			cep10sec.addListener(rrdUpdaterTmp);
 			updaterRepo.put(nsTmp,rrdUpdaterTmp);
 			
