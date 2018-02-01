@@ -25,7 +25,8 @@ import cc.co.llabor.websocket.cep.OrderTick;
 import cc.co.llabor.websocket.cep.Any3SecListener;
 import cc.co.llabor.websocket.cep.BigEventListener;
 import cc.co.llabor.websocket.cep.PoloTick;
-import cc.co.llabor.websocket.cep.RrdPusher; 
+import cc.co.llabor.websocket.cep.RrdPusher;
+import cc.co.llabor.websocket.cep.StatisticPrinter; 
  
  
  
@@ -133,8 +134,23 @@ public final class PoloHandler implements MessageHandler {
 	    EPStatement bigEventTmp = cepAdm.createEPL(eql3); 
 	    bigEventTmp.addListener(new BigEventListener());
 	    
-
-
+	    // step 4: summaryze that all
+	    String eql4 = "insert into TicksPerSecond\n" + 
+	    		"select  'PoloTick' type,  symbol, count(*) as cnt\n" + 
+	    		"from PoloTick.win:time_batch(11 second)\n" + 
+	    		"group by symbol";
+	    EPStatement statStmtTmp = cepAdm.createEPL(eql4); 
+	    //statStmtTmp.addListener(new StatisticPrinter());
+	    
+	    
+	    
+	    // step 5: summaryze that all
+	    String eql5 = "" + 
+	    		"select   type , sum(  cnt  )" + 
+	    		"from TicksPerSecond.win:time_batch(1 second) " + 
+	    		"group by type";
+	    EPStatement statByTypeTmp = cepAdm.createEPL(eql5); 
+	    statByTypeTmp.addListener(new StatisticPrinter());	    
 	    
 	    return cepRT;
 
@@ -195,7 +211,7 @@ public final class PoloHandler implements MessageHandler {
 			else if (poloHandler.poloWS.getPairNameByID(theType) != null ) {
 				String MARKET_PAIR = poloHandler.poloWS.getPairNameByID(theType);
 				processXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
-				//esperXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
+				esperXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
 			} else if ("1002".equals(theType)) {
 				process1002(poloHandler.rrdWS,  nodeTmp);
 				esper1002(poloHandler.rrdWS,  nodeTmp);
@@ -361,7 +377,7 @@ public final class PoloHandler implements MessageHandler {
 		String nsTmp = XPATH_PREFIX + "/"+ propPar+"_"+timeWindowAverage+"sec";
 		// TODO even don't think about sync :)))
 		if (updaterRepo.get(nsTmp)== null) {
-		// step 1 : 
+			// step 1 : 
 			String AGGRSUFFIX = (""+XPATH_PREFIX.hashCode()).replaceAll("-", "_");
 			String eqlDEFsec = " insert into OrderTick"+AGGRSUFFIX+""
 					+ " select avg ("+propPar+") as data from OrderTick(pair='"+MARKET_PAIR+"').win:time_batch( "+timeWindowAverage+" sec) ";
@@ -374,6 +390,14 @@ public final class PoloHandler implements MessageHandler {
 			RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp);
 			cep10sec.addListener(rrdUpdaterTmp);
 			updaterRepo.put(nsTmp,rrdUpdaterTmp);
+			
+		    // step 4: summaryze that all
+		    String eql4 = "insert into TicksPerSecond\n" + 
+		    		"select pair symbol, 'OrderTick' type,    count(*) as cnt\n" + 
+		    		"from OrderTick.win:time_batch(10 second)\n" + 
+		    		"group by pair";
+		    EPStatement statStmtTmp = cepAdm.createEPL(eql4); 
+		    //statStmtTmp.addListener(new StatisticPrinter());
 		}
 	}
 
