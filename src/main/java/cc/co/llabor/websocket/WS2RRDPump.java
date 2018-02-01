@@ -40,10 +40,10 @@ public class WS2RRDPump implements DestroyTracker {
 	}
 
 	private void start() throws URISyntaxException {
-		LOG.debug("start RRDWS...");
+		LOG.info("start RRDWS...");
 		// open RRD-websocket
 		createRRDWS(this);  
-		LOG.debug("start poloWS...");
+		LOG.info("start poloWS...");
 		// open POLO- websocket
 		createPoloWS(this);
 		this.alive = true;
@@ -95,7 +95,7 @@ public class WS2RRDPump implements DestroyTracker {
             	}else if (System.currentTimeMillis() +5000 > pump.created ){ //
             		LOG.debug( "RRD:---<--"+pump.rrdWS.inMessageCounter  +"::---->"+ pump.rrdWS.outMessageCounter ); 
             		LOG.debug("PLO <---  "+pump.poloWS.inMessageCounter +"!!---->"+ pump.poloWS.outMessageCounter );
-            		if (System.currentTimeMillis() +25000 > pump.created  && outOUTMessageCounter == pump.rrdWS.outMessageCounter) {
+            		if (System.currentTimeMillis() +125000 > pump.created  && outOUTMessageCounter  > 1900 && outOUTMessageCounter == pump.rrdWS.outMessageCounter) {
             			try {
             				WS2RRDPump toDEL = pump;
             				pump = null;
@@ -107,7 +107,7 @@ public class WS2RRDPump implements DestroyTracker {
             			}
             		}
         		                                                                                          
-            		if (System.currentTimeMillis() +25000 > pump.created &&  inINMessageCounter == pump.poloWS.inMessageCounter) {
+            		if (System.currentTimeMillis() +125000 > pump.created && inINMessageCounter  > 1900 &&  inINMessageCounter == pump.poloWS.inMessageCounter) {
             			try {
             				WS2RRDPump toDEL = pump;
             				pump = null;
@@ -129,7 +129,7 @@ public class WS2RRDPump implements DestroyTracker {
             	} 
             	
             }
-        }, 0, 11, TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
+        }, 0, 120, TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
 	}
 	
 	

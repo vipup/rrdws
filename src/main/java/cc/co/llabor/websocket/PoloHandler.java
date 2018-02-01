@@ -67,7 +67,7 @@ public final class PoloHandler implements MessageHandler {
 	     
 	    for ( Object key : this.poloHandler.poloWS.id2pairs.keySet()) {
 	    	intPairCounter++;
-	    	// if (intPairCounter<10)
+	    	if (intPairCounter<10)
 	    	for (int pi=1; pi<esper1002PROPS.length;pi++) { // 
 	    		String properyNameTmp =  esper1002PROPS[pi];
 	    		String symTmp = (String) this.poloHandler.poloWS.id2pairs.get(key);
@@ -195,7 +195,7 @@ public final class PoloHandler implements MessageHandler {
 			else if (poloHandler.poloWS.getPairNameByID(theType) != null ) {
 				String MARKET_PAIR = poloHandler.poloWS.getPairNameByID(theType);
 				processXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
-				esperXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
+				//esperXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
 			} else if ("1002".equals(theType)) {
 				process1002(poloHandler.rrdWS,  nodeTmp);
 				esper1002(poloHandler.rrdWS,  nodeTmp);
