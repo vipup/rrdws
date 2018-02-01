@@ -30,6 +30,7 @@ public class RrdPusher implements UpdateListener {
 		for (Object e : newEvents) {
 			MapEventBean eBean = (MapEventBean) e;
 			value = eBean.getProperties().get("avgA");
+			if (value== null) continue;
 			//System.out.println("+#"+updateCounter+"#+-to RRD>---"+symbol+"."+propertyName+"-- ==:" + eBean.getProperties());
 			// TODO GOTO process1001
 			Long timestampTmp = System.currentTimeMillis();

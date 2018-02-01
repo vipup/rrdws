@@ -65,7 +65,8 @@ public final class PoloHandler implements MessageHandler {
 	    int intPairCounter = 0;
 	    // TODO GOTO process1001	     
 	    RRDWSEndpoint rrdWS = this.poloHandler.rrdWS;
-	     
+  
+		
 	    for ( Object key : this.poloHandler.poloWS.id2pairs.keySet()) {
 	    	intPairCounter++;
 	    	//if (intPairCounter<10)
@@ -80,59 +81,27 @@ public final class PoloHandler implements MessageHandler {
 					
 					String XPATH_PMIN = calcXpath4RRD(CID, theNameOfProp);
 		    		WS2RRDPump.createRRDandPushXpathToRegistry(rrdWS, XPATH_PMIN);
-	    		}
-			    // step 1 : filter	    'AAPL'
-			    String eql1 = ""
-			    		//	+ "insert into AgregatingQueue  select symbol,price,avg(price) from " + "StockTick(symbol='AAPL').win:time(110 sec) ");	    
-		 	    		+ " insert into AgregatingQueue"+merticTmp+"  "
-		 	    		+ " select name, symbol, price, avg(price) as theavg , count( * ) thecount"
-		 	    		+ " from PoloTick(symbol='"+symTmp+"')"
-		 	    				+ ".win:time(10 sec) "
-		 	    				+ "group by PoloTick.name"
-		 	    				//+ "where  (propertyName='"+properyNameTmp+"')"
-		 	    				;
-			    //System.out.println(eql1);
-				EPStatement cepStatement = cepAdm.createEPL(eql1);	    
-			    cepStatement.addListener(new CEPListener());
+	    		} 
 			    // step 2 :  split / agregate by 10 sec	    
-			    String eql2 = "insert into BigEvents "
-			    		+ "select '"+merticTmp+"' metric, sum(thecount) eventcount ,  "
-			    				+ " avg(theavg) avgA, count(theavg) coutA, min(theavg) minA , max(theavg) maxA "			    		
-				+ "from AgregatingQueue"+merticTmp+"( name='"+properyNameTmp+"').win:time_batch(33 sec) "
-						+ ""; // TODO 33
-						
-			    //System.out.println(eql2);
-
-				EPStatement cepStatement3sec = cepAdm.createEPL(eql2); 
-				cepStatement3sec.addListener(new Any3SecListener(symTmp, properyNameTmp));
-				
-				
-			    // step 2a : print big events
-			    String eql3a = "select metric aMetric, eventcount,  sum(eventcount) itogo , avgA, minA,maxA,coutA  "
-			    		+ " from  BigEvents  "
-			    		+ " where "
-			    		+ " eventcount > 0 "
-			    		+ "AND "
-			    		+ "	metric =   '"+merticTmp+"'" 
-			    		+ " ";
-			    //System.out.println(eql3a);
-
-				
-			    EPStatement notNullEventsTmp = cepAdm.createEPL(eql3a); 
-				// TODO GOTO process1001
-//				String cmdTmp = WS2RRDPump.makeUpdateCMD(""+valueTMP, timestampTmp, XPATH_PMIN);
-//				rrdWS.sendMessage(cmdTmp);		
+			    String avg10sec = "insert into BigEvents "
+			    		+ "select "
+			    		+ "		'"+merticTmp+"' metric, "
+			    		+ "		(sum(price)/count(price)) avgA   "
+			    		+ " "
+			    		+ "from PoloTick.win:time_batch(10 sec) "
+			    		+ "where  ("
+			    		+ "			name='"+properyNameTmp+"' and "
+			    				+ "	symbol='"+symTmp+"'  "
+			    		+ "  "
+			    				+ ")"
+						+ "";  
+			    //System.out.println(avg10sec);
+			    EPStatement notNullEventsTmp = cepAdm.createEPL(avg10sec); 	
 			    notNullEventsTmp.addListener(new RrdPusher(symTmp,properyNameTmp, rrdWS));
 			    				
 			     
 	    	}
 	    }
-	    
-	    // step 3 : print big events
-	    String eql3 = "select metric aMetric, eventcount,  sum(eventcount) itogo , avgA, minA,maxA,coutA from  BigEvents where eventcount >10 group by metric";
-	    System.out.println(eql3);
-	    EPStatement bigEventTmp = cepAdm.createEPL(eql3); 
-	    bigEventTmp.addListener(new BigEventListener());
 	    
 	    // step 4: summaryze that all
 	    String eql4 = "insert into TicksPerSecond\n" + 
@@ -347,15 +316,15 @@ public final class PoloHandler implements MessageHandler {
 			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 10 );
 			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 10 );
 			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 10 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 60 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 60 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 60 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 300 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 300 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 300 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 600 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 600 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 600 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 60 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 60 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 60 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 300 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 300 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 300 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 600 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 600 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 600 );
 			
 			OrderTick order = new OrderTick(MARKET_PAIR, typeTMP, priceTMP, volTMP );
 			// processing Event
@@ -379,12 +348,13 @@ public final class PoloHandler implements MessageHandler {
 		if (updaterRepo.get(nsTmp)== null) {
 			// step 1 : 
 			String AGGRSUFFIX = (""+XPATH_PREFIX.hashCode()).replaceAll("-", "_");
-			String eqlDEFsec = " insert into OrderTick"+AGGRSUFFIX+""
-					+ " select avg ("+propPar+") as data from OrderTick(pair='"+MARKET_PAIR+"').win:time_batch( "+timeWindowAverage+" sec) ";
+			String eqlDEFsec = " insert into OrderTick"+AGGRSUFFIX+"  \n"
+					+ " select (  sum ("+propPar+") / count("+propPar+") ) data \n"
+					+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time_batch( "+timeWindowAverage+" sec) \n";
 			EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsec);
 			
 			// step 2 : 10 sec
-			String eql10sec = " select  data from OrderTick"+AGGRSUFFIX+".win:time( 57 sec) ";
+			String eql10sec = " select  data from OrderTick"+AGGRSUFFIX+".win:time( 10 sec) ";
 			EPStatement cep10sec= cepAdm.createEPL(eql10sec);
 			
 			RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp);

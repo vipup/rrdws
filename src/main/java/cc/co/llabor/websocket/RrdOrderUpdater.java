@@ -22,6 +22,7 @@ public class RrdOrderUpdater implements UpdateListener {
 		for (EventBean e:newEvents) {
 			
 			String cmdTmp = WS2RRDPump.makeUpdateCMD(""+e.get("data") , System.currentTimeMillis() , nsTmp );
+			//System.out.println("+"+callCounter+"/"+commonCounter+" ::CMD ::"+cmdTmp);
 			rrdWS.sendMessage(cmdTmp);
 			callCounter++;
 			commonCounter++;
