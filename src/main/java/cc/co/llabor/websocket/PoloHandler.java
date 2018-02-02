@@ -346,51 +346,74 @@ public final class PoloHandler implements MessageHandler {
 		String XPATH_PREFIX = WS2RRDPump.PO_LO + "/EQLOrder/" +MARKET_PAIR +"/"+ typeTMP ;
 		// PRICE
 		String nsTmp = XPATH_PREFIX + "/"+ propPar+"_"+timeWindowAverage+"sec";
+		String AGGRSUFFIX = (""+nsTmp.hashCode()).replaceAll("-", "_");
 		// TODO even don't think about sync :)))
 		if (updaterRepo.get(nsTmp)== null) {
-			// step 1 : 
-			String AGGRSUFFIX = (""+XPATH_PREFIX.hashCode()).replaceAll("-", "_");
-			String eqlDEFsec = " insert into OrderTick"+AGGRSUFFIX+"  \n"
-					+ " select (  sum ("+propPar+") / count("+propPar+") ) data , \n"
-					+ "   "+ timeWindowAverage +" timewindow , \n"
-					+ " '"+propPar+"' name \n"
-					+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
-			// overwrite for all
-			//if (timeWindowAverage == 600)
-			//if ("price".equals(propPar))
-				eqlDEFsec = " insert into OrderTick"+AGGRSUFFIX+"  \n"
+			  
+			if ("price".equals(propPar)) {
+				// step 1 : 
+				
+				String 	eqlDEFsec = " insert into OrderTick"+AGGRSUFFIX+"  \n"
+							+ " select "
+							+ "   ( avg ( price )  ) data ,  \n"
+							+ "   ( avg ( price )  ) dataAVG ,  \n"
+							+ "   ( max ( price )  ) dataMAX ,  \n"
+							+ "   ( min ( price )  ) dataMIN ,  \n"
+							+ "   ( count ( price )  ) dataCNT ,  \n"
+							+ "   (  sum ( price ) / count( price ) ) dataCAL , \n"
+							+ "   (  sum (total) / sum (volume) ) dataTOV , \n"
+							+ "   "+ timeWindowAverage +" timewindow , \n"
+							+ " 'price' name \n"
+							+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
+				EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsec);
+				
+				// step 2 : 10 sec
+				String eql10sec = " insert into DiffTracker "
+						+ "select "
+						+ "		'"+MARKET_PAIR+"' pair, "
+						+ "		avg (dataMAX) dataMAX, "
+						+ "		avg (dataMIN) dataMIN, "
+						+ "		avg (dataAVG) dataAVG, "
+						+ "		avg (dataCNT) dataCNT, "
+						+ "		avg (dataCAL) dataCAL, "	
+						+ "		avg (dataTOV) dataTOV, "
+						+ "		'price' type, "
+						+ "		'"+timeWindowAverage+"' timewindow, "
+						+ "		'price'  name, "
+						+ "		avg( data ) data from OrderTick"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) "
+						+ " where name ='price' "
+								+ " and timewindow = "+timeWindowAverage+" ";
+				EPStatement cep10sec= cepAdm.createEPL(eql10sec);
+				
+				RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, "price");
+				cep10sec.addListener(rrdUpdaterTmp);
+				updaterRepo.put(nsTmp,rrdUpdaterTmp);
+				
+			
+			}else {
+				// step 1 : 
+				 
+				String 	eqlDEFsec = " insert into OrderTick_ELSE"+AGGRSUFFIX+"  \n"
 						+ " select "
-						+ "   ( avg ( price )  ) data ,  \n"
-						+ "   ( avg ( price )  ) dataAVG ,  \n"
-						+ "   ( max ( price )  ) dataMAX ,  \n"
-						+ "   ( min ( price )  ) dataMIN ,  \n"
-						+ "   ( count ( price )  ) dataCNT ,  \n"
-						+ "   (  sum ("+propPar+") / count("+propPar+") ) dataCAL , \n"
+						+ "   avg ("+propPar+") data ,  \n"    
 						+ "   "+ timeWindowAverage +" timewindow , \n"
-						+ " '"+propPar+"' name \n"
+						+ " '"+propPar+ "' name \n"
 						+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
-			EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsec);
-			
-			// step 2 : 10 sec
-			String eql10sec = " insert into DiffTracker "
-					+ "select "
-					+ "		'"+MARKET_PAIR+"' pair, "
-					+ "		avg (dataMAX) dataMAX, "
-					+ "		avg (dataMIN) dataMIN, "
-					+ "		avg (dataAVG) dataAVG, "
-					+ "		avg (dataCNT) dataCNT, "
-					+ "		avg (dataCAL) dataCAL, "					
-					+ "		'"+typeTMP+"' type, "
-					+ "		'"+timeWindowAverage+"' timewindow, "
-					+ "		'"+propPar+"' name, "
-					+ "		avg( data ) data from OrderTick"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) "
-					+ " where name ='"+propPar+"' "
-							+ " and timewindow = "+timeWindowAverage+" ";
-			EPStatement cep10sec= cepAdm.createEPL(eql10sec);
-			
-			RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, propPar);
-			cep10sec.addListener(rrdUpdaterTmp);
-			updaterRepo.put(nsTmp,rrdUpdaterTmp);
+				EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsec);
+				// step 2 : 10 sec
+				String eql10sec = "  "
+						+ " select "
+						+ "   avg (data) data ,  \n"    
+						+ "   "+ timeWindowAverage +" timewindow , \n"
+						+ " '"+propPar+ "' name \n"
+						+ "from OrderTick_ELSE"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) ";
+				
+				EPStatement cep10sec= cepAdm.createEPL(eql10sec);
+				
+				RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, propPar);
+				cep10sec.addListener(rrdUpdaterTmp);
+				updaterRepo.put(nsTmp,rrdUpdaterTmp);				
+			}
 			
 			// step 3 : diffTracker 
 			step3_doItOnlyOnce(); 
@@ -411,21 +434,25 @@ public final class PoloHandler implements MessageHandler {
 		// TODO init it only once
 		if (diffTracker == null) {
 /*
- * 					+ "		dataMAX, "
-					+ "		dataMIN, "
-					+ "		dataAVG, "
-					+ "		dataCNT, "
-					+ "		dataCAL, "				
+					+ "		avg (dataMAX) dataMAX, "
+					+ "		avg (dataMIN) dataMIN, "
+					+ "		avg (dataAVG) dataAVG, "
+					+ "		avg (dataCNT) dataCNT, "
+					+ "		avg (dataCAL) dataCAL, "	
+					+ "		avg (dataTOV) dataTOV, "				
  */
 			String eql3 = "" + 
 					"select name, timewindow, "
-					+ "( dataAVG - dataMAX ) 				downT , \n"
-					+ "( dataAVG - dataMIN ) 				upT ,\n"
-					+ "( dataAVG - dataMAX )/dataAVG*100 	downPER ,\n"
-					+ "( dataAVG - dataMIN )/dataAVG*100 	upPER ,\n"
+					+ "( dataAVG - dataTOV ) 				downT , \n"
+					+ "( dataAVG - dataTOV ) 				upT ,\n"
+					+ "( dataAVG - (dataMAX + dataMIN)/2 )/dataAVG*100 	downPER ,\n"
+					+ "( dataAVG - dataTOV )/dataAVG*100 	upPER ,\n"
 					+ " dataAVG avgT, \n"
 					+ " dataMAX maxT, \n"
 					+ " dataMIN minT, \n"
+					+ " dataCAL dCAL, \n"
+					+ " dataCNT dCNT, \n"
+					+ " dataTOV dTOV, \n"
 					+ " pair, \n"
 					+ " \n"
 					+ " type \n"
