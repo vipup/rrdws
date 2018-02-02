@@ -15,12 +15,14 @@ import com.espertech.esper.client.EPRuntime;
 import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPServiceProviderManager;
 import com.espertech.esper.client.EPStatement;
+import com.espertech.esper.client.UpdateListener;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 import cc.co.llabor.websocket.cep.CEPListener;
+import cc.co.llabor.websocket.cep.DiffTracker;
 import cc.co.llabor.websocket.cep.OrderTick;
 import cc.co.llabor.websocket.cep.Any3SecListener;
 import cc.co.llabor.websocket.cep.BigEventListener;
@@ -350,25 +352,68 @@ public final class PoloHandler implements MessageHandler {
 			String AGGRSUFFIX = (""+XPATH_PREFIX.hashCode()).replaceAll("-", "_");
 			String eqlDEFsec = " insert into OrderTick"+AGGRSUFFIX+"  \n"
 					+ " select (  sum ("+propPar+") / count("+propPar+") ) data , \n"
-							+ " '"+propPar+"' name \n"
-					+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time_batch( "+timeWindowAverage+" sec) \n";
+					+ "   "+ timeWindowAverage +" timewindow , \n"
+					+ " '"+propPar+"' name \n"
+					+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
+			if (timeWindowAverage == 600)
+			if ("price".equals(propPar))
+				eqlDEFsec = " insert into OrderTick"+AGGRSUFFIX+"  \n"
+						+ " select "
+						+ "   ( avg ( price )  ) data ,  \n"
+						+ "   "+ timeWindowAverage +" timewindow , \n"
+						+ " '"+propPar+"' name \n"
+						+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
 			EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsec);
 			
 			// step 2 : 10 sec
-			String eql10sec = " select  data from OrderTick"+AGGRSUFFIX+".win:time( 10 sec) where name ='"+propPar+"'";
+			String eql10sec = " insert into DiffTracker "
+					+ "select "
+					+ "		'"+MARKET_PAIR+"' pair, "
+					+ "		'"+typeTMP+"' type, "
+					+ "		'"+timeWindowAverage+"' timewindow, "
+					+ "		'"+propPar+"' name, "
+					+ "		avg( data ) data from OrderTick"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) "
+					+ " where name ='"+propPar+"' "
+							+ " and timewindow = "+timeWindowAverage+" ";
 			EPStatement cep10sec= cepAdm.createEPL(eql10sec);
 			
 			RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, propPar);
 			cep10sec.addListener(rrdUpdaterTmp);
 			updaterRepo.put(nsTmp,rrdUpdaterTmp);
 			
-		    // step 4: summaryze that all
+			// step 3 : diffTracker 
+			step3_doItOnlyOnce(); 
+		    
+			// step 4: summaryze that all
 		    String eql4 = "insert into TicksPerSecond\n" + 
 		    		"select pair symbol, 'OrderTick' type,    count(*) as cnt\n" + 
 		    		"from OrderTick.win:time_batch(10 second)\n" + 
 		    		"group by pair";
 		    EPStatement statStmtTmp = cepAdm.createEPL(eql4); 
 		    //statStmtTmp.addListener(new StatisticPrinter());
+		}
+	}
+
+	UpdateListener diffTracker = null;
+	private void step3_doItOnlyOnce() {
+		// step 3 : diffTracker 
+		// TODO init it only once
+		if (diffTracker == null) { 
+			String eql3 = "" + 
+					"select name, "
+					+ "( avg(data )-max(data ) ) downT ,"
+					+ "( avg(data )-min(data ) ) upT ,"
+					+ "( avg(data )-max(data ) )/avg(data )*100 downPER ,"
+					+ "( avg(data )-min(data ) )/avg(data )*100 upPER ,"
+					+ " avg(data ) avgT,max(data ) maxT,"
+					+ " min(data ) minT, pair, type "
+					+ " "
+					+ " " 
+					+ "from DiffTracker.win:time_batch(   10   sec) group by pair, type, name \n" + 
+					" ";
+			EPStatement difftrackerTMP = cepAdm.createEPL(eql3); 
+			diffTracker = new DiffTracker();
+			difftrackerTMP.addListener(diffTracker );
 		}
 	}
 
