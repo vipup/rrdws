@@ -355,11 +355,17 @@ public final class PoloHandler implements MessageHandler {
 					+ "   "+ timeWindowAverage +" timewindow , \n"
 					+ " '"+propPar+"' name \n"
 					+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
-			if (timeWindowAverage == 600)
-			if ("price".equals(propPar))
+			// overwrite for all
+			//if (timeWindowAverage == 600)
+			//if ("price".equals(propPar))
 				eqlDEFsec = " insert into OrderTick"+AGGRSUFFIX+"  \n"
 						+ " select "
 						+ "   ( avg ( price )  ) data ,  \n"
+						+ "   ( avg ( price )  ) dataAVG ,  \n"
+						+ "   ( max ( price )  ) dataMAX ,  \n"
+						+ "   ( min ( price )  ) dataMIN ,  \n"
+						+ "   ( count ( price )  ) dataCNT ,  \n"
+						+ "   (  sum ("+propPar+") / count("+propPar+") ) dataCAL , \n"
 						+ "   "+ timeWindowAverage +" timewindow , \n"
 						+ " '"+propPar+"' name \n"
 						+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
@@ -369,6 +375,11 @@ public final class PoloHandler implements MessageHandler {
 			String eql10sec = " insert into DiffTracker "
 					+ "select "
 					+ "		'"+MARKET_PAIR+"' pair, "
+					+ "		avg (dataMAX) dataMAX, "
+					+ "		avg (dataMIN) dataMIN, "
+					+ "		avg (dataAVG) dataAVG, "
+					+ "		avg (dataCNT) dataCNT, "
+					+ "		avg (dataCAL) dataCAL, "					
 					+ "		'"+typeTMP+"' type, "
 					+ "		'"+timeWindowAverage+"' timewindow, "
 					+ "		'"+propPar+"' name, "
@@ -398,19 +409,31 @@ public final class PoloHandler implements MessageHandler {
 	private void step3_doItOnlyOnce() {
 		// step 3 : diffTracker 
 		// TODO init it only once
-		if (diffTracker == null) { 
+		if (diffTracker == null) {
+/*
+ * 					+ "		dataMAX, "
+					+ "		dataMIN, "
+					+ "		dataAVG, "
+					+ "		dataCNT, "
+					+ "		dataCAL, "				
+ */
 			String eql3 = "" + 
-					"select name, "
-					+ "( avg(data )-max(data ) ) downT ,"
-					+ "( avg(data )-min(data ) ) upT ,"
-					+ "( avg(data )-max(data ) )/avg(data )*100 downPER ,"
-					+ "( avg(data )-min(data ) )/avg(data )*100 upPER ,"
-					+ " avg(data ) avgT,max(data ) maxT,"
-					+ " min(data ) minT, pair, type "
-					+ " "
-					+ " " 
-					+ "from DiffTracker.win:time_batch(   10   sec) group by pair, type, name \n" + 
-					" ";
+					"select name, timewindow, "
+					+ "( dataAVG - dataMAX ) 				downT , \n"
+					+ "( dataAVG - dataMIN ) 				upT ,\n"
+					+ "( dataAVG - dataMAX )/dataAVG*100 	downPER ,\n"
+					+ "( dataAVG - dataMIN )/dataAVG*100 	upPER ,\n"
+					+ " dataAVG avgT, \n"
+					+ " dataMAX maxT, \n"
+					+ " dataMIN minT, \n"
+					+ " pair, \n"
+					+ " \n"
+					+ " type \n"
+					+ " \n" 
+					+ "from DiffTracker.win:time_batch(   10   sec) \n"
+					+ " where name='price' \n" 
+					+ " group by pair, type, name , timewindow \n"
+					+ " ";
 			EPStatement difftrackerTMP = cepAdm.createEPL(eql3); 
 			diffTracker = new DiffTracker();
 			difftrackerTMP.addListener(diffTracker );
