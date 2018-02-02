@@ -362,9 +362,11 @@ public final class PoloHandler implements MessageHandler {
 							+ "   ( count ( price )  ) dataCNT ,  \n"
 							+ "   (  sum ( price ) / count( price ) ) dataCAL , \n"
 							+ "   (  sum (total) / sum (volume) ) dataTOV , \n"
+															
 							+ "   "+ timeWindowAverage +" timewindow , \n"
 							+ " 'price' name \n"
-							+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
+							+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) "
+									+ "where volume >0 \n";
 				EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsec);
 				
 				// step 2 : 10 sec
