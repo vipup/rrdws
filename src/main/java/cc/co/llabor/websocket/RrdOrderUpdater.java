@@ -29,10 +29,10 @@ public class RrdOrderUpdater implements UpdateListener {
 			callCounter++;
 			commonCounter++;
 			if (nsTmp.contains("/BTC_ETH/")) { 
-				if (nsTmp.contains("/price"))
-					System.out.println("+"+nsTmp+"+--:"+e.get("data") );
-				else
-					System.out.println("+"+nsTmp+"+--:"+e.get("data") );
+//				if (nsTmp.contains("/price"))
+//					System.out.println("+"+nsTmp+"+--:"+e.get("data") );
+//				else
+//					System.out.println("+"+nsTmp+"+--:"+e.get("data") );
 //				if (nsTmp.contains("/volume"))
 //					System.out.println("+"+nsTmp+"+--:"+e.get("volume") );
 //				if (nsTmp.contains("/total"))
