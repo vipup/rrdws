@@ -33,8 +33,9 @@ public class DiffTracker implements UpdateListener {
 	
 	
 	Map<String, JsonNode> pairsMap = new HashMap<String, JsonNode>();
-	String []props = "pair---timewindow---tovPCENT---BOS---middlePCENT---dAVG---dMIN---dCAL---diffMIN---dCNT---type---dMAX---diffDIF---diffMAX---name---dTOV---diffTOV".split("---");
-	String []keyprops = "BOS---timewindow---type---pair---name".split("---");
+	// --name---
+	String []props = "pair---timewindow---tovPCENT---BOS---middlePCENT---dAVG---dMIN---dCAL---diffMIN---dCNT---type---dMAX---diffDIF---diffMAX---dTOV---diffTOV".split("---");
+	String []keyprops = "BOS---timewindow---type---pair".split("---");
 	
 	@Override
 	public void update(EventBean[] newEvents, EventBean[] oldEvents) {
@@ -52,18 +53,8 @@ public class DiffTracker implements UpdateListener {
 				((ObjectNode) value).put(property, object);
 			}
 			
-			list.add( value );
-			pairsMap.put(key, value); 
-			try {  
-				String valueAsString = (new ObjectMapper()).writeValueAsString( list );
-				Cache diffCacher = CacheManager.getInstance().getCache("DiffTracker",true);
-				//Object data = diffCacher .get("last");//diffCacher.put("last", tableDataMessage);
-				//tableDataMessage = data==null?""+data:tableDataMessage;
-				diffCacher .put("last", valueAsString);//diffCacher.put("last", tableDataMessage);
-			}catch (Exception ex) {
-				ex.printStackTrace();
-			}				
-			
+			//list.add( value );
+			pairsMap.put(key, value);
 			callCounter++;
 			//if ((""+eBean.get("pair")).contains("BTC_ETH")) {
 			if ((""+eBean.get("pair")).contains("USDT_LTC")) {
@@ -72,6 +63,18 @@ public class DiffTracker implements UpdateListener {
 			 System.out.println("+DIFF+"+callCounter+"+--:"+" ==:"+eBean.getProperties());
 			}
 		}
+		list.removeAll();
+		list.addAll( pairsMap.values() );
+		try {  
+			String valueAsString = (new ObjectMapper()).writeValueAsString( list );
+			Cache diffCacher = CacheManager.getInstance().getCache("DiffTracker",true);
+			//Object data = diffCacher .get("last");//diffCacher.put("last", tableDataMessage);
+			//tableDataMessage = data==null?""+data:tableDataMessage;
+			diffCacher .put("last", valueAsString);//diffCacher.put("last", tableDataMessage);
+		}catch (Exception ex) {
+			ex.printStackTrace();
+		}				
+		
 	}
 
 	private String calcKey(MapEventBean eBean) {
