@@ -12,8 +12,11 @@ public class DiffTracker implements UpdateListener {
 		for (Object e:newEvents) {
 			MapEventBean eBean = (MapEventBean)e;
 			callCounter++;
-			if ((""+eBean.get("pair")).contains("BTC_ETH")) {
-			 System.out.println("+"+callCounter+"+--:"+"  ==:"+eBean.getProperties());
+			//if ((""+eBean.get("pair")).contains("BTC_ETH")) {
+			if ((""+eBean.get("pair")).contains("USDT_LTC")) {
+			
+
+			 System.out.println("+DIFF+"+callCounter+"+--:"+" ==:"+eBean.getProperties());
 			}
 		}
 	}

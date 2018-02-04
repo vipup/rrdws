@@ -115,6 +115,12 @@ public class PoloPairListener {
 					}
 				}
 
+				@Override
+				public void destroy() throws IOException {
+					 LOG.debug("destroy inited.");
+					
+				}
+
 
 				 		 
 			});

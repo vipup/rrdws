@@ -1,5 +1,7 @@
 package cc.co.llabor.websocket;
 
+import java.io.IOException;
+
 /**
  * Message handler.
  *
@@ -8,4 +10,6 @@ package cc.co.llabor.websocket;
 public interface MessageHandler {
 
     public void handleMessage(String message) throws ErrorProcessingException;
+    
+    public void destroy() throws IOException ;
 }

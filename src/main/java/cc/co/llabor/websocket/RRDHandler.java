@@ -41,4 +41,10 @@ public final class RRDHandler implements MessageHandler {
 		}						
 		//LOG.debug(">>>>RRD>>>>" + message);
 	}
+
+	@Override
+	public void destroy() throws IOException {
+		 LOG.debug("destroy inited.");
+		
+	}
 }

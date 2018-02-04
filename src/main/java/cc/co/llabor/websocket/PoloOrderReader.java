@@ -1,5 +1,6 @@
 package cc.co.llabor.websocket;
  
+import java.io.IOException;
 import java.net.URI; 
 
 import javax.websocket.ClientEndpoint;
@@ -25,6 +26,12 @@ public class PoloOrderReader {
         public void handleMessage(String message) {
             LOG.debug("<<<<<<<<"+message);
         }
+
+		@Override
+		public void destroy() throws IOException {
+			 LOG.debug("destroy inited.");
+			
+		}
     };
 	private String pairName = "USDT_BTC";
 

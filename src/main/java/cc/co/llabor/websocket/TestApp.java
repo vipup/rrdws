@@ -1,5 +1,6 @@
 package cc.co.llabor.websocket;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -26,6 +27,12 @@ public class TestApp {
                 public void handleMessage(String message) {
                     LOG.debug("<<<<<<<<"+message);
                 }
+
+				@Override
+				public void destroy() throws IOException {
+					// TODO Auto-generated method stub
+					
+				}
             });
 
             // send message to websocket

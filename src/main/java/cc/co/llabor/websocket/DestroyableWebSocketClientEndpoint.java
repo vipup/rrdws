@@ -30,7 +30,14 @@ public class DestroyableWebSocketClientEndpoint {
 	public void destroy() throws IOException {
     	MessageHandler bak = this.messageHandler ;
     	System.err.println("DestroyableWebSocketClientEndpoint::"+bak);
-    	this.messageHandler = null; 
+    	try {
+    		this.messageHandler .destroy();
+    		this.messageHandler = null;
+    	}catch(Throwable e) {
+    		e.printStackTrace();
+    		
+    	}
+    		
     	try {
 	    	WebSocketContainer container = userSession.getContainer();
 	    	for (Session sessionTmp : userSession.getOpenSessions()) {

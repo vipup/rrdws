@@ -33,6 +33,12 @@
 		 <input type="submit">
 	 </form>
 	
+	<img src="xgen.jsp?db=${dbTmp}&_start=end-5minutes&_t=5minutes"/>.
+	<img src="xgen.jsp?db=${dbTmp}&_start=end-20minutes&_t=20minutes"/>.
+	<img src="xgen.jsp?db=${dbTmp}&_start=end-1hours&_t=end-1hours"/>.
+	<img src="xgen.jsp?db=${dbTmp}&_start=end-3hours&_t=end-3hours"/>.
+	<img src="xgen.jsp?db=${dbTmp}&_start=end-6hours&_t=end-6hours"/>.
+	<img src="xgen.jsp?db=${dbTmp}&_start=end-12hours&_t=end-12hours"/>.
 	<img src="xgen.jsp?db=${dbTmp}&_start=end-1day&_t=end-1day"/>.
 	<img src="xgen.jsp?db=${dbTmp}&_start=end-1week&_t=end-1week"/>.
 	<img src="xgen.jsp?db=${dbTmp}&_start=end-2week&_t=end-2week"/>. 
