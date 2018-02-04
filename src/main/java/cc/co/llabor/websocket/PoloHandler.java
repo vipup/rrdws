@@ -359,9 +359,9 @@ public final class PoloHandler implements MessageHandler {
 			if ("price".equals(propPar)) {
 				// step 1 : 
 				
-				String 	eqlDEFsecSELL = " insert into OrderTick"+AGGRSUFFIX+"  \n"
+				String 	eqlDEFsecSELLBUY = " insert into OrderTick"+AGGRSUFFIX+"  \n"
 						+ " select "
-						+ "   'sell' BOS ,  \n"
+						+ "   type BOS ,  \n"
 						+ "   ( avg ( price )  ) data ,  \n"
 						+ "   ( avg ( price )  ) dataAVG ,  \n"
 						+ "   ( max ( price )  ) dataMAX ,  \n"
@@ -375,28 +375,10 @@ public final class PoloHandler implements MessageHandler {
 						+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) "
 								+ "where"
 								+ " volume >0 "
-								+ " and type = true " // only buy  
+//								+ " and type = true " // only buy  
 								+ "\n";
-			EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsecSELL);
-			String 	eqlDEFsecBUY = " insert into OrderTick"+AGGRSUFFIX+"  \n"
-					+ " select "
-					+ "   'buy' BOS ,  \n"
-					+ "   ( avg ( price )  ) data ,  \n"
-					+ "   ( avg ( price )  ) dataAVG ,  \n"
-					+ "   ( max ( price )  ) dataMAX ,  \n"
-					+ "   ( min ( price )  ) dataMIN ,  \n"
-					+ "   ( count ( price )  ) dataCNT ,  \n"
-					+ "   (  sum ( price ) / count( price ) ) dataCAL , \n"
-					+ "   (  sum (total) / sum (volume) ) dataTOV , \n"
-													
-					+ "   "+ timeWindowAverage +" timewindow , \n"
-					+ " 'price' name \n"
-					+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) "
-							+ "where"
-							+ " volume >0 "
-							+ " and type = false " // only sell 
-							+ "\n";
-		EPStatement cepDEFsecBUY= cepAdm.createEPL(eqlDEFsecBUY);			
+			EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsecSELLBUY);
+ 		
 				
 				// step 2 : 10 sec
 				String eql10sec = " insert into DiffTracker "
@@ -415,7 +397,7 @@ public final class PoloHandler implements MessageHandler {
 						+ "		'price'  name, "
 						+ "		avg( data ) data from OrderTick"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) "
 						+ " where name ='price' "
-						+ "group by BOS,timewindow  "
+						+ "group by BOS,timewindow, name "
 						
 										+ "";
 				EPStatement cep10sec= cepAdm.createEPL(eql10sec);
@@ -478,13 +460,15 @@ public final class PoloHandler implements MessageHandler {
  */
 			String eql3 = "" + 
 					"select BOS, name, timewindow, "
-					+ "( dataAVG - dataTOV ) 				downT , \n"
-					+ "( dataAVG - dataTOV ) 				upT ,\n"
-					+ "( dataAVG - (dataMAX + dataMIN)/2 )/dataAVG*100 	downPER ,\n"
-					+ "( dataAVG - dataTOV )/dataAVG*100 	upPER ,\n"
-					+ " dataAVG avgT, \n"
-					+ " dataMAX maxT, \n"
-					+ " dataMIN minT, \n"
+					+ "( dataAVG - dataMAX )							diffMAX , \n"
+					+ "( dataAVG - dataMIN )							diffMIN ,\n"
+					+ "( dataMAX  - dataMIN )							diffDIF ,\n"
+					+ "( (dataMAX + dataMIN)/2   - dataTOV )				diffTOV ,\n"
+					+ "( dataAVG - (dataMAX + dataMIN)/2 )/dataAVG*100 	middlePCENT ,\n"
+					+ "( dataAVG - dataTOV )/dataAVG*100				tovPCENT ,\n"
+					+ " dataAVG dAVG, \n"
+					+ " dataMAX dMAX, \n"
+					+ " dataMIN dMIN, \n"
 					+ " dataCAL dCAL, \n"
 					+ " dataCNT dCNT, \n"
 					+ " dataTOV dTOV, \n"
