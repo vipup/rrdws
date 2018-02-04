@@ -16,14 +16,17 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory; 
+import org.apache.juli.logging.LogFactory;
+
+import cc.co.llabor.cache.CacheManager;
+import net.sf.jsr107cache.Cache; 
  
 @ServerEndpoint(value = "/websocket/tabledata")
 public class TableDataStream {
 
     private static final Log LOG = LogFactory.getLog(TableDataStream.class);
 
-    private static final String GUEST_PREFIX = "Guest";
+    private static final String GUEST_PREFIX = "Herr";
     private static final AtomicInteger connectionIds = new AtomicInteger(0);
     private static final Set<TableDataStream> connections =
             new CopyOnWriteArraySet<TableDataStream>();
@@ -31,9 +34,10 @@ public class TableDataStream {
     private final String nickname;
     private Session session;
 
+    final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
     public TableDataStream() {
         nickname = GUEST_PREFIX + connectionIds.getAndIncrement();
-        final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+        
         
         ses.scheduleWithFixedDelay(new Runnable() {
 
@@ -56,6 +60,7 @@ public class TableDataStream {
 
     @OnClose
     public void end() {
+    	ses.shutdown();
         connections.remove(this);
         String message = String.format("* %s %s",
                 nickname, "has disconnected.");
@@ -72,14 +77,22 @@ public class TableDataStream {
     	}
     }
 
-	private String generateNewFakeData() {
+	private String generateNewFakeData() { 
 		String tableDataMessage= " [\n" + 
-				"    {id: \""+i+++ "\", ort: \"Schlosskeller\", name: \"DnB for live\", beginn: \"1.11.2011, ab 22 Uhr\"},\n" + 
-				"    {id: \""+i+++ "\", ort: \"603qm\", name: \"Electro Technik\", beginn: \"1.11.2011, ab 22 Uhr\"},\n" + 
-				"    {id: \""+i+++ "\", ort: \"Krone\", name: \"da geht der Punk \", beginn: \"1.11.2011, ab 20 Uhr\"},\n" + 
-				"    {id: \""+i+++ "\", ort: \"Schlosskeller\", name: \"Wuerstchenfest\", beginn: \"2.11.2011, ab 20 Uhr\"},\n" + 
-				"    {id: \""+i+++ "\", ort: \"Krone\", name: \"Karaoke\", beginn: \"2.11.2011, ab 21 Uhr\"}\n" + 
+				"    {id: \""+i+++ "\", ort: \"Berlin\", name: \"Ivan\", DoB: \"1.11.2011, ab 11 Uhr\"},\n" + 
+				"    {id: \""+i+++ "\", ort: \"Sindey\", name: \"Hans\", DoB: \"2.11.2011, ab 22 Uhr\"},\n" + 
+				"    {id: \""+i+++ "\", ort: \"New York\", name: \"John \", DoB: \"3.11.2011, ab 13 Uhr\"},\n" + 
+				"    {id: \""+i+++ "\", ort: \"Tokio\", name: \"Wahno\", DoB: \"2.11.2011, ab 20 Uhr\"},\n" + 
+				"    {id: \""+i+++ "\", ort: \"Moscow\", name: \"Don Juan\", DoB: \"4.11.2011, ab 03 Uhr\"}   ,\n" + 
+				"    {id: \""+i+++ "\", ort: \"Madrid\", name: \"Diego\", DoB: \"5.11.2001, ab 03 Uhr\"}\n" + 
 				"]";
+		try {
+			Cache diffCacher = CacheManager.getCache("DiffTracker");
+			Object data = diffCacher .get("last");//diffCacher.put("last", tableDataMessage);
+			tableDataMessage = data==null?""+data:tableDataMessage;
+		}catch (Exception e) {
+			// ignore
+		}
 		return tableDataMessage;
 	}
 

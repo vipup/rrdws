@@ -66,7 +66,7 @@ CPU.update = (function(message) {
 	var rawdatacontainer = document.getElementById('rawdatacontainer');
 	rawdatacontainer.innerHTML = message;
 	textToData( );
-	transform('name');
+	transform();
 	
 });
 
@@ -76,7 +76,7 @@ TheConsole.log = (function(message) {
 	var usernameTmp =  message.slice(0,message.indexOf(":"));
 	var textTmp =  message.slice(message.indexOf(":")+1); 
 
-	console.log(usernameTmp +":"+textTmp);
+	//console.log(usernameTmp +":"+textTmp);
 	
 });
 

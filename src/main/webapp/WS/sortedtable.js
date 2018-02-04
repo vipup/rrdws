@@ -1,17 +1,45 @@
 var i = 0, data = "";
+var lastActivatedAttribute = "name";
 function textToData( ) {
 	data = eval (document.getElementById('rawdatacontainer').innerText);
 }
+
+function proxy(a,b,c,d,e){
+     console.log("xxxxxx" );
+}
  
+function setSortOrder(d,i){
+                        var colName = d[0]; 
+                        var myName = "transform('" + colName + "');"; 
+                        // console.log("Sort changed to:" +myName);
+                        return myName;    
+}
+
+function setSortAttribute(toSort){
+    if (toSort){
+        lastActivatedAttribute = toSort;
+        console.log("lastActivatedAttribute;;"+lastActivatedAttribute );
+    }
+    
+}
+
+function transform() {
+    transform(lastActivatedAttribute) ;
+}
+
 
 function transform(attrName) {
+    if (attrName){
+        setSortAttribute(attrName);
+    }
+    attrName = lastActivatedAttribute;
     d3.select("tbody").selectAll("tr").remove();
 
 // Header
     var th = d3.select("thead").selectAll("th")
             .data(jsonToArray(data[0]))
           .enter().append("th")
-            .attr("onclick", function (d, i) { return "transform('" + d[0] + "');";})
+            .attr("onclick", setSortOrder)
             .text(function(d) { return d[0]; })
 
 // Rows
@@ -24,14 +52,14 @@ function transform(attrName) {
     var td = tr.selectAll("td")
             .data(function(d) { return jsonToArray(d); })
           .enter().append("td")
-            .attr("onclick", function (d, i) { return "transform('" + d[0] + "');";})
+            .attr("onclick",setSortOrder)
             .text(function(d) { return d[1]; });
 
 }
 
 function stringCompare(a, b) {
-    a = a.toLowerCase();
-    b = b.toLowerCase();
+    a = (""+a).toLowerCase();
+    b = (""+b).toLowerCase();
     return a > b ? 1 : a == b ? 0 : -1;
 }
 
