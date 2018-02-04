@@ -84,12 +84,12 @@ public class TableDataStream {
 				"    {id: \""+i+++ "\", ort: \"New York\", name: \"John \", DoB: \"3.11.2011, ab 13 Uhr\"},\n" + 
 				"    {id: \""+i+++ "\", ort: \"Tokio\", name: \"Wahno\", DoB: \"2.11.2011, ab 20 Uhr\"},\n" + 
 				"    {id: \""+i+++ "\", ort: \"Moscow\", name: \"Don Juan\", DoB: \"4.11.2011, ab 03 Uhr\"}   ,\n" + 
-				"    {id: \""+i+++ "\", ort: \"Madrid\", name: \"Diego\", DoB: \"5.11.2001, ab 03 Uhr\"}\n" + 
+				"    {id: \""+i+++ "\", ort: \"Madrid\", name: \"Diego\", DoB: \"5.11.2001, ab 03 Uhr\" }\n" + 
 				"]";
 		try {
 			Cache diffCacher = CacheManager.getCache("DiffTracker");
 			Object data = diffCacher .get("last");//diffCacher.put("last", tableDataMessage);
-			tableDataMessage = data==null?""+data:tableDataMessage;
+			tableDataMessage = data!=null?""+data:tableDataMessage;
 		}catch (Exception e) {
 			// ignore
 		}

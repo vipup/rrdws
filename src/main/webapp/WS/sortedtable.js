@@ -1,6 +1,8 @@
 var i = 0, data = "";
 var lastActivatedAttribute = "name";
+var lastSortingOrder  = 1;
 function textToData( ) {
+    document.getElementById('rawdatacontainer').style.display = 'none';
 	data = eval (document.getElementById('rawdatacontainer').innerText);
 }
 
@@ -17,8 +19,12 @@ function setSortOrder(d,i){
 
 function setSortAttribute(toSort){
     if (toSort){
-        lastActivatedAttribute = toSort;
-        console.log("lastActivatedAttribute;;"+lastActivatedAttribute );
+        if (toSort == lastActivatedAttribute) {
+            lastSortingOrder = -1 *lastSortingOrder;
+        } else {
+            lastActivatedAttribute = toSort;
+            console.log("lastActivatedAttribute;;"+lastActivatedAttribute );
+        }
     }
     
 }
@@ -52,15 +58,23 @@ function transform(attrName) {
     var td = tr.selectAll("td")
             .data(function(d) { return jsonToArray(d); })
           .enter().append("td")
-            .attr("onclick",setSortOrder)
+           // .attr("onclick",setSortOrder)
             .text(function(d) { return d[1]; });
 
 }
 
 function stringCompare(a, b) {
-    a = (""+a).toLowerCase();
-    b = (""+b).toLowerCase();
-    return a > b ? 1 : a == b ? 0 : -1;
+ 
+    if (!isNaN(parseFloat(b)) && isFinite(b) )
+    if (!isNaN(parseFloat(a)) && isFinite(a) )
+    {
+        a = parseFloat(a);
+        b = parseFloat(b);
+    }else{
+        a = (""+a).toLowerCase();
+        b = (""+b).toLowerCase();
+    }
+    return (lastSortingOrder) * ( a > b ? 1 : a == b ? 0 : -1 );
 }
 
 function jsonKeyValueToArray(k, v) {return [k, v];}

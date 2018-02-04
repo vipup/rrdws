@@ -8,3 +8,5 @@ rest is ignored
 
 @original filename (in classpath) :
 >META-INF/services/net.sf.jsr107cache.CacheFactory
+
+to activete BasicCacheFactory for Eclipse just add "-Dnet.sf.jsr107cache.CacheFactory=cc.co.llabor.cache.BasicCacheFactory" to start params
