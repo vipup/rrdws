@@ -58,6 +58,8 @@
 		   			<h2><a href="rrdcalc.html">RRD CALC</a></h2>	
 		   			<h2><a href="backup.htm">BACKUPRRD</a></h2>	
 		   			<h2><a href="restore.htm">restore.RRD</a></h2>	
+		   			<h2><a href="WS/sortedtable.xhtml">sortedtable</a></h2>
+		   			
 		   			
 		   			
 		   			
