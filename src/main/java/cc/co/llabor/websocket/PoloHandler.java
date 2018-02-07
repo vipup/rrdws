@@ -139,9 +139,14 @@ public final class PoloHandler implements MessageHandler {
 				String MARKET_PAIR = (String) pair;
 				registerAllTypesOfOrders4ESPER(rrdWS, MARKET_PAIR , typeTMP);
 			}
-
-	    	
 	    }
+		/// 			
+		// step 3 : diffTracker 
+		step3_doItOnlyOnce(); 
+		
+		// step 4: summaryze that all
+	    step4_doItOnlyOnce(); 
+	    //statStmtTmp.addListener(new StatisticPrinter());		
 	    
 	    return cepRT;
 
@@ -363,16 +368,12 @@ public final class PoloHandler implements MessageHandler {
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 600 );
 		
 		
-		/// 			
-		// step 3 : diffTracker 
-		step3_doItOnlyOnce(); 
-		
-		// step 4: summaryze that all
-	    step4_doItOnlyOnce(); 
-	    //statStmtTmp.addListener(new StatisticPrinter());		
+
 	}
 	UpdateListener diffTracker = null;
 	private void step3_doItOnlyOnce() {
+		System.out.println("	private void step3_doItOnlyOnce() {\n" + 
+				"");
 		// step 3 : diffTracker 
 		// TODO init it only once
 		if (diffTracker == null) {
@@ -386,6 +387,9 @@ public final class PoloHandler implements MessageHandler {
  */
 			String eql3 = "" + 
 					"select BOS, name, timewindow, "
+					+ "   max ( TIMESTOP ) - min ( TIMESTART )  diffTIME ,\n"					
+					+ "   max ( TIMESTOP )  TIMESTOP ,\n"					
+					+ "   min ( TIMESTART )  TIMESTART,\n"					
 					+ "( dataAVG - dataMAX )							diffMAX , \n"
 					+ "( dataAVG - dataMIN )							diffMIN ,\n"
 					+ "( dataMAX  - dataMIN )							diffDIF ,\n"
@@ -401,7 +405,7 @@ public final class PoloHandler implements MessageHandler {
 					+ " pair, \n" 
 					+ " type \n"
 					+ " \n" 
-					+ "from DiffTracker.win:time_batch(   10   sec) \n"
+					+ " from DiffTracker.win:time_batch(   10   sec) \n"
 					+ " where name='price' \n" 
 					+ " group by pair, type, name , timewindow, BOS \n"
 					+ " ";
@@ -410,7 +414,7 @@ public final class PoloHandler implements MessageHandler {
 			difftrackerTMP.addListener(diffTracker );
 		}
 	}
-	private void step4_doItOnlyOnce() {
+	private void step4_doItOnlyOnce() { 		System.out.println("private void step4_doItOnlyOnce() {");
 		String eql4 = "insert into TicksPerSecond\n" + 
 	    		"select pair symbol, 'OrderTick' type,    count(*) as cnt\n" + 
 	    		"from OrderTick.win:time_batch(10 second)\n" + 
@@ -422,8 +426,10 @@ public final class PoloHandler implements MessageHandler {
 
 	private void registerRRDUpdaterIfAny(RRDWSEndpoint rrdWS, String MARKET_PAIR, String typeTMP, String propPar, int timeWindowAverage) {
 		String XPATH_PREFIX = WS2RRDPump.PO_LO + "/EQLOrder/" +MARKET_PAIR +"/"+ typeTMP ;
+		
 		// PRICE
 		String nsTmp = XPATH_PREFIX + "/"+ propPar+"_"+timeWindowAverage+"sec";
+		System.out.println("registerRRDUpdaterIfAny:::"+nsTmp);
 		String AGGRSUFFIX = (""+nsTmp.hashCode()).replaceAll("-", "_");
 		// TODO even don't think about sync :)))
 		if (updaterRepo.get(nsTmp)== null) {
@@ -434,6 +440,8 @@ public final class PoloHandler implements MessageHandler {
 				String 	eqlDEFsecSELLBUY = " insert into OrderTick"+AGGRSUFFIX+"  \n"
 						+ " select "
 						+ "   type BOS ,  \n"
+						+ "   min (current_timestamp)  TIMESTART ,\n"
+						+ "   max (current_timestamp)  TIMESTOP ,\n"
 						+ "   ( avg ( price )  ) data ,  \n"
 						+ "   ( avg ( price )  ) dataAVG ,  \n"
 						+ "   ( max ( price )  ) dataMAX ,  \n"
@@ -460,6 +468,8 @@ public final class PoloHandler implements MessageHandler {
 						
 						+ "		BOS BOS, "
 						+ "		'"+MARKET_PAIR+"' pair, "
+						+ " 	min (TIMESTART)  	TIMESTART, "	
+						+ " 	max (TIMESTOP)  	TIMESTOP, "	
 						+ "		avg (dataMAX) dataMAX, "
 						+ "		avg (dataMIN) dataMIN, "
 						+ "		avg (dataAVG) dataAVG, "
@@ -487,7 +497,9 @@ public final class PoloHandler implements MessageHandler {
 				 
 				String 	eqlDEFsec = " insert into OrderTick_ELSE"+AGGRSUFFIX+"  \n"
 						+ " select "
-						+ "   avg ("+propPar+") data ,  \n"    
+						+ "   avg ("+propPar+") data ,  \n"
+						+ "   min (current_timestamp)  TIMESTART ,\n"
+						+ "   max (current_timestamp)  	TIMESTOP ,\n" 
 						+ "   "+ timeWindowAverage +" timewindow , \n"
 						+ " '"+propPar+ "' name \n"
 						+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
@@ -495,7 +507,10 @@ public final class PoloHandler implements MessageHandler {
 				// step 2 : 10 sec
 				String eql10sec = "  "
 						+ " select "
-						+ "   avg (data) data ,  \n"    
+						+ "   avg (data) data ,  \n"
+						+ "   min ( TIMESTART  ) TIMESTART,\n"
+						+ "   max ( TIMESTOP  ) TIMESTOP,\n"
+						
 						+ "   "+ timeWindowAverage +" timewindow , \n"
 						+ " '"+propPar+ "' name \n"
 						+ "from OrderTick_ELSE"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) ";
