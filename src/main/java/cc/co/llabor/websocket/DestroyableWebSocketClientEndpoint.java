@@ -139,6 +139,9 @@ public class DestroyableWebSocketClientEndpoint {
 			sizePerSec =0;
 		}
 		try {
+			if (message.indexOf("X1088538178")>0) {
+				System.out.println("------------------X1088538178[" + System.currentTimeMillis() +"]"+message);
+			}
 			this.userSession.getAsyncRemote().sendText(message);
 		}catch(Throwable e) {
 			errorCounter++;

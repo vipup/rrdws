@@ -35,6 +35,10 @@ public class RrdPusher implements UpdateListener {
 			// TODO GOTO process1001
 			Long timestampTmp = System.currentTimeMillis();
 			String cmdTmp = WS2RRDPump.makeUpdateCMD(""+value, timestampTmp, XPATH_PMIN);
+			if (XPATH_PMIN .startsWith("/PoLo/EQLOrder/"))
+			if (XPATH_PMIN .equals("/PoLo/EQLOrder/USDT_DASH/0/price_300sec")) {
+				System.out.println("cmdTmp  ...::"+cmdTmp);
+			}
 			//System.out.println("+#"+updateCounter+"#+-to RRD>---"+cmdTmp);
 			rrdws.sendMessage(cmdTmp);					
 		}
