@@ -72,6 +72,14 @@ public final class PoloHandler implements MessageHandler {
 	    cep = EPServiceProviderManager.getProvider("myCEPEngine", cepConfig);
 		cepRT = cep.getEPRuntime(); 
 	    cepAdm = cep.getEPAdministrator();
+	    
+	    // timer
+	    // 	Create a statement.
+	    EPStatement stmt = cepAdm.createEPL("insert into PoloTimer select current_timestamp()  as ct " +
+	      "from pattern[every timer:interval(1 second)]");
+	    stmt.addListener(new ClockListener());	// add a listener
+	    
+	    
 	    int intPairCounter = 0;
 	    // TODO GOTO process1001	     
 	    
@@ -79,7 +87,7 @@ public final class PoloHandler implements MessageHandler {
 		
 	    for ( Object key : this.poloHandler.poloWS.id2pairs.keySet()) {
 	    	intPairCounter++;
-	    	//if (intPairCounter<10)
+	    	if (intPairCounter<10)
 	    	for (int pi=1; pi<esper1002PROPS.length;pi++) { // 
 	    		String properyNameTmp =  esper1002PROPS[pi];
 	    		String symTmp = (String) this.poloHandler.poloWS.id2pairs.get(key);
@@ -133,9 +141,14 @@ public final class PoloHandler implements MessageHandler {
 	    
 	    
 	    /// XXXXYYY
+	    
 	    for (String typeTMP:new String[]{"0","1"}) {
+	    	intPairCounter = 0;
+
 	    	
 			for (Object pair: poloHandler.poloWS.pairs.keySet() ) {
+		    	intPairCounter++;
+		    	if (intPairCounter>10) break;
 				String MARKET_PAIR = (String) pair;
 				registerAllTypesOfOrders4ESPER(rrdWS, MARKET_PAIR , typeTMP);
 			}
@@ -358,12 +371,12 @@ public final class PoloHandler implements MessageHandler {
 		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 60 );
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 60 );
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 60 );
-		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 300 );
+//		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 300 );
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 300 );
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 300 );
 		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 600 );
-		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 1200 );
-		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 2400 );
+//		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 1200 );
+//		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 2400 );
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 600 );
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 600 );
 		
@@ -385,8 +398,9 @@ public final class PoloHandler implements MessageHandler {
 					+ "		avg (dataCAL) dataCAL, "	
 					+ "		avg (dataTOV) dataTOV, "				
  */
-			String eql3 = "" + 
-					"select BOS, name, timewindow, "
+			String eql3 = //" select min( ct ) ctTIMER, BOS from  PoloTimer, DiffTracker where ct= TIMESTOP " + 
+					"select distinct min(ct), BOS, name, timewindow, "
+					+ "   (xTIMESTOP - xTIMESTART) xTIME ,\n"					
 					+ "   max ( TIMESTOP ) - min ( TIMESTART )  diffTIME ,\n"					
 					+ "   max ( TIMESTOP )  TIMESTOP ,\n"					
 					+ "   min ( TIMESTART )  TIMESTART,\n"					
@@ -405,11 +419,20 @@ public final class PoloHandler implements MessageHandler {
 					+ " pair, \n" 
 					+ " type \n"
 					+ " \n" 
-					+ " from DiffTracker.win:time_batch(   10   sec) \n"
-					+ " where name='price' \n" 
+					+ " from  "
+					// http://esper.espertech.com/release-5.0.0/esper-reference/html_single/index.html#epl-views
+					//+ "    PoloTimer.win:time_batch(   10   sec) ,"
+					//+ "    PoloTimer.std:lastevent() ,"
+					//+ "    PoloTimer.win:length( 10 )  ,"
+					+ "    PoloTimer.win:length_batch( 10 )  ,"
+					
+					
+					+ "    DiffTracker.win:time_batch(   10   sec)  \n"
+					+ " where name='price' \n"
+					//+ "  and ct= TIMESTOP" 
 					+ " group by pair, type, name , timewindow, BOS \n"
 					+ " ";
-			EPStatement difftrackerTMP = cepAdm.createEPL(eql3); 
+			EPStatement difftrackerTMP = cepAdm.createEPL(eql3); // cepAdm.createEPL(" select ct.P1  asas,   ct.P0  BDSFSDF  from  PoloTimer.win:time(60) P0 , PoloTimer.win:time_batch(60) P1  where   ct.P0 = ct.P1 ").addListener((new ClockListener()));
 			diffTracker = new DiffTracker();
 			difftrackerTMP.addListener(diffTracker );
 		}
@@ -440,8 +463,8 @@ public final class PoloHandler implements MessageHandler {
 				String 	eqlDEFsecSELLBUY = " insert into OrderTick"+AGGRSUFFIX+"  \n"
 						+ " select "
 						+ "   type BOS ,  \n"
-						+ "   min (current_timestamp)  TIMESTART ,\n"
-						+ "   max (current_timestamp)  TIMESTOP ,\n"
+						+ "     min(ct)  TIMESTART ,\n"
+						+ "     max(ct) TIMESTOP ,\n"
 						+ "   ( avg ( price )  ) data ,  \n"
 						+ "   ( avg ( price )  ) dataAVG ,  \n"
 						+ "   ( max ( price )  ) dataMAX ,  \n"
@@ -452,7 +475,9 @@ public final class PoloHandler implements MessageHandler {
 														
 						+ "   "+ timeWindowAverage +" timewindow , \n"
 						+ " 'price' name \n"
-						+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) "
+						+ "from "
+						+ "    PoloTimer.win:time( "+timeWindowAverage+" sec)  ,"
+						+ " OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) "
 								+ "where"
 								+ " volume >0 "
 								+ "and price > 0 "								
@@ -468,8 +493,11 @@ public final class PoloHandler implements MessageHandler {
 						
 						+ "		BOS BOS, "
 						+ "		'"+MARKET_PAIR+"' pair, "
-						+ " 	min (TIMESTART)  	TIMESTART, "	
-						+ " 	max (TIMESTOP)  	TIMESTOP, "	
+						//+ " 	 rate( "+10+ "  ) rateTIME , \n"
+						+ " 	 min (1+current_timestamp())  	xTIMESTART, \n"	
+						+ " 	 max (1+current_timestamp()) 	xTIMESTOP, "	
+						+ " 	 min (TIMESTART)   	TIMESTART, "	
+						+ " 	 max (TIMESTOP) 	TIMESTOP, "							
 						+ "		avg (dataMAX) dataMAX, "
 						+ "		avg (dataMIN) dataMIN, "
 						+ "		avg (dataAVG) dataAVG, "
@@ -498,8 +526,8 @@ public final class PoloHandler implements MessageHandler {
 				String 	eqlDEFsec = " insert into OrderTick_ELSE"+AGGRSUFFIX+"  \n"
 						+ " select "
 						+ "   avg ("+propPar+") data ,  \n"
-						+ "   min (current_timestamp)  TIMESTART ,\n"
-						+ "   max (current_timestamp)  	TIMESTOP ,\n" 
+						+ "   min (current_timestamp())  TIMESTART ,\n"
+						+ "   max (current_timestamp())  	TIMESTOP ,\n" 
 						+ "   "+ timeWindowAverage +" timewindow , \n"
 						+ " '"+propPar+ "' name \n"
 						+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
@@ -508,8 +536,8 @@ public final class PoloHandler implements MessageHandler {
 				String eql10sec = "  "
 						+ " select "
 						+ "   avg (data) data ,  \n"
-						+ "   min ( TIMESTART  ) TIMESTART,\n"
-						+ "   max ( TIMESTOP  ) TIMESTOP,\n"
+						+ "   min ( current_timestamp()  ) TIMESTART,\n"
+						+ "   max ( current_timestamp()  ) TIMESTOP,\n"
 						
 						+ "   "+ timeWindowAverage +" timewindow , \n"
 						+ " '"+propPar+ "' name \n"
