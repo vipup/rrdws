@@ -1,6 +1,8 @@
 package cc.co.llabor.websocket.cep;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +18,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
+import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -30,11 +35,19 @@ import net.sf.jsr107cache.Cache;
 
 public class DiffTracker implements UpdateListener {
 	private int callCounter = 0;
+	ObjectMapper objectMapper ;
+	Cache diffCacher = CacheManager.getInstance().getCache("DiffTracker",true);
+ 
+	public DiffTracker (){
+		objectMapper = new ObjectMapper();  
+		
+	}
 	
 	
 	Map<String, JsonNode> pairsMap = new HashMap<String, JsonNode>();
 	// --name---
-	String []props = "pair---timewindow---tovPCENT---BOS---middlePCENT---dAVG---dMIN---dCAL---diffMIN---dCNT---type---dMAX---diffDIF---diffMAX---dTOV---diffTOV".split("---");
+	String []props = "pair---timewindow---BOS---iTOV---iAVG---pTOV---pAVG---dTOV---dAVG---dMIN---startTIMESTAMP---diffTIME---dCAL---dCNT---type---dMAX---name---stopTIME---startTIME".split("---");
+	
 	String []keyprops = "BOS---timewindow---type---pair".split("---");
 	
 	@Override
@@ -48,6 +61,7 @@ public class DiffTracker implements UpdateListener {
 			JsonNode value = pairsMap.get(key);
 			value = value == null? nc.objectNode():value  ;//nc.pojoNode(eBean) ;
 			for (String property:props) {
+				if (!eBean.getProperties().containsKey(property))continue;
 				if (null == eBean.get(property)) continue;
 				String object = ""+eBean.get(property);
 				((ObjectNode) value).put(property, object);
@@ -64,8 +78,10 @@ public class DiffTracker implements UpdateListener {
 		list.removeAll();
 		list.addAll( pairsMap.values() );
 		try {  
-			String valueAsString = (new ObjectMapper()).writeValueAsString( list );
-			Cache diffCacher = CacheManager.getInstance().getCache("DiffTracker",true);
+			 
+	 
+			String valueAsString = objectMapper.writeValueAsString( list );
+			
 			//Object data = diffCacher .get("last");//diffCacher.put("last", tableDataMessage);
 			//tableDataMessage = data==null?""+data:tableDataMessage;
 			diffCacher .put("last", valueAsString);//diffCacher.put("last", tableDataMessage);

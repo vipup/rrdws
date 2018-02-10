@@ -28,6 +28,9 @@ public class RrdOrderUpdater implements UpdateListener {
 			rrdWS.sendMessage(cmdTmp);
 			callCounter++;
 			commonCounter++;
+			if (!"price".equals(propPar)) {
+//				System.out.println("+TOTALorVOLUME+"+nsTmp+"+--:"+e.get("data") );
+			}
 			if (nsTmp.contains("/BTC_ETH/")) { 
 //				if (nsTmp.contains("/price"))
 //					System.out.println("+"+nsTmp+"+--:"+e.get("data") );

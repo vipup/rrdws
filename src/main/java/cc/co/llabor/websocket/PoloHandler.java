@@ -28,7 +28,8 @@ import cc.co.llabor.websocket.cep.Any3SecListener;
 import cc.co.llabor.websocket.cep.BigEventListener;
 import cc.co.llabor.websocket.cep.PoloTick;
 import cc.co.llabor.websocket.cep.RrdPusher;
-import cc.co.llabor.websocket.cep.StatisticPrinter; 
+import cc.co.llabor.websocket.cep.StatisticPrinter;
+import cc.co.llabor.websocket.cep.SummPrinter; 
  
  
  
@@ -371,12 +372,12 @@ public final class PoloHandler implements MessageHandler {
 		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 60 );
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 60 );
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 60 );
-//		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 300 );
+		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 300 );
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 300 );
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 300 );
 		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 600 );
-//		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 1200 );
-//		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 2400 );
+		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 1200 );
+		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 2400 );
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 600 );
 //			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 600 );
 		
@@ -398,24 +399,25 @@ public final class PoloHandler implements MessageHandler {
 					+ "		avg (dataCAL) dataCAL, "	
 					+ "		avg (dataTOV) dataTOV, "				
  */
-			String eql3 = //" select min( ct ) ctTIMER, BOS from  PoloTimer, DiffTracker where ct= TIMESTOP " + 
-					"select distinct min(ct), BOS, name, timewindow, "
-					+ "   (xTIMESTOP - xTIMESTART) xTIME ,\n"					
+			String eql3 = ""//" select min( ct ) ctTIMER, BOS from  PoloTimer, DiffTracker where ct= TIMESTOP " + 
+					+ " insert into SummStream "
+					+ "select distinct min(ct) startTIMESTAMP ,"
 					+ "   max ( TIMESTOP ) - min ( TIMESTART )  diffTIME ,\n"					
-					+ "   max ( TIMESTOP )  TIMESTOP ,\n"					
-					+ "   min ( TIMESTART )  TIMESTART,\n"					
-					+ "( dataAVG - dataMAX )							diffMAX , \n"
-					+ "( dataAVG - dataMIN )							diffMIN ,\n"
-					+ "( dataMAX  - dataMIN )							diffDIF ,\n"
-					+ "( (dataMAX + dataMIN)/2   - dataTOV )				diffTOV ,\n"
-					+ "( dataAVG - (dataMAX + dataMIN)/2 )/dataAVG*100 	middlePCENT ,\n"
-					+ "( dataAVG - dataTOV )/dataAVG*100				tovPCENT ,\n"
+					+ "   max ( TIMESTOP )  stopTIME ,\n"					
+					+ "   min ( TIMESTART )  startTIME ,\n"				 
 					+ " dataAVG dAVG, \n"
+					+ " first (dataAVG) pAVG, \n"
+
+					+ " ((first (dataAVG)-dataAVG) / dataAVG) iAVG, \n"
 					+ " dataMAX dMAX, \n"
 					+ " dataMIN dMIN, \n"
 					+ " dataCAL dCAL, \n"
 					+ " dataCNT dCNT, \n"
 					+ " dataTOV dTOV, \n"
+					+ " first (dataTOV) pTOV, \n"
+					+ " ((first (dataTOV)-dataTOV) / dataTOV) iTOV, \n"
+					
+					+ " BOS, name, timewindow, "
 					+ " pair, \n" 
 					+ " type \n"
 					+ " \n" 
@@ -424,9 +426,7 @@ public final class PoloHandler implements MessageHandler {
 					//+ "    PoloTimer.win:time_batch(   10   sec) ,"
 					//+ "    PoloTimer.std:lastevent() ,"
 					//+ "    PoloTimer.win:length( 10 )  ,"
-					+ "    PoloTimer.win:length_batch( 10 )  ,"
-					
-					
+					+ "    PoloTimer.win:length_batch( 10 )  ,"										
 					+ "    DiffTracker.win:time_batch(   10   sec)  \n"
 					+ " where name='price' \n"
 					//+ "  and ct= TIMESTOP" 
@@ -435,6 +435,32 @@ public final class PoloHandler implements MessageHandler {
 			EPStatement difftrackerTMP = cepAdm.createEPL(eql3); // cepAdm.createEPL(" select ct.P1  asas,   ct.P0  BDSFSDF  from  PoloTimer.win:time(60) P0 , PoloTimer.win:time_batch(60) P1  where   ct.P0 = ct.P1 ").addListener((new ClockListener()));
 			diffTracker = new DiffTracker();
 			difftrackerTMP.addListener(diffTracker );
+//			
+//			String eql4 = ""//" select min( ct ) ctTIMER, BOS from  PoloTimer, DiffTracker where ct= TIMESTOP " + 
+//					+ " select"
+//					+ "  distinct SS.dTOV tovPrice, \n"
+//					+ "  SS.dAVG price, \n"
+//					// SS
+//					+ "	 SS.startTIMESTAMP sTIME, "
+// 					+ "  SS.BOS BoS,  "
+//					//+ " SS.name,  "
+//					+ "SS.timewindow TW,  SS.pair pair, "
+//					//+ " SS.type ,\n"
+// 
+//					+ "  lastever(SS.dAVG) lePRICE, firstever(SS.dAVG) fePRICE , prevwindow(SS.dAVG) prPRICE , prev (SS.dAVG) prePRICE"
+//					+ "    \n" 
+//					+ "  from \n"
+//					+ " SummStream.win:time_batch(   10   sec)  as SS  \n"
+//					//+ " where"
+// 
+//					+ " group by \n"
+//					+ "  SS.BOS, SS.name, SS.timewindow , SS.pair, SS.type \n"
+//					+ ""
+//					+ " output every 5 sec \n";
+//			EPStatement summsTMP = cepAdm.createEPL(eql4);
+//			UpdateListener summPrinter = new SummPrinter () ;
+//			summsTMP.addListener(summPrinter  );
+				
 		}
 	}
 	private void step4_doItOnlyOnce() { 		System.out.println("private void step4_doItOnlyOnce() {");
@@ -494,8 +520,6 @@ public final class PoloHandler implements MessageHandler {
 						+ "		BOS BOS, "
 						+ "		'"+MARKET_PAIR+"' pair, "
 						//+ " 	 rate( "+10+ "  ) rateTIME , \n"
-						+ " 	 min (1+current_timestamp())  	xTIMESTART, \n"	
-						+ " 	 max (1+current_timestamp()) 	xTIMESTOP, "	
 						+ " 	 min (TIMESTART)   	TIMESTART, "	
 						+ " 	 max (TIMESTOP) 	TIMESTOP, "							
 						+ "		avg (dataMAX) dataMAX, "
@@ -525,23 +549,28 @@ public final class PoloHandler implements MessageHandler {
 				 
 				String 	eqlDEFsec = " insert into OrderTick_ELSE"+AGGRSUFFIX+"  \n"
 						+ " select "
+						+ " type BOS ,"
+						+ "     111111111  TIMESTART ,\n"
+						+ "     22222222 TIMESTOP ,\n"						
 						+ "   avg ("+propPar+") data ,  \n"
-						+ "   min (current_timestamp())  TIMESTART ,\n"
-						+ "   max (current_timestamp())  	TIMESTOP ,\n" 
 						+ "   "+ timeWindowAverage +" timewindow , \n"
 						+ " '"+propPar+ "' name \n"
-						+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
+						+ "from "
+						+ "   OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
 				EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsec);
 				// step 2 : 10 sec
 				String eql10sec = "  "
-						+ " select "
+						+ " select " 
 						+ "   avg (data) data ,  \n"
-						+ "   min ( current_timestamp()  ) TIMESTART,\n"
-						+ "   max ( current_timestamp()  ) TIMESTOP,\n"
-						
+						+ " 	 1111   	TIMESTART, "	
+						+ " 	 22222222222	TIMESTOP, "		 
 						+ "   "+ timeWindowAverage +" timewindow , \n"
 						+ " '"+propPar+ "' name \n"
-						+ "from OrderTick_ELSE"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) ";
+						+ "from OrderTick_ELSE"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) "
+								+ "where "
+								+ " data > 0 "
+								+ "group by BOS,timewindow, name "
+						;
 				
 				EPStatement cep10sec= cepAdm.createEPL(eql10sec);
 				

@@ -1,6 +1,9 @@
 package cc.co.llabor.websocket;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
@@ -30,10 +33,16 @@ public class DestroyableWebSocketClientEndpoint {
 	public void destroy() throws IOException {
     	MessageHandler bak = this.messageHandler ;
     	System.err.println("DestroyableWebSocketClientEndpoint::"+bak);
+    	LOG.error("DestroyableWebSocketClientEndpoint::",bak);
+    	
     	try {
     		this.messageHandler .destroy();
     		this.messageHandler = null;
+    		System.err.println("DestroyableWebSocketClientEndpoint::DONE");
+    		LOG.error("DestroyableWebSocketClientEndpoint::",bak);
     	}catch(Throwable e) {
+    		System.err.println("DestroyableWebSocketClientEndpoint::"+e);
+    		LOG.error("DestroyableWebSocketClientEndpoint::",e);
     		e.printStackTrace();
     		
     	}
@@ -103,16 +112,25 @@ public class DestroyableWebSocketClientEndpoint {
         	}catch(Throwable e) {
         		LOG.error("public void onMessage(String message) throws ErrorProcessingException {",e);
         		errorCounter++;
+        		processError();
         	}
         }
     }
 
     /**
-     * register message handler
+     * register message handler (overwrite, if any )
      *
      * @param msgHandler
      */
     public void addMessageHandler(MessageHandler msgHandler) {
+    	if (this.messageHandler != null)
+    	try {
+    		messageHandler.destroy();
+    	}catch(Throwable e) {
+    		e.printStackTrace();
+    		LOG.error("public void addMessageHandler(MessageHandler msgHandler) {"+this.messageHandler,e);
+    		
+    	}
         this.messageHandler = msgHandler;
     }
 
@@ -145,11 +163,46 @@ public class DestroyableWebSocketClientEndpoint {
 			this.userSession.getAsyncRemote().sendText(message);
 		}catch(Throwable e) {
 			errorCounter++;
-			LOG.error("public void sendMessage(String message) {",e);
+			LOG.error("public void sendMessage(String message) {"+errorCounter+"]]]",e);
+			processError();
+			
 		} 
     }
+
+	private void processError() {
+		final DestroyableWebSocketClientEndpoint me = this;
+		if (errorCounter> 100) {
+			synchronized (DestroyableWebSocketClientEndpoint.class) {
+				
+				
+		        final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+		        
+		        ses.schedule(new Runnable() {
+		            @Override
+		            public void run() {
+		            	try {
+		            		me.stop();
+		            		me.destroy();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							LOG.error("public void sendMessage(String message) {"+errorCounter+"]]]"+me,e);
+						}
+		            }
+		        }, 1, TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
+			
+			} 
+			
+		}
+	}
     
-    long lastHandledTimestamp = 0;
+    protected void stop() {
+    	this.messageHandler = null;
+		if (watchDog!=null)watchDog.stop();
+		
+	}
+
+	long lastHandledTimestamp = 0;
     long outMessageCounter = 0;
 	long inMessageCounter = 0;
 	long messagesPerSec = 0;
