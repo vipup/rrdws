@@ -20,7 +20,9 @@ import org.slf4j.LoggerFactory;
 
 @ClientEndpoint
 public class DestroyableWebSocketClientEndpoint {
-    /** Logger */
+    private static final int MAX_ALLOWED_ERROR_BEFORE_RESTART = 33;
+
+	/** Logger */
     private static Logger LOG = LoggerFactory.getLogger(DestroyableWebSocketClientEndpoint.class);	
 	
     Session userSession = null;
@@ -162,7 +164,7 @@ public class DestroyableWebSocketClientEndpoint {
 
 	private void processFinalizationAfterError(String message) {
 		final DestroyableWebSocketClientEndpoint me = this;
-		if (errorCounter> 3) {
+		if (errorCounter> MAX_ALLOWED_ERROR_BEFORE_RESTART) {
 			synchronized (DestroyableWebSocketClientEndpoint.class) {
 				
 				

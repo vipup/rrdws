@@ -35,6 +35,10 @@ public class WS2RRDPump implements DestroyTracker {
 		
 	}
 	
+	public void destroyed(RRDHandler rrdHandler) {
+		LOG.error("RRDHandler rrdHandler  was DESTROYED:"+rrdHandler);		
+	}	
+	
 	long created = System.currentTimeMillis();
 	
 	public WS2RRDPump () throws URISyntaxException {
@@ -257,6 +261,7 @@ public class WS2RRDPump implements DestroyTracker {
 				+ "				RRA:MIN:0.5:731:719 " + "				RRA:MIN:0.5:10000:273 " + " ";
 		return cmdCreate;
 	}
+
 
 
 

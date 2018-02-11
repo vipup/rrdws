@@ -45,6 +45,7 @@ public final class RRDHandler implements MessageHandler {
 	@Override
 	public void destroy() throws IOException {
 		 LOG.debug("destroy inited.");
+		 RRDHandler.destroyed(this);
 		
 	}
 }
