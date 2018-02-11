@@ -21,8 +21,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 
+import cc.co.llabor.websocket.cep.CEPListener;
 import cc.co.llabor.websocket.cep.DiffTracker;
 import cc.co.llabor.websocket.cep.OrderTick;
+import cc.co.llabor.websocket.cep.Any3SecListener;
+import cc.co.llabor.websocket.cep.BigEventListener;
 import cc.co.llabor.websocket.cep.PoloTick;
 import cc.co.llabor.websocket.cep.RrdPusher;
 import cc.co.llabor.websocket.cep.StatisticPrinter; 
@@ -43,27 +46,22 @@ public final class PoloHandler implements MessageHandler {
 	 * @param ws2rrdPump
 	 */
 	PoloHandler(WS2RRDPump ws2rrdPump) {
-		poloHandler = ws2rrdPump; 
-		try {
-			initCEP(this.poloHandler.rrdWS);
-		}catch (Exception e) {
-			e.printStackTrace();
-			System.exit(-111);
-		}
-		
+		poloHandler = ws2rrdPump;
+		initCEP();
 	}
- 
+	
 	EPAdministrator cepAdm;
 	EPRuntime cepRT;
 	String esper1002PROPS[] = {"N/A", "PRICELAST", "priceMax","PriceMin","PriceDiff", "volume24H","volumeTotal", "hight24H","low24H"};
-	static EPServiceProvider cep;
+	EPServiceProvider cep;
 	
 	public void destroy() {
+		cepAdm.destroyAllStatements();
+		
 		cep.destroy();
 	}
-	
-	EPRuntime initCEP(RRDWSEndpoint rrdWS){
-		
+	static int engineCounter = 0;
+	EPRuntime initCEP(){
 
 	    // The Configuration is meant only as an initialization-time object.
 	    Configuration cepConfig = new Configuration();
@@ -71,25 +69,17 @@ public final class PoloHandler implements MessageHandler {
 	    //
 	    cepConfig.addEventType("OrderTick", OrderTick.class.getName());
 	    
-	    cep = EPServiceProviderManager.getProvider("myCEPEngine", cepConfig);
+	    cep = EPServiceProviderManager.getProvider("myCEPEngine#"+engineCounter++, cepConfig);
 		cepRT = cep.getEPRuntime(); 
 	    cepAdm = cep.getEPAdministrator();
-	    
-	    // timer
-	    // 	Create a statement.
-	    EPStatement stmt = cepAdm.createEPL("insert into PoloTimer select current_timestamp()  as ct " +
-	      "from pattern[every timer:interval(1 second)]");
-	    stmt.addListener(new ClockListener());	// add a listener
-	    
-	    
 	    int intPairCounter = 0;
 	    // TODO GOTO process1001	     
-	    
+	    RRDWSEndpoint rrdWS = this.poloHandler.rrdWS;
   
 		
 	    for ( Object key : this.poloHandler.poloWS.id2pairs.keySet()) {
 	    	intPairCounter++;
-	    	if (intPairCounter<10)
+	    	//if (intPairCounter<10)
 	    	for (int pi=1; pi<esper1002PROPS.length;pi++) { // 
 	    		String properyNameTmp =  esper1002PROPS[pi];
 	    		String symTmp = (String) this.poloHandler.poloWS.id2pairs.get(key);
@@ -126,7 +116,7 @@ public final class PoloHandler implements MessageHandler {
 	    // step 4: summaryze that all
 	    String eql4 = "insert into TicksPerSecond\n" + 
 	    		"select  'PoloTick' type,  symbol, count(*) as cnt\n" + 
-	    		"from PoloTick.win:time_batch(10 second)\n" + 
+	    		"from PoloTick.win:time_batch(11 second)\n" + 
 	    		"group by symbol";
 	    EPStatement statStmtTmp = cepAdm.createEPL(eql4); 
 	    //statStmtTmp.addListener(new StatisticPrinter());
@@ -140,28 +130,6 @@ public final class PoloHandler implements MessageHandler {
 	    		"group by type";
 	    EPStatement statByTypeTmp = cepAdm.createEPL(eql5); 
 	    statByTypeTmp.addListener(new StatisticPrinter());	    
-	    
-	    
-	    /// XXXXYYY
-	    
-	    for (String typeTMP:new String[]{"0","1"}) {
-	    	intPairCounter = 0;
-
-	    	
-			for (Object pair: poloHandler.poloWS.pairs.keySet() ) {
-		    	intPairCounter++;
-		    	if (intPairCounter>10) break;
-				String MARKET_PAIR = (String) pair;
-				registerAllTypesOfOrders4ESPER(rrdWS, MARKET_PAIR , typeTMP);
-			}
-	    }
-		/// 			
-		// step 3 : diffTracker 
-		step3_doItOnlyOnce(); 
-		
-		// step 4: summaryze that all
-	    step4_doItOnlyOnce(); 
-	    //statStmtTmp.addListener(new StatisticPrinter());		
 	    
 	    return cepRT;
 
@@ -353,7 +321,23 @@ public final class PoloHandler implements MessageHandler {
 			String typeTMP = xxx.get(1).asText() ;
 			BigDecimal priceTMP = new BigDecimal(xxx.get(2).asText()); 
 			BigDecimal volTMP = new BigDecimal(xxx.get(3).asText());
- 
+
+			
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 10 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 10 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 10 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 60 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 60 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 60 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 300 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 300 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 300 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 600 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 1200 );
+			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 2400 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 600 );
+//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 600 );
+			
 			OrderTick order = new OrderTick(MARKET_PAIR, typeTMP, priceTMP, volTMP );
 			// processing Event
 		    cepRT.sendEvent(order); 
@@ -365,121 +349,13 @@ public final class PoloHandler implements MessageHandler {
 			LOG.debug( "TODO XXXYYY_O:" + xxx);
 		}		
 	}
-
-	private void registerAllTypesOfOrders4ESPER(RRDWSEndpoint rrdWS, String MARKET_PAIR, String typeTMP) {
-		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 10 );
-		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 10 );
-		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 10 );
-		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 60 );
-//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 60 );
-//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 60 );
-		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 300 );
-//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 300 );
-//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 300 );
-		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 600 );
-		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 1200 );
-		registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 2400 );
-//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 600 );
-//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 600 );
-		
-		
-
-	}
-	UpdateListener diffTracker = null;
-	private void step3_doItOnlyOnce() {
-		System.out.println("	private void step3_doItOnlyOnce() {\n" + 
-				"");
-		// step 3 : diffTracker 
-		// TODO init it only once
-		if (diffTracker == null) {
-/*
-					+ "		avg (dataMAX) dataMAX, "
-					+ "		avg (dataMIN) dataMIN, "
-					+ "		avg (dataAVG) dataAVG, "
-					+ "		avg (dataCNT) dataCNT, "
-					+ "		avg (dataCAL) dataCAL, "	
-					+ "		avg (dataTOV) dataTOV, "				
- */
-			String eql3 = ""//" select min( ct ) ctTIMER, BOS from  PoloTimer, DiffTracker where ct= TIMESTOP " + 
-					+ " insert into SummStream "
-					+ "select distinct min(ct) startTIMESTAMP ,"
-					+ "   max ( TIMESTOP ) - min ( TIMESTART )  diffTIME ,\n"					
-					+ "   max ( TIMESTOP )  stopTIME ,\n"					
-					+ "   min ( TIMESTART )  startTIME ,\n"				 
-					+ " dataAVG dAVG, \n"
-					+ " first (dataAVG) pAVG, \n"
-
-					+ " ((first (dataAVG)-dataAVG) / dataAVG) iAVG, \n"
-					+ " dataMAX dMAX, \n"
-					+ " dataMIN dMIN, \n"
-					+ " dataCAL dCAL, \n"
-					+ " dataCNT dCNT, \n"
-					+ " dataTOV dTOV, \n"
-					+ " first (dataTOV) pTOV, \n"
-					+ " ((first (dataTOV)-dataTOV) / dataTOV) iTOV, \n"
-					
-					+ " BOS, name, timewindow, "
-					+ " pair, \n" 
-					+ " type \n"
-					+ " \n" 
-					+ " from  "
-					// http://esper.espertech.com/release-5.0.0/esper-reference/html_single/index.html#epl-views
-					//+ "    PoloTimer.win:time_batch(   10   sec) ,"
-					//+ "    PoloTimer.std:lastevent() ,"
-					//+ "    PoloTimer.win:length( 10 )  ,"
-					+ "    PoloTimer.win:length_batch( 10 )  ,"										
-					+ "    DiffTracker.win:time_batch(   10   sec)  \n"
-					+ " where name='price' \n"
-					//+ "  and ct= TIMESTOP" 
-					+ " group by pair, type, name , timewindow, BOS \n"
-					+ " ";
-			EPStatement difftrackerTMP = cepAdm.createEPL(eql3); // cepAdm.createEPL(" select ct.P1  asas,   ct.P0  BDSFSDF  from  PoloTimer.win:time(60) P0 , PoloTimer.win:time_batch(60) P1  where   ct.P0 = ct.P1 ").addListener((new ClockListener()));
-			diffTracker = new DiffTracker();
-			difftrackerTMP.addListener(diffTracker );
-//			
-//			String eql4 = ""//" select min( ct ) ctTIMER, BOS from  PoloTimer, DiffTracker where ct= TIMESTOP " + 
-//					+ " select"
-//					+ "  distinct SS.dTOV tovPrice, \n"
-//					+ "  SS.dAVG price, \n"
-//					// SS
-//					+ "	 SS.startTIMESTAMP sTIME, "
-// 					+ "  SS.BOS BoS,  "
-//					//+ " SS.name,  "
-//					+ "SS.timewindow TW,  SS.pair pair, "
-//					//+ " SS.type ,\n"
-// 
-//					+ "  lastever(SS.dAVG) lePRICE, firstever(SS.dAVG) fePRICE , prevwindow(SS.dAVG) prPRICE , prev (SS.dAVG) prePRICE"
-//					+ "    \n" 
-//					+ "  from \n"
-//					+ " SummStream.win:time_batch(   10   sec)  as SS  \n"
-//					//+ " where"
-// 
-//					+ " group by \n"
-//					+ "  SS.BOS, SS.name, SS.timewindow , SS.pair, SS.type \n"
-//					+ ""
-//					+ " output every 5 sec \n";
-//			EPStatement summsTMP = cepAdm.createEPL(eql4);
-//			UpdateListener summPrinter = new SummPrinter () ;
-//			summsTMP.addListener(summPrinter  );
-				
-		}
-	}
-	private void step4_doItOnlyOnce() { 		System.out.println("private void step4_doItOnlyOnce() {");
-		String eql4 = "insert into TicksPerSecond\n" + 
-	    		"select pair symbol, 'OrderTick' type,    count(*) as cnt\n" + 
-	    		"from OrderTick.win:time_batch(10 second)\n" + 
-	    		"group by pair";
-	    EPStatement statStmtTmp = cepAdm.createEPL(eql4);
-	}
 	
 	private Map<String, RrdOrderUpdater> updaterRepo = new HashMap<String, RrdOrderUpdater>();
 
 	private void registerRRDUpdaterIfAny(RRDWSEndpoint rrdWS, String MARKET_PAIR, String typeTMP, String propPar, int timeWindowAverage) {
 		String XPATH_PREFIX = WS2RRDPump.PO_LO + "/EQLOrder/" +MARKET_PAIR +"/"+ typeTMP ;
-		
 		// PRICE
 		String nsTmp = XPATH_PREFIX + "/"+ propPar+"_"+timeWindowAverage+"sec";
-		System.out.println("registerRRDUpdaterIfAny:::"+nsTmp);
 		String AGGRSUFFIX = (""+nsTmp.hashCode()).replaceAll("-", "_");
 		// TODO even don't think about sync :)))
 		if (updaterRepo.get(nsTmp)== null) {
@@ -490,28 +366,22 @@ public final class PoloHandler implements MessageHandler {
 				String 	eqlDEFsecSELLBUY = " insert into OrderTick"+AGGRSUFFIX+"  \n"
 						+ " select "
 						+ "   type BOS ,  \n"
-						+ "     min(ct)  TIMESTART ,\n"
-						+ "     max(ct) TIMESTOP ,\n"
 						+ "   ( avg ( price )  ) data ,  \n"
 						+ "   ( avg ( price )  ) dataAVG ,  \n"
 						+ "   ( max ( price )  ) dataMAX ,  \n"
 						+ "   ( min ( price )  ) dataMIN ,  \n"
 						+ "   ( count ( price )  ) dataCNT ,  \n"
 						+ "   (  sum ( price ) / count( price ) ) dataCAL , \n"
-						+ "   (  sum (price*volume) / sum (volume) ) dataTOV , \n"
+						+ "   (  sum (total) / sum (volume) ) dataTOV , \n"
 														
 						+ "   "+ timeWindowAverage +" timewindow , \n"
 						+ " 'price' name \n"
-						+ "from "
-						+ "    PoloTimer.win:time( "+timeWindowAverage+" sec)  ,"
-						+ " OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) "
+						+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) "
 								+ "where"
 								+ " volume >0 "
-								+ "and price > 0 "								
 //								+ " and type = true " // only buy  
-								+ " group by pair "
 								+ "\n";
-				EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsecSELLBUY);
+			EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsecSELLBUY);
  		
 				
 				// step 2 : 10 sec
@@ -520,9 +390,6 @@ public final class PoloHandler implements MessageHandler {
 						
 						+ "		BOS BOS, "
 						+ "		'"+MARKET_PAIR+"' pair, "
-						//+ " 	 rate( "+10+ "  ) rateTIME , \n"
-						+ " 	 min (TIMESTART)   	TIMESTART, "	
-						+ " 	 max (TIMESTOP) 	TIMESTOP, "							
 						+ "		avg (dataMAX) dataMAX, "
 						+ "		avg (dataMIN) dataMIN, "
 						+ "		avg (dataAVG) dataAVG, "
@@ -534,7 +401,6 @@ public final class PoloHandler implements MessageHandler {
 						+ "		'price'  name, "
 						+ "		avg( data ) data from OrderTick"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) "
 						+ " where name ='price' "
-						+ "and data > 0 "
 						+ "group by BOS,timewindow, name "
 						
 										+ "";
@@ -550,39 +416,78 @@ public final class PoloHandler implements MessageHandler {
 				 
 				String 	eqlDEFsec = " insert into OrderTick_ELSE"+AGGRSUFFIX+"  \n"
 						+ " select "
-						+ " type BOS ,"
-						+ "     111111111  TIMESTART ,\n"
-						+ "     22222222 TIMESTOP ,\n"						
-						+ "   avg ("+propPar+") data ,  \n"
+						+ "   avg ("+propPar+") data ,  \n"    
 						+ "   "+ timeWindowAverage +" timewindow , \n"
 						+ " '"+propPar+ "' name \n"
-						+ "from "
-						+ "   OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
+						+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
 				EPStatement cepDEFsec= cepAdm.createEPL(eqlDEFsec);
 				// step 2 : 10 sec
 				String eql10sec = "  "
-						+ " select " 
-						+ "   avg (data) data ,  \n"
-						+ " 	 1111   	TIMESTART, "	
-						+ " 	 22222222222	TIMESTOP, "		 
+						+ " select "
+						+ "   avg (data) data ,  \n"    
 						+ "   "+ timeWindowAverage +" timewindow , \n"
 						+ " '"+propPar+ "' name \n"
-						+ "from OrderTick_ELSE"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) "
-								+ "where "
-								+ " data > 0 "
-								+ "group by BOS,timewindow, name "
-						;
+						+ "from OrderTick_ELSE"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) ";
 				
 				EPStatement cep10sec= cepAdm.createEPL(eql10sec);
 				
 				RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, propPar);
 				cep10sec.addListener(rrdUpdaterTmp);
 				updaterRepo.put(nsTmp,rrdUpdaterTmp);				
-			} 
+			}
+			
+			// step 3 : diffTracker 
+			step3_doItOnlyOnce(); 
+		    
+			// step 4: summaryze that all
+		    String eql4 = "insert into TicksPerSecond\n" + 
+		    		"select pair symbol, 'OrderTick' type,    count(*) as cnt\n" + 
+		    		"from OrderTick.win:time_batch(10 second)\n" + 
+		    		"group by pair";
+		    EPStatement statStmtTmp = cepAdm.createEPL(eql4); 
+		    //statStmtTmp.addListener(new StatisticPrinter());
 		}
 	}
 
-
+	UpdateListener diffTracker = null;
+	private void step3_doItOnlyOnce() {
+		// step 3 : diffTracker 
+		// TODO init it only once
+		if (diffTracker == null) {
+/*
+					+ "		avg (dataMAX) dataMAX, "
+					+ "		avg (dataMIN) dataMIN, "
+					+ "		avg (dataAVG) dataAVG, "
+					+ "		avg (dataCNT) dataCNT, "
+					+ "		avg (dataCAL) dataCAL, "	
+					+ "		avg (dataTOV) dataTOV, "				
+ */
+			String eql3 = "" + 
+					"select BOS, name, timewindow, "
+					+ "( dataAVG - dataMAX )							diffMAX , \n"
+					+ "( dataAVG - dataMIN )							diffMIN ,\n"
+					+ "( dataMAX  - dataMIN )							diffDIF ,\n"
+					+ "( (dataMAX + dataMIN)/2   - dataTOV )				diffTOV ,\n"
+					+ "( dataAVG - (dataMAX + dataMIN)/2 )/dataAVG*100 	middlePCENT ,\n"
+					+ "( dataAVG - dataTOV )/dataAVG*100				tovPCENT ,\n"
+					+ " dataAVG dAVG, \n"
+					+ " dataMAX dMAX, \n"
+					+ " dataMIN dMIN, \n"
+					+ " dataCAL dCAL, \n"
+					+ " dataCNT dCNT, \n"
+					+ " dataTOV dTOV, \n"
+					+ " pair, \n" 
+					+ " type \n"
+					+ " \n" 
+					+ "from DiffTracker.win:time_batch(   10   sec) \n"
+					+ " where name='price' \n" 
+					+ " group by pair, type, name , timewindow, BOS \n"
+					+ " ";
+			EPStatement difftrackerTMP = cepAdm.createEPL(eql3); 
+			diffTracker = new DiffTracker();
+			difftrackerTMP.addListener(diffTracker );
+		}
+	}
 
  
 	

@@ -29,7 +29,9 @@ public class WS2RRDPump implements DestroyTracker {
 	public void destroyed(DestroyableWebSocketClientEndpoint destroyableWebSocketClientEndpoint) {
 		LOG.debug("initially was DESTROYED:"+destroyableWebSocketClientEndpoint);
 		// close the rest...
-//		this.destroy();
+		// looks like we have to restart....
+		System.err.println("looks like we have to restart....");
+        startAllOfThis(11);
 		
 	}
 	
@@ -107,7 +109,12 @@ public class WS2RRDPump implements DestroyTracker {
 						}
             		}
             	}
-            	synchronized (WS2RRDPump.class) {
+            	toBeRemoved();
+            	
+            }
+			private void toBeRemoved() {
+				if ("TODO".equals("WIP")) // it should be removed  ...
+				synchronized (WS2RRDPump.class) {
 	            	if (!pump.isAlive()) { // check fo alive, and reInit
 	            		
 	            		pump = null;
@@ -149,8 +156,7 @@ public class WS2RRDPump implements DestroyTracker {
 	            		
 	            	}
             	}
-            	
-            }
+			}
         }, delayPar , 13, TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
 	}
 	
@@ -164,12 +170,13 @@ public class WS2RRDPump implements DestroyTracker {
 	private void destroy(String reasonPar) {
 		System.out.println("Destroy initiated..[" +reasonPar +"]");
 		// first schedule new start in 33 sec ... 
-		
+		System.out.println("..I'll be back...");
+		LOG.error( "..I'll be back..." );
+
 		startAllOfThis(33);
 		
 		LOG.error("Destroy initiated..");
 		try {
-			this.rrdWS.addMessageHandler(null);
 			this.rrdWS.destroy();
 			this.rrdWS = null;
 		} catch (RuntimeException e) {
@@ -178,7 +185,6 @@ public class WS2RRDPump implements DestroyTracker {
 			LOG.error("this.rrdWS.destroy();", e) ;
 		}
 		try {
-			this.poloWS.addMessageHandler(null);
 			this.poloWS.destroy();
 			this.poloWS = null;
 		} catch (RuntimeException e) {

@@ -35,17 +35,7 @@ public class DestroyableWebSocketClientEndpoint {
     	System.err.println("DestroyableWebSocketClientEndpoint::"+bak);
     	LOG.error("DestroyableWebSocketClientEndpoint::",bak);
     	
-    	try {
-    		this.messageHandler .destroy();
-    		this.messageHandler = null;
-    		System.err.println("DestroyableWebSocketClientEndpoint::DONE");
-    		LOG.error("DestroyableWebSocketClientEndpoint::",bak);
-    	}catch(Throwable e) {
-    		System.err.println("DestroyableWebSocketClientEndpoint::"+e);
-    		LOG.error("DestroyableWebSocketClientEndpoint::",e);
-    		e.printStackTrace();
-    		
-    	}
+    	this.addMessageHandler(null);
     		
     	try {
 	    	WebSocketContainer container = userSession.getContainer();
@@ -62,6 +52,7 @@ public class DestroyableWebSocketClientEndpoint {
     		userSession.close( reason  );
     	}catch(Throwable e) {
     		e.printStackTrace();
+    		LOG.error("public void destroy() throws IOException {"+this, e);
     	}
     	
     	this.userSession = null;
@@ -110,9 +101,9 @@ public class DestroyableWebSocketClientEndpoint {
         	try {
         		this.messageHandler.handleMessage(message);
         	}catch(Throwable e) {
-        		LOG.error("public void onMessage(String message) throws ErrorProcessingException {",e);
+        		LOG.error("public void onMessage(String ::"+message+") throws ErrorProcessingException {",e);
         		errorCounter++;
-        		processError();
+        		processFinalizationAfterError(message);
         	}
         }
     }
@@ -163,15 +154,15 @@ public class DestroyableWebSocketClientEndpoint {
 			this.userSession.getAsyncRemote().sendText(message);
 		}catch(Throwable e) {
 			errorCounter++;
-			LOG.error("public void sendMessage(String message) {"+errorCounter+"]]]",e);
-			processError();
+			LOG.error("public void sendMessage(String ::"+message+") {"+errorCounter+"]]]",e);
+			processFinalizationAfterError(message);
 			
 		} 
     }
 
-	private void processError() {
+	private void processFinalizationAfterError(String message) {
 		final DestroyableWebSocketClientEndpoint me = this;
-		if (errorCounter> 100) {
+		if (errorCounter> 3) {
 			synchronized (DestroyableWebSocketClientEndpoint.class) {
 				
 				
@@ -193,6 +184,8 @@ public class DestroyableWebSocketClientEndpoint {
 			
 			} 
 			
+		}else {
+			LOG.error("SENDRCVMESSAGEERROR:::["+message+"]");
 		}
 	}
     
