@@ -21,15 +21,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-import cc.co.llabor.websocket.cep.CEPListener;
 import cc.co.llabor.websocket.cep.DiffTracker;
 import cc.co.llabor.websocket.cep.OrderTick;
-import cc.co.llabor.websocket.cep.Any3SecListener;
-import cc.co.llabor.websocket.cep.BigEventListener;
 import cc.co.llabor.websocket.cep.PoloTick;
 import cc.co.llabor.websocket.cep.RrdPusher;
-import cc.co.llabor.websocket.cep.StatisticPrinter;
-import cc.co.llabor.websocket.cep.SummPrinter; 
+import cc.co.llabor.websocket.cep.StatisticPrinter; 
  
  
  
@@ -48,7 +44,12 @@ public final class PoloHandler implements MessageHandler {
 	 */
 	PoloHandler(WS2RRDPump ws2rrdPump) {
 		poloHandler = ws2rrdPump; 
-			initCEP(this.poloHandler.rrdWS); 
+		try {
+			initCEP(this.poloHandler.rrdWS);
+		}catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-111);
+		}
 		
 	}
  
@@ -497,7 +498,7 @@ public final class PoloHandler implements MessageHandler {
 						+ "   ( min ( price )  ) dataMIN ,  \n"
 						+ "   ( count ( price )  ) dataCNT ,  \n"
 						+ "   (  sum ( price ) / count( price ) ) dataCAL , \n"
-						+ "   (  sum (total) / sum (volume) ) dataTOV , \n"
+						+ "   (  sum (price*volume) / sum (volume) ) dataTOV , \n"
 														
 						+ "   "+ timeWindowAverage +" timewindow , \n"
 						+ " 'price' name \n"

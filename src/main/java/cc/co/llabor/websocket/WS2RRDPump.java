@@ -79,7 +79,7 @@ public class WS2RRDPump implements DestroyTracker {
 	public static void main(String[] args) {
         startAllOfThis(1);
 	}
-	private static void startAllOfThis(long delayPar) {
+	private static synchronized void startAllOfThis(long delayPar) {
 		final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
         
         ses.scheduleAtFixedRate(new Runnable() {
@@ -164,6 +164,7 @@ public class WS2RRDPump implements DestroyTracker {
 	private void destroy(String reasonPar) {
 		System.out.println("Destroy initiated..[" +reasonPar +"]");
 		// first schedule new start in 33 sec ... 
+		
 		startAllOfThis(33);
 		
 		LOG.error("Destroy initiated..");

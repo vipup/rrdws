@@ -8,6 +8,7 @@ public class OrderTick {
 	private double volume;
 	private String pair;
 	private boolean type;
+	private double total;
 
 	public OrderTick(String pair, String typeTMP, BigDecimal price, BigDecimal volume) {
 		this(pair, "0".equals(typeTMP), price.doubleValue(), volume.doubleValue());
@@ -19,11 +20,12 @@ public class OrderTick {
 		this.setVolume(volume);
 		this.setPrice(price);
 		this.setType(type);
+		this.setTotal(price*volume);
 	}
 	
-	public double getTotal() {
-		return price * volume;
-	}
+//	public double getTotal() {
+//		return price * volume;
+//	}
 
 	public double getPrice() {
 		return price;
@@ -55,6 +57,14 @@ public class OrderTick {
 
 	public void setType(boolean type) {
 		this.type = type;
+	}
+
+	public double getTotal() {
+		return total;
+	}
+
+	public void setTotal(double total) {
+		this.total = total;
 	}
 
 }
