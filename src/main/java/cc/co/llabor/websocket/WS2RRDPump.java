@@ -31,6 +31,7 @@ public class WS2RRDPump implements DestroyTracker {
 		// close the rest...
 		// looks like we have to restart....
 		System.err.println("looks like we have to restart....");
+		pumpAllBeOne = null ; // suicide
         startAllOfThis(11);
 		
 	}
@@ -40,9 +41,15 @@ public class WS2RRDPump implements DestroyTracker {
 	}	
 	
 	long created = System.currentTimeMillis();
+
+
+
+
+	private ScheduledExecutorService scheduler;
 	
-	public WS2RRDPump () throws URISyntaxException {
-		// start();
+	public WS2RRDPump (ScheduledExecutorService ses) throws URISyntaxException {
+		this.scheduler = ses;
+		System.out.println("T1");
 	}
 	@Override
 	public void stop() {
@@ -56,6 +63,7 @@ public class WS2RRDPump implements DestroyTracker {
 	}	
 
 	private void start() throws URISyntaxException {
+		System.out.println("T2");
 		synchronized (WS2RRDPump.class) {
 			LOG.info("start RRDWS...");
 			// open RRD-websocket
@@ -76,6 +84,7 @@ public class WS2RRDPump implements DestroyTracker {
 
 	private void createRRDWS(DestroyTracker watchDog) throws URISyntaxException {
 		URI endpointURI = new URI(WS_SSO_AT_THE_HOST_8080_RRDSAAS_WEBSOCKET_CHAT);
+		System.out.println("T3");
 		rrdWS = new RRDWSEndpoint( endpointURI, watchDog );
 					// add listener - just print + ignore
 					rrdWS.addMessageHandler(new RRDHandler(this));
@@ -85,83 +94,62 @@ public class WS2RRDPump implements DestroyTracker {
 	public static void main(String[] args) {
         startAllOfThis(1);
 	}
+	private static final void cleanUpAllGarbageIfPossible(WS2RRDPump invalidPumpIsHere) {
+		System.out.println("Last chance to die...");
+		LOG.error( "Last chance to die...");
+		LOG.info( "Last chance to die...");
+		LOG.debug( "Last chance to die...");
+		LOG.trace( "Last chance to die...");
+		invalidPumpIsHere.destroy("EOL");
+	}
+	
+	private static WS2RRDPump pumpAllBeOne = null;
+	
+ 
+	static volatile boolean newStartRequested = false;
+	
 	private static synchronized void startAllOfThis(long delayPar) {
+		if (newStartRequested ) return;
+		newStartRequested = true;
 		final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
-        
-        ses.scheduleAtFixedRate(new Runnable() {
-        	
-        	WS2RRDPump pump = null;
-        	long inOUTMessageCounter = 0;// not used 
-        	long outOUTMessageCounter = 0;// ->RRD 
-        	long outINMessageCounter = 0;// not used
-        	long inINMessageCounter = 0; // POLO->        	
+		
+        ses.schedule(new Runnable() { 
             @Override
             public void run() {
-            	System.out.println("Check Pump::#"+inINMessageCounter+"/"+outOUTMessageCounter+" STATUS:"+pump);
+            	newStartRequested  = false;
+            	long inOUTMessageCounter = 0;// not used 
+            	long outOUTMessageCounter = 0;// ->RRD 
+            	long outINMessageCounter = 0;// not used
+            	long inINMessageCounter = 0; // POLO->                  	
+            	System.out.println("Check Pump::#"+inINMessageCounter+"/"+outOUTMessageCounter+" STATUS:"+pumpAllBeOne);
                 // Check pump any minute , and restart if something wrong
-            	while (pump == null) {
+            	while (pumpAllBeOne == null) {
             		synchronized (WS2RRDPump.class) {
+            			if (pumpAllBeOne == null)
 	            		try {
+	            			pumpAllBeOne = new WS2RRDPump (ses);
 	            			LOG.info("start#"+(restartCounter++)+" ...");
-	            			pump = new WS2RRDPump ();
-	            			LOG.debug("new Pump created:"+pump);
-	            			pump.start();
+	            			 
+	            			LOG.debug("new Pump created:"+pumpAllBeOne);
+	            			pumpAllBeOne.start();
 	            			LOG.debug("..and started.");
+	            			 
 	            			
-						} catch (URISyntaxException e) {
-							LOG.error("LOG.debug(\"new Pump created:\"+pump);", e) ;
+	            		} catch (URISyntaxException e) {
+							LOG.error("LOG.debug(\"new Pump created:\"+pump);", e) ;	
+							pumpAllBeOne = null;
+						}catch (Throwable e) {
+							LOG.error("Hmmm... Something goes wrong with restart... -> try again...", e) ;
+							startAllOfThis( 10 * restartCounter ) ; // with hope, that wrong restrt will take not more than this growing timep-period 
+							cleanUpAllGarbageIfPossible(pumpAllBeOne);	
+							pumpAllBeOne = null;
 						}
+            			 
             		}
-            	}
-            	toBeRemoved();
-            	
-            }
-			private void toBeRemoved() {
-				if ("TODO".equals("WIP")) // it should be removed  ...
-				synchronized (WS2RRDPump.class) {
-	            	if (!pump.isAlive()) { // check fo alive, and reInit
-	            		
-	            		pump = null;
-	            		LOG.debug("Pump should be GCed.. ");
-	            		System.gc();
-	            	}else if (System.currentTimeMillis() +5000 > pump.created ){ //
-	            		LOG.debug( "RRD:---<--"+pump.rrdWS.inMessageCounter  +"::---->"+ pump.rrdWS.outMessageCounter ); 
-	            		LOG.debug("PLO <---  "+pump.poloWS.inMessageCounter +"!!---->"+ pump.poloWS.outMessageCounter );
-	            		if (System.currentTimeMillis() +125000 > pump.created  && outOUTMessageCounter  > 1900 && outOUTMessageCounter == pump.rrdWS.outMessageCounter) {
-	            			try {
-	            				WS2RRDPump toDEL = pump;
-	            				pump = null;
-	            				toDEL.destroy("if (System.currentTimeMillis() +125000 > pump.created  && outOUTMessageCounter  > 1900 && outOUTMessageCounter == pump.rrdWS.outMessageCounter) {");
-	            				
-	            				return;
-	            			}catch(Throwable e) {
-	            				LOG.error("outOUTMessageCounter  > 1900 && outOUTMessageCounter == pump.rrdWS.outMessageCounter;", e) ;
-	            			}
-	            		}
-	        		                                                                                          
-	            		if (System.currentTimeMillis() +125000 > pump.created && inINMessageCounter  > 1900 &&  inINMessageCounter == pump.poloWS.inMessageCounter) {
-	            			try {
-	            				WS2RRDPump toDEL = pump;
-	            				pump = null;
-	            				toDEL.destroy("if (System.currentTimeMillis() +125000 > pump.created && inINMessageCounter  > 1900 &&  inINMessageCounter == pump.poloWS.inMessageCounter) {");
-	            				
-	            				return;
-	            			}catch(Throwable e) {
-	            				LOG.error("inINMessageCounter  > 1900 &&  inINMessageCounter == pump.poloWS.inMessageCounter;", e) ;
-	            			}
-	            		}
-	            		outOUTMessageCounter = pump.rrdWS.outMessageCounter;
-	            		inINMessageCounter  = pump.poloWS.inMessageCounter;
-	            		// not insteresting
-	            		inOUTMessageCounter =  pump.rrdWS.inMessageCounter;
-	            		outINMessageCounter  = pump.poloWS.outMessageCounter;
-	            		
-	            		
-	            		
-	            	}
-            	}
+           		
+            	} 
 			}
-        }, delayPar , 13, TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
+        }, delayPar , TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
 	}
 	
 	
@@ -172,6 +160,7 @@ public class WS2RRDPump implements DestroyTracker {
 	}
 
 	private void destroy(String reasonPar) {
+		
 		System.out.println("Destroy initiated..[" +reasonPar +"]");
 		// first schedule new start in 33 sec ... 
 		System.out.println("..I'll be back...");
@@ -197,6 +186,8 @@ public class WS2RRDPump implements DestroyTracker {
 			LOG.error("this.poloWS.destroy();;", e) ;
 		}
 		alive = false;
+		
+		scheduler.shutdown();
 	}
 
 

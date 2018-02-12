@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 @ClientEndpoint
 public class DestroyableWebSocketClientEndpoint {
-    private static final int MAX_ALLOWED_ERROR_BEFORE_RESTART = 33;
+    private static final int MAX_ALLOWED_ERROR_BEFORE_RESTART = 333;
 
 	/** Logger */
     private static Logger LOG = LoggerFactory.getLogger(DestroyableWebSocketClientEndpoint.class);	
@@ -30,9 +30,14 @@ public class DestroyableWebSocketClientEndpoint {
 	
     public DestroyableWebSocketClientEndpoint(DestroyTracker watchDog ) {
 		this.watchDog = watchDog;
+		System.out.println("T4");
+
 	}
 
 	public void destroy() throws IOException {
+		
+		this.isAlive = false;
+		
     	MessageHandler bak = this.messageHandler ;
     	System.err.println("DestroyableWebSocketClientEndpoint::"+bak);
     	LOG.error("DestroyableWebSocketClientEndpoint::",bak);
@@ -66,6 +71,8 @@ public class DestroyableWebSocketClientEndpoint {
     }
 
     protected MessageHandler messageHandler ;
+
+	private boolean isAlive=true;
     
     /**
      * Callback hook for Connection open events.
@@ -100,6 +107,7 @@ public class DestroyableWebSocketClientEndpoint {
     public void onMessage(String message) throws ErrorProcessingException {
     	inMessageCounter ++;
         if (this.messageHandler != null) {
+        	if (isAlive )
         	try {
         		this.messageHandler.handleMessage(message);
         	}catch(Throwable e) {
@@ -149,6 +157,7 @@ public class DestroyableWebSocketClientEndpoint {
 			messagesPerSec = 0;
 			sizePerSec =0;
 		}
+		if (isAlive)
 		try {
 			if (message.indexOf("X1088538178")>0) {
 				System.out.println("------------------X1088538178[" + System.currentTimeMillis() +"]"+message);
@@ -166,7 +175,7 @@ public class DestroyableWebSocketClientEndpoint {
 		final DestroyableWebSocketClientEndpoint me = this;
 		if (errorCounter> MAX_ALLOWED_ERROR_BEFORE_RESTART) {
 			synchronized (DestroyableWebSocketClientEndpoint.class) {
-				
+				isAlive = false; // stop all firther errors...
 				
 		        final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
 		        
