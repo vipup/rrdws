@@ -200,7 +200,6 @@ public class WS2RRDPump implements DestroyTracker {
 	}
 
 	private void destroy(String reasonPar) {
-		if (!alive)return;
 		
 		System.out.println("Destroy initiated..[" +reasonPar +"]");
 		// first schedule new start in 33 sec ... 
