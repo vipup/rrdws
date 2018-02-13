@@ -35,7 +35,6 @@ public class DestroyableWebSocketClientEndpoint {
 	}
 
 	public void destroy() throws IOException {
-		
 		this.isAlive = false;
 		
     	MessageHandler bak = this.messageHandler ;
@@ -108,8 +107,9 @@ public class DestroyableWebSocketClientEndpoint {
     	inMessageCounter ++;
         if (this.messageHandler != null) {
         	if (isAlive )
-        	try {
+        	try {        		
         		this.messageHandler.handleMessage(message);
+        		lastHandledTimestamp = System.currentTimeMillis();
         	}catch(Throwable e) {
         		LOG.error("public void onMessage(String ::"+message+") throws ErrorProcessingException {",e);
         		errorCounter++;
@@ -146,23 +146,14 @@ public class DestroyableWebSocketClientEndpoint {
     	outMessageCounter++; 
     	messagesPerSec++; 
     	sizePerSec+=message.length();
-		if (errorCounter > 1000  || (lastHandledTimestamp>111111111111L && System.currentTimeMillis()  -lastHandledTimestamp  >100000 )) { // FULL Restart
-    	//	if ( System.currentTimeMillis() -1000 >lastHandledTimestamp ) {
-			
-			LOG.debug("RRDSENDED:<"+(lastHandledTimestamp-System.currentTimeMillis())+">>>   " +
-			"/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::"			+
-			(sizePerSec/messagesPerSec) +" bytes/message["+inMessageCounter + "///"+ outMessageCounter 
-			);
-			lastHandledTimestamp = System.currentTimeMillis();
-			messagesPerSec = 0;
-			sizePerSec =0;
-		}
+ 
 		if (isAlive)
 		try {
 			if (message.indexOf("X1088538178")>0) {
 				System.out.println("------------------X1088538178[" + System.currentTimeMillis() +"]"+message);
 			}
 			this.userSession.getAsyncRemote().sendText(message);
+			lastHandledTimestamp = System.currentTimeMillis();
 		}catch(Throwable e) {
 			errorCounter++;
 			LOG.error("public void sendMessage(String ::"+message+") {"+errorCounter+"]]]",e);

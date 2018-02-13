@@ -24,6 +24,7 @@ public class WS2RRDPump implements DestroyTracker {
 	public static final String PO_LO = "/PoLo";
 	RRDWSEndpoint rrdWS ;
 	PoloWSEndpoint poloWS;
+	ScheduledExecutorService WD;  
 	private boolean alive;
 	@Override
 	public void destroyed(DestroyableWebSocketClientEndpoint destroyableWebSocketClientEndpoint) {
@@ -71,10 +72,46 @@ public class WS2RRDPump implements DestroyTracker {
 			LOG.info("start poloWS...");
 			// open POLO- websocket
 			createPoloWS(this);
+			
+			LOG.info("start WatchDOGS...");
+			createWD(this);
+			
+			
 			this.alive = true;
 			LOG.info("started.");
 		}	
 	}
+	private void createWD(final WS2RRDPump ws2rrdPump) {
+		WD = Executors.newSingleThreadScheduledExecutor();
+		
+        Runnable command = new Runnable() {
+        	long initTime = System.currentTimeMillis();
+        	int checkCount =0;
+            @Override
+            public void run() {
+            	if ( System.currentTimeMillis() - ws2rrdPump.poloWS.lastHandledTimestamp > 100000)  ws2rrdPump.destroy("POLO is passive last 100 sec!");
+            	if ( System.currentTimeMillis() - ws2rrdPump.rrdWS.lastHandledTimestamp   > 100000)  ws2rrdPump.destroy("RRD is passive!last 100 sec!");
+            	System.out.println("all fine with "+ws2rrdPump+"::::"+checkCount);
+            	LOG.info(
+            			"WDINFO{}: {} ms ::i{}o{}->/->I{}O{}",
+            			checkCount,
+            			System.currentTimeMillis() - initTime, 
+            			ws2rrdPump.poloWS.inMessageCounter,
+            			ws2rrdPump.poloWS.outMessageCounter,
+            			ws2rrdPump.rrdWS.inMessageCounter,
+            			ws2rrdPump.rrdWS.outMessageCounter
+            			
+            			);
+            	checkCount++;
+            }
+        };
+		long initialDelay = 13;
+		long period = 17;
+		TimeUnit unit = TimeUnit .SECONDS;
+		WD.scheduleAtFixedRate(command, initialDelay, period, unit);
+		
+	}
+
 	private void createPoloWS(DestroyTracker watchDog) throws URISyntaxException {
 		URI endpointURI = new URI(WSS_API2_POLONIEX_COM);
 		poloWS = new PoloWSEndpoint(endpointURI, watchDog );
@@ -109,11 +146,14 @@ public class WS2RRDPump implements DestroyTracker {
 	static volatile boolean newStartRequested = false;
 	
 	private static synchronized void startAllOfThis(long delayPar) {
+		restartCounter++;
 		if (newStartRequested ) return;
+		
 		newStartRequested = true;
 		final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
 		
         ses.schedule(new Runnable() { 
+        	final int myID = restartCounter;
             @Override
             public void run() {
             	newStartRequested  = false;
@@ -128,7 +168,7 @@ public class WS2RRDPump implements DestroyTracker {
             			if (pumpAllBeOne == null)
 	            		try {
 	            			pumpAllBeOne = new WS2RRDPump (ses);
-	            			LOG.info("start#"+(restartCounter++)+" ...");
+	            			LOG.info("start#"+(myID)+" ...");
 	            			 
 	            			LOG.debug("new Pump created:"+pumpAllBeOne);
 	            			pumpAllBeOne.start();
@@ -149,7 +189,7 @@ public class WS2RRDPump implements DestroyTracker {
            		
             	} 
 			}
-        }, delayPar , TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
+        }, restartCounter * delayPar , TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
 	}
 	
 	
@@ -160,6 +200,7 @@ public class WS2RRDPump implements DestroyTracker {
 	}
 
 	private void destroy(String reasonPar) {
+		if (!alive)return;
 		
 		System.out.println("Destroy initiated..[" +reasonPar +"]");
 		// first schedule new start in 33 sec ... 
@@ -176,7 +217,9 @@ public class WS2RRDPump implements DestroyTracker {
 			LOG.error("this.rrdWS.destroy();", e) ;
 		} catch (IOException e) {
 			LOG.error("this.rrdWS.destroy();", e) ;
-		}
+		} catch (Throwable e) {
+			LOG.error("this.rrdWS.destroy();;", e) ;
+		}  
 		try {
 			this.poloWS.destroy();
 			this.poloWS = null;
@@ -184,10 +227,24 @@ public class WS2RRDPump implements DestroyTracker {
 			LOG.error("this.poloWS.destroy();;", e) ;
 		} catch (IOException e) {
 			LOG.error("this.poloWS.destroy();;", e) ;
-		}
-		alive = false;
+		} catch (Throwable e) {
+			LOG.error("this.poloWS.destroy();;", e) ;
+		}  
+ 
+		try {
+			this.scheduler.shutdown();
+			this.scheduler = null;
+		} catch (Throwable e) {
+			LOG.error("this.scheduler.destroy();;", e) ;
+		}  
+		try {
+			this.WD.shutdown();
+			this.WD = null;
+		} catch (Throwable e) {
+			LOG.error("this.WD.destroy();;", e) ;
+		}  
 		
-		scheduler.shutdown();
+		alive = false;
 	}
 
 
