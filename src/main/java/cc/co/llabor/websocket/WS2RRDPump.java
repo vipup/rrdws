@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory; ;
 public class WS2RRDPump implements DestroyTracker {
     /** Logger */
     private static Logger LOG = LoggerFactory.getLogger(WS2RRDPump.class);	
-	
+	// use -DDISABLE_REPAIR_JOBS for debugger
+    public final static boolean DISABLE_REPAIR_JOBS =  System.getProperty("DISABLE_REPAIR_JOBS") != null;
 	
 	 	
 
@@ -82,6 +83,7 @@ public class WS2RRDPump implements DestroyTracker {
 		}	
 	}
 	private void createWD(final WS2RRDPump ws2rrdPump) {
+		if (WS2RRDPump.DISABLE_REPAIR_JOBS) return;
 		WD = Executors.newSingleThreadScheduledExecutor();
 		
         Runnable command = new Runnable() {
@@ -200,7 +202,7 @@ public class WS2RRDPump implements DestroyTracker {
 	}
 
 	private void destroy(String reasonPar) {
-		
+		if (WS2RRDPump.DISABLE_REPAIR_JOBS) return;
 		System.out.println("Destroy initiated..[" +reasonPar +"]");
 		// first schedule new start in 33 sec ... 
 		System.out.println("..I'll be back...");

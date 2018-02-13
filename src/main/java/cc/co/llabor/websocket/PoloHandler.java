@@ -149,19 +149,6 @@ public final class PoloHandler implements MessageHandler {
 		messageCounter ++; 
 		messagesPerSec++; 
 		sizePerSec+=message.length();
-		if ( System.currentTimeMillis() -1000 >lastHandledTimestamp ) {
-			if (errorCounter > 1000  || (lastHandledTimestamp>111111111111L && System.currentTimeMillis()  -lastHandledTimestamp  >100000 )) { // FULL Restart
-				try {
-					poloHandler.poloWS.destroy();
-				} catch (IOException e) {
-					LOG.error("poloHandler.poloWS.destroy();", e);
-				}
-			}
-			LOG.debug( "WSRECEIVE:<"+(lastHandledTimestamp-System.currentTimeMillis())+"<<<   " + "/ "+messagesPerSec +" msg/sec  // "+sizePerSec+"  bytes/per sec  :::" + (sizePerSec/messagesPerSec) +" bytes/message[" +messageCounter );
-			lastHandledTimestamp = System.currentTimeMillis();
-			messagesPerSec = 0;
-			
-		}
 		// The channels are:
 		// 1001 = trollbox (you will get nothing but a heartbeat)
 		// 1002 = ticker
@@ -367,9 +354,9 @@ public final class PoloHandler implements MessageHandler {
 						+ " select "
 						+ "   type BOS ,  \n"
 						+ "   ( avg ( price )  ) data ,  \n"
-						+ "   ( avg ( price )  ) dataAVG ,  \n"
-						+ "   ( max ( price )  ) dataMAX ,  \n"
-						+ "   ( min ( price )  ) dataMIN ,  \n"
+						+ "   ( avg ( price )  ) dataAVG ,  \n" 
+						+ "   ( max ( count( price )  + avg ( (price * volume) ) / avg (volume)  / 1000000 )  ) dataMAX ,  \n"
+						+ "   ( min ( count( price )  + avg ( (price * volume) ) / avg (volume)  / 1000000 )  ) dataMIN ,  \n"
 						+ "   ( count ( price )  ) dataCNT ,  \n"
 						+ "   (  sum ( price ) / count( price ) ) dataCAL , \n"
 						+ "   (  sum (total) / sum (volume) ) dataTOV , \n"
@@ -390,10 +377,10 @@ public final class PoloHandler implements MessageHandler {
 						
 						+ "		BOS BOS, "
 						+ "		'"+MARKET_PAIR+"' pair, "
-						+ "		avg (dataMAX) dataMAX, "
-						+ "		avg (dataMIN) dataMIN, "
+						+ "		max (dataMAX) dataMAX, "
+						+ "		min (dataMIN) dataMIN, "
 						+ "		avg (dataAVG) dataAVG, "
-						+ "		avg (dataCNT) dataCNT, "
+						+ "		max (dataCNT) dataCNT, "
 						+ "		avg (dataCAL) dataCAL, "	
 						+ "		avg (dataTOV) dataTOV, "
 						+ "		'price' type, "
@@ -461,18 +448,18 @@ public final class PoloHandler implements MessageHandler {
 					+ "		avg (dataCNT) dataCNT, "
 					+ "		avg (dataCAL) dataCAL, "	
 					+ "		avg (dataTOV) dataTOV, "				
- */
+ */ 
 			String eql3 = "" + 
 					"select BOS, name, timewindow, "
-					+ "( dataAVG - dataMAX )							diffMAX , \n"
-					+ "( dataAVG - dataMIN )							diffMIN ,\n"
-					+ "( dataMAX  - dataMIN )							diffDIF ,\n"
+					+ "( dataAVG - (1000000.0000000000001* (dataMAX%1.0000000000000000001))    )							diffMAX , \n"
+					+ "( dataAVG - (1000000.0000000000001* (dataMIN%1.0000000000000000001))    )							diffMIN ,\n"
+					+ "( (1000000.0000000000001* (dataMAX%1.0000000000000000001))   - (1000000.0000000000001* (dataMIN%1.0000000000000000001))    )							diffDIF ,\n"
 					+ "( (dataMAX + dataMIN)/2   - dataTOV )				diffTOV ,\n"
 					+ "( dataAVG - (dataMAX + dataMIN)/2 )/dataAVG*100 	middlePCENT ,\n"
 					+ "( dataAVG - dataTOV )/dataAVG*100				tovPCENT ,\n"
 					+ " dataAVG dAVG, \n"
-					+ " dataMAX dMAX, \n"
-					+ " dataMIN dMIN, \n"
+					+ " (1000000.0000000000001* (dataMAX%1.0000000000000000001))  dMAX, \n"
+					+ " (1000000.0000000000001* (dataMIN%1.0000000000000000001))  dMIN, \n"
 					+ " dataCAL dCAL, \n"
 					+ " dataCNT dCNT, \n"
 					+ " dataTOV dTOV, \n"

@@ -163,7 +163,9 @@ public class DestroyableWebSocketClientEndpoint {
     }
 
 	private void processFinalizationAfterError(String message) {
+		if (WS2RRDPump.DISABLE_REPAIR_JOBS) return;
 		final DestroyableWebSocketClientEndpoint me = this;
+		
 		if (errorCounter> MAX_ALLOWED_ERROR_BEFORE_RESTART) {
 			synchronized (DestroyableWebSocketClientEndpoint.class) {
 				isAlive = false; // stop all firther errors...
