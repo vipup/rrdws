@@ -182,7 +182,7 @@ public class WS2RRDPump implements DestroyTracker {
 							pumpAllBeOne = null;
 						}catch (Throwable e) {
 							LOG.error("Hmmm... Something goes wrong with restart... -> try again...", e) ;
-							startAllOfThis( 10 * restartCounter ) ; // with hope, that wrong restrt will take not more than this growing timep-period 
+							startAllOfThis( 3 + restartCounter ) ; // with hope, that wrong restrt will take not more than this growing timep-period 
 							cleanUpAllGarbageIfPossible(pumpAllBeOne);	
 							pumpAllBeOne = null;
 						}
