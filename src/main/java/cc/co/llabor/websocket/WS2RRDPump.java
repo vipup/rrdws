@@ -95,7 +95,7 @@ public class WS2RRDPump implements DestroyTracker {
             	if ( System.currentTimeMillis() - ws2rrdPump.rrdWS.lastHandledTimestamp   > 100000)  ws2rrdPump.destroy("RRD is passive!last 100 sec!");
             	System.out.println("all fine with "+ws2rrdPump+"::::"+checkCount);
             	LOG.info(
-            			"WDINFO{}: {} ms ::i{}o{}->/->I{}O{}",
+            			"WDINFO{}: {} ms ::i {} .{} ->/-> i {} .{}",
             			checkCount,
             			System.currentTimeMillis() - initTime, 
             			ws2rrdPump.poloWS.inMessageCounter,
@@ -191,7 +191,7 @@ public class WS2RRDPump implements DestroyTracker {
            		
             	} 
 			}
-        }, restartCounter * delayPar , TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
+        }, restartCounter + delayPar , TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
 	}
 	
 	
