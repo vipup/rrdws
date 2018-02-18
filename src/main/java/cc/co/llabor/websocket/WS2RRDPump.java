@@ -191,7 +191,7 @@ public class WS2RRDPump implements DestroyTracker {
            		
             	} 
 			}
-        }, restartCounter + delayPar , TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
+        }, (restartCounter + delayPar)%33 , TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
 	}
 	
 	
