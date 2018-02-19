@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map; 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit; 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory; ;
@@ -35,6 +36,8 @@ public class WS2RRDPump implements DestroyTracker {
 		System.err.println("looks like we have to restart....");
 		pumpAllBeOne = null ; // suicide
         startAllOfThis(11);
+        
+        System.gc();
 		
 	}
 	
@@ -152,9 +155,20 @@ public class WS2RRDPump implements DestroyTracker {
 		if (newStartRequested ) return;
 		
 		newStartRequested = true;
-		final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+		ThreadFactory threadFactory = new ThreadFactory() {
+
+			@Override
+			public Thread newThread(Runnable r) {
+
+				Thread retval = new Thread(r, "restartedPump#"+restartCounter);
+				retval.setPriority(Thread.MAX_PRIORITY-1);
+				return retval ;
+			}
+			
+		};
+		final ScheduledExecutorService sesTmp = Executors.newSingleThreadScheduledExecutor(threadFactory );
 		
-        ses.schedule(new Runnable() { 
+		sesTmp.schedule(new Runnable() { 
         	final int myID = restartCounter;
             @Override
             public void run() {
@@ -169,7 +183,7 @@ public class WS2RRDPump implements DestroyTracker {
             		synchronized (WS2RRDPump.class) {
             			if (pumpAllBeOne == null)
 	            		try {
-	            			pumpAllBeOne = new WS2RRDPump (ses);
+	            			pumpAllBeOne = new WS2RRDPump (sesTmp);
 	            			LOG.info("start#"+(myID)+" ...");
 	            			 
 	            			LOG.debug("new Pump created:"+pumpAllBeOne);
