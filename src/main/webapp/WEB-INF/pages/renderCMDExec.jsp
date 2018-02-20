@@ -6,46 +6,53 @@ ac3021705f1233dd4253336fa8b8b6a19e8e1aae
 <form method="post">
 	<table>
 		<tr>
-			<td><textarea cols="80" rows="10">${bufAsString}</textarea></td>
-			<td><textarea>${o}</textarea></td>
+			<td><input type="submit">EXEC</input></td>
 		</tr>
 		<tr>
+			<td>
+				<!--   // @see ExecController.java ---> <textarea name="cmd"
+					cols="77" rows="14" value="${testCMD}">${testCMD}</textarea>
+			</td>
+		</tr>		
+		<tr> 
+			<td>O:</td>
+		</tr>
+		<tr>			
+			<td><textarea>${o}</textarea></td>
+		</tr>		
+		<tr>
 			<td>LastCMD:</td>
+		</tr>
+		<tr>			
 			<td width="80%"><textarea>${cmdTmp}</textarea></td>
 		</tr>
 		<tr>
 			<td width="10%" height="64">Tomcat RESULT Image:</td>
-			<td width="10%" height="64">GAE RESULT Image:</td>
+		</tr>
+		<tr>			
+			<td width="50%" height="25%">
+			<IMG src="speed.gif" alt="tomcat/jee rrdoutput" width="99%" /></td>
 		</tr>
 		<tr>
-			<td width="10%" height="64"><IMG src="speed.gif" height="64"
-				width="164" alt="tomcat/jee rrdoutput" /></td>
-			<td width="10%" height="64"><embed src="svg.jsp"
-					type="image/svg+xml" height="100%" width="100%" alt="gae rrdoutput" />
+			<td width="10%" height="64">Vector/SVG RESULT Image:</td>
+		</tr>
+		<tr>			
+			<td width="50%" height="25%"><embed src="svg.jsp"  width="99%"
+					type="image/svg+xml"   alt="SVG rrdoutput" />
 			</td>
+		</tr>
+
+		<tr>
+			<td><<<-- if u don't know what to do -- just try the default
+				action - press the button ;)</td>
 		</tr>
 		<tr>
-			<td>
-				<table>
-					<tr>
-						<td>
-							<!--   // @see ExecController.java ---> <textarea name="cmd"
-								cols="60" rows="4" value="${testCMD}">${testCMD}</textarea>
-						</td>
-					</tr>
-					<tr>
-						<td><<<-- if u don't know what to do -- just try the default
-							action - press the button ;)</td>
-					</tr>
-					<tr>
-						<td><input type="submit">EXEC</input></td>
-					</tr>
-				</table>
-
-			</td>
-
-			</td>
+			<td><input type="submit">EXEC</input></td>
 		</tr>
+		<tr>
+			<td><textarea cols="80" rows="3">${bufAsString}</textarea></td>
+ 
+		</tr>
+		
 	</table>
 </form>
-<!-- eo TUTORIAL -->
