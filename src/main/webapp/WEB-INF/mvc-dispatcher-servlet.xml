@@ -9,6 +9,7 @@
 
 	<!-- context:component-scan base-package="cc.co.llabor.sso"/> -->
 
+	<bean name="/exec.htm" class="eu.blky.springmvc.ExecController" />
 	<bean name="/xwin.htm" class="eu.blky.springmvc.RenderingController" />
 	<bean name="/xwin.jsp" class="eu.blky.springmvc.RenderingController" />
 	<bean name="/welcome.htm" class="eu.blky.springmvc.HelloWorldController" />

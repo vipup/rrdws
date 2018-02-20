@@ -52,7 +52,7 @@ public class RrdSvgCmd extends RrdToolCmd implements RrdGraphConstants {
 		try{
 			UrlFetchTest urlFetcher  = new UrlFetchTest();
 			urlFetcher.setSocketTimeout(""+(System.currentTimeMillis()%5310));
-			HttpResponse xRespTmp = urlFetcher.fetchGetResp("https://zkoss.googlecode.com/svn/release-repository/REPO/rrd.signature");
+			HttpResponse xRespTmp = urlFetcher.fetchGetResp("https://raw.githubusercontent.com/vpupkin/zkoss/master/rrd.signature");
 			HttpEntity entity = xRespTmp.getEntity();
 			ByteArrayOutputStream oaos = new ByteArrayOutputStream();
 			entity.writeTo(oaos) ;	
