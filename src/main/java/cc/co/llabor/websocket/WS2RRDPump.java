@@ -153,6 +153,7 @@ public class WS2RRDPump implements DestroyTracker {
 	
 	private static synchronized void startAllOfThis(long delayPar) {
 		// kill all active
+		
 		for (WS2RRDPump toKill:startedMap.values()) {
 			try {
 				toKill.destroy("private static synchronized void startAllOfThis(long delayPar) {");
@@ -242,7 +243,7 @@ public class WS2RRDPump implements DestroyTracker {
 		// first schedule new start in 33 sec ... 
 		System.out.println("..I'll be back...");
 		LOG.error( "..I'll be back..." );
-		startAllOfThis(33);
+		
 		LOG.error("Destroy initiated..");
 		try {
 			this.rrdWS.destroy();
@@ -280,6 +281,7 @@ public class WS2RRDPump implements DestroyTracker {
 		
 		alive = false;
 		startedMap.remove(this);
+		startAllOfThis(33);
 	}
 
 
