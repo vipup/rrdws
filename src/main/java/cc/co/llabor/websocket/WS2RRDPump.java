@@ -151,27 +151,35 @@ public class WS2RRDPump implements DestroyTracker {
 	static volatile boolean newStartRequested = false;
 	
 	private static synchronized void startAllOfThis(long delayPar) {
+		System.out.println("star*");
 		restartCounter++;
+		System.out.println("star**");
 		if (newStartRequested ) return;
+		System.out.println("star***");
 		
 		newStartRequested = true;
+		System.out.println("star****");
 		ThreadFactory threadFactory = new ThreadFactory() {
 
 			@Override
 			public Thread newThread(Runnable r) {
-
+				System.out.println("star****");
 				Thread retval = new Thread(r, "restartedPump#"+restartCounter);
+				System.out.println("star******");
 				retval.setPriority(Thread.MAX_PRIORITY-1);
+				System.out.println("star*******");
 				return retval ;
 			}
 			
 		};
+		System.out.println("star*******");
 		final ScheduledExecutorService sesTmp = Executors.newSingleThreadScheduledExecutor(threadFactory );
-		
+		System.out.println("star********");
 		sesTmp.schedule(new Runnable() { 
         	final int myID = restartCounter;
             @Override
             public void run() {
+            	System.out.println("star********");
             	newStartRequested  = false;
             	long inOUTMessageCounter = 0;// not used 
             	long outOUTMessageCounter = 0;// ->RRD 
@@ -180,9 +188,12 @@ public class WS2RRDPump implements DestroyTracker {
             	System.out.println("Check Pump::#"+inINMessageCounter+"/"+outOUTMessageCounter+" STATUS:"+pumpAllBeOne);
                 // Check pump any minute , and restart if something wrong
             	while (pumpAllBeOne == null) {
+            		System.out.println("star********");
             		synchronized (WS2RRDPump.class) {
+            			System.out.println("star*********");
             			if (pumpAllBeOne == null)
 	            		try {
+	            			System.out.println("star**********");
 	            			pumpAllBeOne = new WS2RRDPump (sesTmp);
 	            			LOG.info("start#"+(myID)+" ...");
 	            			 
