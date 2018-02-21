@@ -162,6 +162,7 @@ public class WS2RRDPump implements DestroyTracker {
 				return;
 			}catch(Throwable e) {
 				e.printStackTrace();
+				System.exit(-333);
 			}
 		}
 		
