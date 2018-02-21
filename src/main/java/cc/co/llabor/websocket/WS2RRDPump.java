@@ -156,8 +156,10 @@ public class WS2RRDPump implements DestroyTracker {
 		
 		for (WS2RRDPump toKill:startedMap.values()) {
 			try {
-				toKill.destroy("private static synchronized void startAllOfThis(long delayPar) {");
-				
+				//toKill.destroy("private static synchronized void startAllOfThis(long delayPar) {");
+				System.out.println( " should be stopped first! :"+toKill);
+				toKill.stop();
+				return;
 			}catch(Throwable e) {
 				e.printStackTrace();
 			}
