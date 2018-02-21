@@ -148,16 +148,16 @@ public class WS2RRDPump implements DestroyTracker {
 	private static WS2RRDPump pumpAllBeOne = null;
 	
  
-	static volatile boolean newStartRequested = false;
+	static final HashMap<String, ScheduledExecutorService> newStartRequestMap = new HashMap<String, ScheduledExecutorService>();
 	
 	private static synchronized void startAllOfThis(long delayPar) {
 		System.out.println("star*");
-		restartCounter++;
+		
 		System.out.println("star**");
-		if (newStartRequested ) return;
+		if (newStartRequestMap.size() > 0 ) return;
 		System.out.println("star***");
 		
-		newStartRequested = true;
+		
 		System.out.println("star****");
 		ThreadFactory threadFactory = new ThreadFactory() {
 
@@ -174,18 +174,15 @@ public class WS2RRDPump implements DestroyTracker {
 		};
 		System.out.println("star*******");
 		final ScheduledExecutorService sesTmp = Executors.newSingleThreadScheduledExecutor(threadFactory );
+		final String myID = (""+ restartCounter++) ;
+		newStartRequestMap.put(myID , sesTmp);
+		
 		System.out.println("star********");
 		sesTmp.schedule(new Runnable() { 
-        	final int myID = restartCounter;
+        	final String uid =  myID;
             @Override
             public void run() {
             	System.out.println("star********");
-            	newStartRequested  = false;
-            	long inOUTMessageCounter = 0;// not used 
-            	long outOUTMessageCounter = 0;// ->RRD 
-            	long outINMessageCounter = 0;// not used
-            	long inINMessageCounter = 0; // POLO->                  	
-            	System.out.println("Check Pump::#"+inINMessageCounter+"/"+outOUTMessageCounter+" STATUS:"+pumpAllBeOne);
                 // Check pump any minute , and restart if something wrong
             	while (pumpAllBeOne == null) {
             		System.out.println("star********");
@@ -200,7 +197,7 @@ public class WS2RRDPump implements DestroyTracker {
 	            			LOG.debug("new Pump created:"+pumpAllBeOne);
 	            			pumpAllBeOne.start();
 	            			LOG.debug("..and started.");
-	            			 
+	            			newStartRequestMap.remove(uid);
 	            			
 	            		} catch (URISyntaxException e) {
 							LOG.error("LOG.debug(\"new Pump created:\"+pump);", e) ;	
@@ -226,15 +223,14 @@ public class WS2RRDPump implements DestroyTracker {
 		return alive;
 	}
 
-	private void destroy(String reasonPar) {
+ 	
+	private void destroy(String reasonPar) { 
 		if (WS2RRDPump.DISABLE_REPAIR_JOBS) return;
 		System.out.println("Destroy initiated..[" +reasonPar +"]");
 		// first schedule new start in 33 sec ... 
 		System.out.println("..I'll be back...");
 		LOG.error( "..I'll be back..." );
-
 		startAllOfThis(33);
-		
 		LOG.error("Destroy initiated..");
 		try {
 			this.rrdWS.destroy();
