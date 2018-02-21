@@ -149,8 +149,19 @@ public class WS2RRDPump implements DestroyTracker {
 	
  
 	static final HashMap<String, ScheduledExecutorService> newStartRequestMap = new HashMap<String, ScheduledExecutorService>();
+	static final HashMap<String, WS2RRDPump> startedMap = new HashMap<String, WS2RRDPump>();
 	
 	private static synchronized void startAllOfThis(long delayPar) {
+		// kill all active
+		for (WS2RRDPump toKill:startedMap.values()) {
+			try {
+				toKill.destroy("private static synchronized void startAllOfThis(long delayPar) {");
+				
+			}catch(Throwable e) {
+				e.printStackTrace();
+			}
+		}
+		
 		System.out.println("star*");
 		
 		System.out.println("star**");
@@ -197,7 +208,8 @@ public class WS2RRDPump implements DestroyTracker {
 	            			LOG.debug("new Pump created:"+pumpAllBeOne);
 	            			pumpAllBeOne.start();
 	            			LOG.debug("..and started.");
-	            			newStartRequestMap.remove(uid);
+	            			ScheduledExecutorService startedTmp = newStartRequestMap.remove(uid);
+	            			startedMap.put(""+startedTmp, pumpAllBeOne);
 	            			
 	            		} catch (URISyntaxException e) {
 							LOG.error("LOG.debug(\"new Pump created:\"+pump);", e) ;	
@@ -267,6 +279,7 @@ public class WS2RRDPump implements DestroyTracker {
 		}  
 		
 		alive = false;
+		startedMap.remove(this);
 	}
 
 
