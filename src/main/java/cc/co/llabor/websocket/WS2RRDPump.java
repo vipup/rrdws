@@ -116,6 +116,30 @@ public class WS2RRDPump implements DestroyTracker {
 		WD.scheduleAtFixedRate(command, initialDelay, period, unit);
 		
 	}
+	
+	// never ending flow
+	private static void createStarterThread( ) {
+		 
+		ScheduledExecutorService neverendingThread = Executors.newSingleThreadScheduledExecutor();
+		
+        Runnable command = new Runnable() {
+        	long initTime = System.currentTimeMillis();
+        	int checkCount =0;
+            @Override
+            public void run() {
+            	checkCount++;
+            	if ( pumpAllBeOne == null ) {
+            		System.out.println("net::::"+checkCount);
+            		startAllOfThis(2);
+            	}
+            }
+        };
+		long initialDelay = 1;
+		long period = 77;
+		TimeUnit unit = TimeUnit .SECONDS;
+		neverendingThread.scheduleAtFixedRate(command, initialDelay, period, unit);
+		
+	}	
 
 	private void createPoloWS(DestroyTracker watchDog) throws URISyntaxException {
 		URI endpointURI = new URI(WSS_API2_POLONIEX_COM);
@@ -134,7 +158,7 @@ public class WS2RRDPump implements DestroyTracker {
 
 	static int restartCounter = 0;
 	public static void main(String[] args) {
-        startAllOfThis(1);
+		createStarterThread();
 	}
 	private static final void cleanUpAllGarbageIfPossible(WS2RRDPump invalidPumpIsHere) {
 		System.out.println("Last chance to die...");
