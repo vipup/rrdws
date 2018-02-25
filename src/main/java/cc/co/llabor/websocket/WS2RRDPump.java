@@ -117,10 +117,23 @@ public class WS2RRDPump implements DestroyTracker {
 		
 	}
 	
+	static ThreadGroup arg0 = new ThreadGroup("always running TG4Pump" );
 	// never ending flow
 	private static void createStarterThread( ) {
 		 
-		ScheduledExecutorService neverendingThread = Executors.newSingleThreadScheduledExecutor();
+		ThreadFactory highPrioFactory = new ThreadFactory() {
+			
+			@Override
+			public Thread newThread(Runnable r) {				
+				Runnable arg1 = r;
+				String arg2 = "highPrioFactory";
+				Thread retval = new Thread(arg0, arg1, arg2);
+				retval.setDaemon(true);
+				retval.setPriority(Thread.MAX_PRIORITY-1);
+				return retval ;
+			}
+		};
+		ScheduledExecutorService neverendingThread = Executors.newSingleThreadScheduledExecutor(highPrioFactory );
 		
         Runnable command = new Runnable() {
         	long initTime = System.currentTimeMillis();
