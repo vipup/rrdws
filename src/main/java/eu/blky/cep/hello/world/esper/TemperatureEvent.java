@@ -1,4 +1,4 @@
-package hello.world.esper;
+package eu.blky.cep.hello.world.esper;
 
 import java.util.Date;
 

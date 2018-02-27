@@ -1,4 +1,4 @@
-package hello.world.esper;
+package eu.blky.cep.hello.world.esper;
 
 /**
  * Just a convenience interface to let us easily contain the Esper statements with the Subscribers -

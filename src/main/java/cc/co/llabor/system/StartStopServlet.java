@@ -24,10 +24,7 @@ import org.jrobin.mrtg.server.IfDsicoverer;
 import org.jrobin.mrtg.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.espertech.esper.client.Configuration;
-import com.espertech.esper.client.EPServiceProvider;
-import com.espertech.esper.client.EPServiceProviderManager;
+ 
 
 import ws.rrd.csv.RrdKeeper;
 import ws.rrd.logback.ServletListener;
@@ -37,12 +34,7 @@ import cc.co.llabor.threshold.TholdException;
 import cc.co.llabor.threshold.rrd.Threshold;
 import eu.blky.springmvc.BackupController;
 import eu.blky.springmvc.RestoreController;
-import hello.world.esper.CriticalEventSubscriber;
-import hello.world.esper.MonitorEventSubscriber;
-import hello.world.esper.RandomTemperatureEventGenerator;
-import hello.world.esper.TemperatureEvent;
-import hello.world.esper.TemperatureEventHandler;
-import hello.world.esper.WarningEventSubscriber; 
+ 
 
 public class StartStopServlet extends HttpServlet {
 	
@@ -76,8 +68,7 @@ public class StartStopServlet extends HttpServlet {
 		initCollectD();		
 		
 		initAlerter(); 
-		
-		initTschernoschima();
+
 		
 //		initMRTG();
 		
@@ -91,23 +82,6 @@ public class StartStopServlet extends HttpServlet {
 	}
 
 
-	private void initTschernoschima() {
-		try {
-	        Configuration configuration = new Configuration();
-	        configuration.addEventType("TemperatureEvent", TemperatureEvent.class.getName()); 
-	        EPServiceProvider provider = EPServiceProviderManager.getProvider("NucleaTemperatureHandling", configuration);
-			// temperatureEventHandler.epService = provider;
-	        
-			TemperatureEventHandler temperatureEventHandler = new TemperatureEventHandler(provider); 
-			temperatureEventHandler.subscribe(new MonitorEventSubscriber()); 
-			temperatureEventHandler.subscribe(new CriticalEventSubscriber()); 
-			temperatureEventHandler.subscribe(new WarningEventSubscriber()); 
-			RandomTemperatureEventGenerator generator = new RandomTemperatureEventGenerator(temperatureEventHandler);
-			generator .startSendingTemperatureReadings(Long.MAX_VALUE );
-		}catch(Throwable e) {
-			log.error("private void initTschernoschima() {", e);
-		}
-	}
 
 
 	private void initAlerter() {

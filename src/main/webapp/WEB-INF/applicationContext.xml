@@ -19,4 +19,5 @@
 	<bean
 		class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
 	<bean name="myService" class="com.journaldev.spring.service.MyService" />
+	<bean name="chernoshima" class="eu.blky.cep.hello.world.esper.ChernoshimaService" />
 </beans>

@@ -1,4 +1,4 @@
-package hello.world.esper;
+package eu.blky.cep.hello.world.esper;
 
 import java.util.Date;
 import java.util.Random;
@@ -25,7 +25,11 @@ public class RandomTemperatureEventGenerator {
 		this.temperatureEventHandler = par1;
 	}
 
-
+    int count = 0;
+    public void stop() {
+    	count = Integer.MAX_VALUE;
+    }
+    
 	/**
      * Creates simple random Temperature events and lets the implementation class handle them.
      */
@@ -38,7 +42,7 @@ public class RandomTemperatureEventGenerator {
             public void run() {
                 LOG.debug(getStartingMessage());
                 
-                int count = 0;
+                
                 while (count < noOfTemperatureEvents) {
                 	try {
 	                    TemperatureEvent ve = new TemperatureEvent(new Random().nextInt(500), new Date());
