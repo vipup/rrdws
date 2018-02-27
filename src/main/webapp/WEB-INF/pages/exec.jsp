@@ -15,16 +15,16 @@ ac3021705f1233dd4253336fa8b8b6a19e8e1aae
 			</td>
 		</tr>		
 		<tr> 
-			<td>O:</td>
+			<td>Output:</td>
 		</tr>
 		<tr>			
-			<td><textarea>${o}</textarea></td>
+			<td><textarea cols="77" rows="4">${o}</textarea></td>
 		</tr>		
 		<tr>
 			<td>LastCMD:</td>
 		</tr>
 		<tr>			
-			<td width="80%"><textarea>${cmdTmp}</textarea></td>
+			<td width="80%"><textarea cols="77" rows="4" name="cmdLast" disabled="disabled">${cmdTmp}</textarea></td>
 		</tr>
 		<tr>
 			<td width="10%" height="64">Tomcat RESULT Image:</td>
@@ -37,7 +37,7 @@ ac3021705f1233dd4253336fa8b8b6a19e8e1aae
 			<td width="10%" height="64">Vector/SVG RESULT Image:</td>
 		</tr>
 		<tr>			
-			<td width="50%" height="25%"><embed src="svg.jsp"  width="99%"
+			<td width="100%" height="25%"><embed src="svg.jsp"  width="100%"
 					type="image/svg+xml"   alt="SVG rrdoutput" />
 			</td>
 		</tr>

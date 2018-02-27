@@ -22,7 +22,7 @@ public class ExecController extends AbstractController {
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		HttpSession session = request.getSession();
-		ModelAndView model = new ModelAndView("renderCMDExec"); // .jsp
+		ModelAndView model = new ModelAndView("exec"); // .jsp
 		System.out.println("== RrdWS/RRDTool commander exec...");
 		Object o = null;
 		String cmdTmp = request.getParameter("cmd");
@@ -55,6 +55,7 @@ public class ExecController extends AbstractController {
  
 		model.addObject("bufAsString", bufOut.toString());// bufAsStringbufOut.toString()
 		model.addObject("cmd", cmdTmp);  
+		model.addObject("cmdTmp", cmdTmp);  
 		model.addObject("o", o);  
 		
 		
