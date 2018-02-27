@@ -46,7 +46,7 @@ public class DiffTracker implements UpdateListener {
 	
 	Map<String, JsonNode> pairsMap = new HashMap<String, JsonNode>();
 	// --name---
-	String []props = "pair---timewindow---BOS---dataFIRST---tovFIRST---iTOV---iAVG---pTOV---pAVG---dTOV---dAVG---dMIN---startTIMESTAMP---diffTIME---dCAL---dCNT---type---dMAX---name---stopTIME---startTIME".split("---");
+	String []props = "pair---timewindow---BOS---percentDIFF---priceDIFF---middlePCENT---tovPCENT---dataFIRST---tovFIRST---iTOV---iAVG---pTOV---pAVG---dTOV---dAVG---dMIN---startTIMESTAMP---diffTIME---dCAL---dCNT---type---dMAX---name---stopTIME---startTIME".split("---");
 	
 	String []keyprops = "BOS---timewindow---type---pair".split("---");
 	

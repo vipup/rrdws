@@ -357,6 +357,8 @@ public final class PoloHandler implements MessageHandler {
 						+ "   ( avg ( price )  ) dataAVG ,  \n" 
 						+ "   ( max ( count( price )  + avg ( (price * volume) ) / avg (volume)  / 1000000 )  ) dataMAX ,  \n"
 						+ "   ( min ( count( price )  + avg ( (price * volume) ) / avg (volume)  / 1000000 )  ) dataMIN ,  \n"
+						+ "   ( max ( count( price )  + avg ( (price)  / 1000000 )  )   ) priceMAX ,  \n"
+						+ "   ( min ( count( price )  + avg ( (price)  / 1000000 )  )   ) priceMIN ,  \n"
 						+ "   ( count ( price )  ) dataCNT ,  \n"
 						+ "   (  sum ( price ) / count( price ) ) dataCAL , \n"
 						+ "   (  sum (total) / sum (volume) ) dataTOV , \n"
@@ -379,6 +381,9 @@ public final class PoloHandler implements MessageHandler {
 						+ "		'"+MARKET_PAIR+"' pair, "
 						+ "		max (dataMAX) dataMAX, "
 						+ "		min (dataMIN) dataMIN, "
+						+ "		max (priceMAX) priceMAX, "
+						+ "		min (priceMIN) priceMIN, "
+						
 						+ "		avg (dataAVG) dataAVG, "
 						+ "		max (dataCNT) dataCNT, "
 						+ "		avg (dataCAL) dataCAL, "	
@@ -454,12 +459,15 @@ public final class PoloHandler implements MessageHandler {
 					+ "( dataAVG - (1000000.0000000000001* (dataMAX%1.0000000000000000001))    )							diffMAX , \n"
 					+ "( dataAVG - (1000000.0000000000001* (dataMIN%1.0000000000000000001))    )							diffMIN ,\n"
 					+ "( (1000000.0000000000001* (dataMAX%1.0000000000000000001))   - (1000000.0000000000001* (dataMIN%1.0000000000000000001))    )							diffDIF ,\n"
+					
 					+ "( (dataMAX + dataMIN)/2   - dataTOV )				diffTOV ,\n"
 					+ "( dataAVG - (dataMAX + dataMIN)/2 )/dataAVG*100 	middlePCENT ,\n"
 					+ "( dataAVG - dataTOV )/dataAVG*100				tovPCENT ,\n"
 					+ " dataAVG dAVG, \n"
-					+ " (1000000.0000000000001* (dataMAX%1.0000000000000000001))  dMAX, \n"
-					+ " (1000000.0000000000001* (dataMIN%1.0000000000000000001))  dMIN, \n"
+					+ " (1000000.0000000000001* (dataMAX%1.0000000000000000001))  dMAX, \n" // last  on timeWin
+					+ " (1000000.0000000000001* (dataMIN%1.0000000000000000001))  dMIN, \n" // first on timeWin
+					+ " 100 * (  (1000000.0000000000001* (dataMAX%1.0000000000000000001))  - (1000000.0000000000001* (dataMIN%1.0000000000000000001))  ) / (  dataTOV    )  percentDIFF, \n" // drowing in percent 
+					+ " 100 * (  (1000000.0000000000001* (priceMAX%1.0000000000000000001))  - (1000000.0000000000001* (priceMIN%1.0000000000000000001))  ) / (  dataTOV    )  priceDIFF, \n" // drowing in percent 
 					+ " dataCAL dCAL, \n"
 					+ " dataCNT dCNT, \n"
 					+ " dataTOV dTOV, \n"

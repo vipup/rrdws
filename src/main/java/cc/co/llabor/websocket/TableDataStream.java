@@ -46,7 +46,7 @@ public class TableDataStream {
 	            String tableDataMessage = generateNewFakeData();
 				broadcast(tableDataMessage); 
 			} 
-        }, 0, 7, TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
+        }, 0, 1, TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
     } 
 
     @OnOpen
