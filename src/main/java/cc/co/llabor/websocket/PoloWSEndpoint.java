@@ -25,12 +25,26 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
     private static Logger LOG = LoggerFactory.getLogger(PoloWSEndpoint.class);	
  
 
+    public PoloWSEndpoint(URI endpointURI, DestroyTracker watchDog, Object just4IgnoreExc) {
+    	super(watchDog);
+        try {
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            container.setDefaultMaxBinaryMessageBufferSize(1116*1024);
+            container.setDefaultMaxTextMessageBufferSize(1132*1024);
+             
+            container.connectToServer(this, endpointURI);
+        } catch (Exception e) {
+            //throw new RuntimeException(e);
+        	e.printStackTrace();
+        }  	
+    }
     public PoloWSEndpoint(URI endpointURI, DestroyTracker watchDog) {
     	super(watchDog);
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             container.setDefaultMaxBinaryMessageBufferSize(1116*1024);
             container.setDefaultMaxTextMessageBufferSize(1132*1024);
+             
             container.connectToServer(this, endpointURI);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -85,7 +99,7 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
     }
     
     Properties pairs= new Properties();
-    Properties id2pairs= new Properties();
+    public Properties id2pairs= new Properties();
     
     {
     	try {

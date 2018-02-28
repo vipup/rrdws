@@ -20,4 +20,42 @@
 		class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
 	<bean name="myService" class="com.journaldev.spring.service.MyService" />
 	<bean name="chernoshima" class="eu.blky.cep.hello.world.esper.ChernoshimaService" />
+
+	<bean name="cepConfiguration" class="com.espertech.esper.client.Configuration" />
+	<!-- https://stackoverflow.com/questions/6384268/how-to-create-a-linkedblockingqueuerunnable-as-a-spring-bean -->
+	<bean id="abcBlockingQueueImpl" class="java.util.concurrent.LinkedBlockingQueue">
+		<constructor-arg type="int">
+			<value>10</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- https://stackoverflow.com/questions/38925594/not-able-to-create-bean-of-java-util-concurrent-threadpoolexecutor-using-spring -->
+	<bean id="threadPoolExector" class="java.util.concurrent.ThreadPoolExecutor"
+		lazy-init="true" scope="singleton">
+		<constructor-arg index="0" type="int" value="3" />
+		<constructor-arg index="1" type="int" value="3" />
+		<constructor-arg index="2" type="long" value="0" />
+		<constructor-arg index="3" type="java.util.concurrent.TimeUnit"
+			value="SECONDS" />
+		<constructor-arg index="4" ref="abcBlockingQueueImpl" />
+	</bean>
+	<bean name="poloWebsocketEP" class="cc.co.llabor.websocket.PoloWSEndpoint">
+		<constructor-arg>
+			<bean class="java.net.URI">
+				<constructor-arg value="wss://api2.poloniex.com" />
+			</bean>
+		</constructor-arg>
+		<constructor-arg>
+			<bean name="poloDestroyer" class="eu.blky.cep.polo2rrd.DestroyTrackerImplementation">
+			</bean>
+		</constructor-arg>
+		<constructor-arg ref="threadPoolExector">
+			
+		</constructor-arg>
+	</bean>
+
+	<bean name="polo2rrd" class="eu.blky.cep.polo2rrd.Polo2RddForwarderService">
+		<property name="cepConfig" ref="cepConfiguration"></property>
+		<property name="poloWS" ref="poloWebsocketEP"></property>
+	</bean>
 </beans>
