@@ -216,7 +216,7 @@ public class WS2RRDPump implements DestroyTracker {
            		
             	} 
 			}
-        }, (restartCounter + delayPar)%33 , TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
+        }, (delayPar), TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
 	}
 	
 	
@@ -233,7 +233,7 @@ public class WS2RRDPump implements DestroyTracker {
 		System.out.println("..I'll be back...");
 		LOG.error( "..I'll be back..." );
 
-		startAllOfThis(33);
+		startAllOfThis(13);
 		
 		LOG.error("Destroy initiated..");
 		try {
