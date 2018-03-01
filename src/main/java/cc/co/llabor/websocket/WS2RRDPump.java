@@ -116,43 +116,6 @@ public class WS2RRDPump implements DestroyTracker {
 		WD.scheduleAtFixedRate(command, initialDelay, period, unit);
 		
 	}
-	
-	static ThreadGroup arg0 = new ThreadGroup("always running TG4Pump" );
-	// never ending flow
-	private static void createStarterThread( ) {
-		 
-		ThreadFactory highPrioFactory = new ThreadFactory() {
-			
-			@Override
-			public Thread newThread(Runnable r) {				
-				Runnable arg1 = r;
-				String arg2 = "highPrioFactory";
-				Thread retval = new Thread(arg0, arg1, arg2);
-				retval.setDaemon(false);
-				retval.setPriority(Thread.MAX_PRIORITY-1);
-				return retval ;
-			}
-		};
-		ScheduledExecutorService neverendingThread = Executors.newSingleThreadScheduledExecutor(highPrioFactory );
-		
-        Runnable command = new Runnable() {
-        	long initTime = System.currentTimeMillis();
-        	int checkCount =0;
-            @Override
-            public void run() {
-            	checkCount++;
-            	if ( pumpAllBeOne == null ) {
-            		System.out.println("net::::"+checkCount);
-            		startAllOfThis(2);
-            	}
-            }
-        };
-		long initialDelay = 1;
-		long period = 77;
-		TimeUnit unit = TimeUnit .SECONDS;
-		neverendingThread.scheduleAtFixedRate(command, initialDelay, period, unit);
-		
-	}	
 
 	private void createPoloWS(DestroyTracker watchDog) throws URISyntaxException {
 		URI endpointURI = new URI(WSS_API2_POLONIEX_COM);
@@ -171,7 +134,7 @@ public class WS2RRDPump implements DestroyTracker {
 
 	static int restartCounter = 0;
 	public static void main(String[] args) {
-		createStarterThread();
+        startAllOfThis(1);
 	}
 	private static final void cleanUpAllGarbageIfPossible(WS2RRDPump invalidPumpIsHere) {
 		System.out.println("Last chance to die...");
@@ -185,31 +148,16 @@ public class WS2RRDPump implements DestroyTracker {
 	private static WS2RRDPump pumpAllBeOne = null;
 	
  
-	static final HashMap<String, ScheduledExecutorService> newStartRequestMap = new HashMap<String, ScheduledExecutorService>();
-	static final HashMap<String, WS2RRDPump> startedMap = new HashMap<String, WS2RRDPump>();
+	static volatile boolean newStartRequested = false;
 	
 	private static synchronized void startAllOfThis(long delayPar) {
-		// kill all active
-		
-		for (WS2RRDPump toKill:startedMap.values()) {
-			try {
-				//toKill.destroy("private static synchronized void startAllOfThis(long delayPar) {");
-				System.out.println( " should be stopped first! :"+toKill);
-				toKill.stop();
-				return;
-			}catch(Throwable e) {
-				e.printStackTrace();
-				System.exit(-333);
-			}
-		}
-		
 		System.out.println("star*");
-		
+		restartCounter++;
 		System.out.println("star**");
-		if (newStartRequestMap.size() > 0 ) return;
+		if (newStartRequested ) return;
 		System.out.println("star***");
 		
-		
+		newStartRequested = true;
 		System.out.println("star****");
 		ThreadFactory threadFactory = new ThreadFactory() {
 
@@ -226,15 +174,18 @@ public class WS2RRDPump implements DestroyTracker {
 		};
 		System.out.println("star*******");
 		final ScheduledExecutorService sesTmp = Executors.newSingleThreadScheduledExecutor(threadFactory );
-		final String myID = (""+ restartCounter++) ;
-		newStartRequestMap.put(myID , sesTmp);
-		
 		System.out.println("star********");
 		sesTmp.schedule(new Runnable() { 
-        	final String uid =  myID;
+        	final int myID = restartCounter;
             @Override
             public void run() {
             	System.out.println("star********");
+            	newStartRequested  = false;
+            	long inOUTMessageCounter = 0;// not used 
+            	long outOUTMessageCounter = 0;// ->RRD 
+            	long outINMessageCounter = 0;// not used
+            	long inINMessageCounter = 0; // POLO->                  	
+            	System.out.println("Check Pump::#"+inINMessageCounter+"/"+outOUTMessageCounter+" STATUS:"+pumpAllBeOne);
                 // Check pump any minute , and restart if something wrong
             	while (pumpAllBeOne == null) {
             		System.out.println("star********");
@@ -249,8 +200,7 @@ public class WS2RRDPump implements DestroyTracker {
 	            			LOG.debug("new Pump created:"+pumpAllBeOne);
 	            			pumpAllBeOne.start();
 	            			LOG.debug("..and started.");
-	            			ScheduledExecutorService startedTmp = newStartRequestMap.remove(uid);
-	            			startedMap.put(""+startedTmp, pumpAllBeOne);
+	            			 
 	            			
 	            		} catch (URISyntaxException e) {
 							LOG.error("LOG.debug(\"new Pump created:\"+pump);", e) ;	
@@ -266,7 +216,7 @@ public class WS2RRDPump implements DestroyTracker {
            		
             	} 
 			}
-        }, (restartCounter + delayPar)%33 , TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
+        }, (delayPar), TimeUnit.SECONDS ); //1, TimeUnit.MINUTES);
 	}
 	
 	
@@ -276,13 +226,14 @@ public class WS2RRDPump implements DestroyTracker {
 		return alive;
 	}
 
- 	
-	private void destroy(String reasonPar) { 
+	private void destroy(String reasonPar) {
 		if (WS2RRDPump.DISABLE_REPAIR_JOBS) return;
 		System.out.println("Destroy initiated..[" +reasonPar +"]");
 		// first schedule new start in 33 sec ... 
 		System.out.println("..I'll be back...");
 		LOG.error( "..I'll be back..." );
+
+		startAllOfThis(13);
 		
 		LOG.error("Destroy initiated..");
 		try {
@@ -320,8 +271,6 @@ public class WS2RRDPump implements DestroyTracker {
 		}  
 		
 		alive = false;
-		startedMap.remove(this);
-		startAllOfThis(33);
 	}
 
 
