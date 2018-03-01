@@ -128,7 +128,7 @@ public class WS2RRDPump implements DestroyTracker {
 				Runnable arg1 = r;
 				String arg2 = "highPrioFactory";
 				Thread retval = new Thread(arg0, arg1, arg2);
-				retval.setDaemon(true);
+				retval.setDaemon(false);
 				retval.setPriority(Thread.MAX_PRIORITY-1);
 				return retval ;
 			}
