@@ -142,7 +142,7 @@ public class WS2RRDPump implements DestroyTracker {
             public void run() {
             	checkCount++;
             	if ( pumpAllBeOne == null ) {
-            		System.out.println("net::::"+checkCount);
+            		System.out.println("net::["+initTime+"]::"+checkCount);
             		startAllOfThis(2);
             	}
             }
@@ -274,13 +274,13 @@ public class WS2RRDPump implements DestroyTracker {
 
 	protected boolean isAlive() { 
 		return alive;
-	}
-
+	} 
  	
 	private void destroy(String reasonPar) { 
 		if (WS2RRDPump.DISABLE_REPAIR_JOBS) return;
 		System.out.println("Destroy initiated..[" +reasonPar +"]");
 		// first schedule new start in 33 sec ... 
+		
 		System.out.println("..I'll be back...");
 		LOG.error( "..I'll be back..." );
 		
@@ -288,6 +288,7 @@ public class WS2RRDPump implements DestroyTracker {
 		try {
 			this.rrdWS.destroy();
 			this.rrdWS = null;
+			LOG.error("Destroyed : this.rrdWS.destroy(); ");
 		} catch (RuntimeException e) {
 			LOG.error("this.rrdWS.destroy();", e) ;
 		} catch (IOException e) {
@@ -298,6 +299,7 @@ public class WS2RRDPump implements DestroyTracker {
 		try {
 			this.poloWS.destroy();
 			this.poloWS = null;
+			LOG.error("Destroyed : this.poloWS.destroy(); ");
 		} catch (RuntimeException e) {
 			LOG.error("this.poloWS.destroy();;", e) ;
 		} catch (IOException e) {
@@ -309,18 +311,25 @@ public class WS2RRDPump implements DestroyTracker {
 		try {
 			this.scheduler.shutdown();
 			this.scheduler = null;
+			LOG.error("Destroyed : this.scheduler.shutdown(); ");
 		} catch (Throwable e) {
 			LOG.error("this.scheduler.destroy();;", e) ;
 		}  
+		
 		try {
 			this.WD.shutdown();
 			this.WD = null;
+			LOG.error("Destroyed : tthis.WD.shutdown(); ");
 		} catch (Throwable e) {
 			LOG.error("this.WD.destroy();;", e) ;
 		}  
 		
+		
+		
 		alive = false;
 		startedMap.remove(this);
+		pumpAllBeOne = null;
+		LOG.error("Destroyed : pumpAllBeOne = null ");
 		startAllOfThis(33);
 	}
 
