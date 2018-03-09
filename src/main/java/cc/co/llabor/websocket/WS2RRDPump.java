@@ -144,9 +144,8 @@ public class WS2RRDPump implements DestroyTracker {
             	if ( pumpAllBeOne == null ) {
             		System.out.println("net::["+initTime+"]::"+checkCount);
             		startAllOfThis(2);
-            	}
-            	if ( checkCount%100 == 0) {
-            		System.out.println("checkCount%100 == 0"+checkCount);
+            	}else{
+            		System.out.println("checkCount ::"+checkCount);
             		LOG.info("checkCount%100 == 0"+checkCount);
             	}
             }
