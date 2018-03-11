@@ -6,7 +6,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;  
+import org.slf4j.LoggerFactory;
+
+import com.espertech.esper.client.EPServiceDestroyedException;  
 
 /**
  * Just a simple class to create a number of Random TemperatureEvents and pass them off to the
@@ -25,9 +27,9 @@ public class RandomTemperatureEventGenerator {
 		this.temperatureEventHandler = par1;
 	}
 
-    int count = 0;
+    long count = 0;
     public void stop() {
-    	count = Integer.MAX_VALUE;
+    	count = Long.MAX_VALUE;
     }
     
 	/**
@@ -54,6 +56,9 @@ public class RandomTemperatureEventGenerator {
                         LOG.error("Thread Interrupted", e);
                     } catch (Throwable e) {
                         LOG.error("???", e);
+                        if (e instanceof EPServiceDestroyedException) {
+                        	stop() ; // finish!
+                        }
                     }
                 }
 

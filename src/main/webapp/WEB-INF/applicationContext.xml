@@ -54,7 +54,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean name="polo2rrd" class="eu.blky.cep.polo2rrd.Polo2RddForwarderService">
+	<bean name="polo2rrd" class="eu.blky.cep.polo2rrd.Polo2RddForwarderService"  destroy-method="destroy" init-method="init">
 		<property name="cepConfig" ref="cepConfiguration"></property>
 		<property name="poloWS" ref="poloWebsocketEP"></property>
 	</bean>
