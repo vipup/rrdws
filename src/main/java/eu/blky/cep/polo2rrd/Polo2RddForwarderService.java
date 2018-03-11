@@ -64,6 +64,13 @@ public class Polo2RddForwarderService {
 		try {			 
 			initCEP();
 			System.out.println("initCEP() done");
+			System.out.println("initCEP() done");
+			System.out.println("initCEP() done");
+			System.out.println("initCEP() done");
+			System.out.println("initCEP() done");
+			System.out.println("initCEP() done");
+			System.out.println("initCEP() done");
+			System.out.println("initCEP() done");
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -76,6 +83,16 @@ public class Polo2RddForwarderService {
 	
 	@PreDestroy
 	public void destroy(){
+		System.out.println("Polo2RddForwarderService destroy method called");
+		System.out.println("Polo2RddForwarderService destroy method called");
+		System.out.println("Polo2RddForwarderService destroy method called");
+		System.out.println("Polo2RddForwarderService destroy method called");
+		System.out.println("Polo2RddForwarderService destroy method called");
+		System.out.println("Polo2RddForwarderService destroy method called");
+		System.out.println("Polo2RddForwarderService destroy method called");
+		System.out.println("Polo2RddForwarderService destroy method called");
+		System.out.println("Polo2RddForwarderService destroy method called");
+		System.out.println("Polo2RddForwarderService destroy method called");
 		System.out.println("Polo2RddForwarderService destroy method called");
 		try {
 			getPoloWS().destroy();
