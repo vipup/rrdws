@@ -4,16 +4,36 @@ import java.io.IOException;
 
 import cc.co.llabor.websocket.ErrorProcessingException;
 import cc.co.llabor.websocket.MessageHandler;
+import ws.rrd.csv.Action;
+import ws.rrd.csv.RrdKeeper;
+import ws.rrd.csv.RrdUpdateAction;
 
 public class UpdateCounter implements MessageHandler {
 	private int updateCounter = 0;
+	private long lastOut = 0;
 	
 	@Override
 	public void handleMessage(String message) throws ErrorProcessingException {
 		if (updateCounter%1000==0) {
-			System.out.println("+#"+updateCounter+"#+-to  ==:" + message);
+			long upPerSec = calcUpdatePerSecond();
+			System.out.println("+#"+updateCounter+"#+-to  ==:" + message + ""+ upPerSec);
+			lastOut = System.currentTimeMillis();
+			rrdUpdate(upPerSec); 
 		}
 		updateCounter++;
+	}
+
+	private void rrdUpdate(long upPerSec) {
+		Action rrdUpdateAction =  new RrdUpdateAction(); 
+		Object retval = rrdUpdateAction.perform(   "rrdws/POLO/updatesPerSec" ,  lastOut , ""+upPerSec );
+	}
+
+	private long calcUpdatePerSecond() {
+		try {
+			return (1000*updateCounter)/(System.currentTimeMillis() - lastOut);
+		}catch(Throwable e) {
+			return 1;
+		}
 	}
 
 	@Override
