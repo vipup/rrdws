@@ -11,6 +11,7 @@ import ws.rrd.csv.RrdUpdateAction;
 public class UpdateCounter implements MessageHandler {
 	private int updateCounter = 0;
 	private long lastOut = 0;
+	private long lastUp = 0;
 	
 	@Override
 	public void handleMessage(String message) throws ErrorProcessingException {
@@ -18,6 +19,7 @@ public class UpdateCounter implements MessageHandler {
 			long upPerSec = calcUpdatePerSecond();
 			System.out.println("+#"+updateCounter+"#+-to  ==:" + message + ""+ upPerSec);
 			lastOut = System.currentTimeMillis();
+			lastUp = updateCounter;
 			rrdUpdate(upPerSec); 
 		}
 		updateCounter++;
@@ -30,7 +32,7 @@ public class UpdateCounter implements MessageHandler {
 
 	private long calcUpdatePerSecond() {
 		try {
-			return (1000*updateCounter)/(System.currentTimeMillis() - lastOut);
+			return (1000*(updateCounter-lastUp))/(System.currentTimeMillis() - lastOut);
 		}catch(Throwable e) {
 			return 1;
 		}
