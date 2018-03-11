@@ -28,11 +28,15 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
     public PoloWSEndpoint(URI endpointURI, DestroyTracker watchDog, Object just4IgnoreExc) {
     	super(watchDog);
         try {
+        	ClassLoader clBAK = Thread.currentThread().getContextClassLoader();
+        	ClassLoader cl = PoloWSEndpoint.class.getClassLoader();
+        	//Thread.currentThread().setContextClassLoader(cl );
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             container.setDefaultMaxBinaryMessageBufferSize(1116*1024);
             container.setDefaultMaxTextMessageBufferSize(1132*1024);
              
             container.connectToServer(this, endpointURI);
+            //Thread.currentThread().setContextClassLoader( clBAK );
         } catch (Exception e) {
             //throw new RuntimeException(e);
         	e.printStackTrace();
@@ -68,9 +72,9 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
     public void onOpen(Session userSession) {
     	LOG.debug("opening websocket");
         this.userSession = userSession;
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1001}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1002}");
-        userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":1003}");
+        sendText(userSession, "{\"command\":\"subscribe\",\"channel\":1001}");
+        sendText(userSession, "{\"command\":\"subscribe\",\"channel\":1002}");
+        sendText(userSession, "{\"command\":\"subscribe\",\"channel\":1003}");
         
  
 		InputStream inStream = PoloPairListener.class.getClassLoader().getResourceAsStream("cc/co/llabor/websocket/polo.txt");
@@ -84,7 +88,7 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
 	          String key = e.nextElement();
 	          String value = pairs.getProperty(key);
 	          LOG.debug(key + " -- " + pairs.getProperty(key));
-	          userSession.getAsyncRemote().sendText("{\"command\":\"subscribe\",\"channel\":\""+key+"\"}");
+	          sendText(userSession, "{\"command\":\"subscribe\",\"channel\":\""+key+"\"}");
 	          try {
 				Thread.sleep(5);
 			} catch (InterruptedException e1) {
@@ -97,6 +101,13 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
       
         
     }
+	private void sendText(Session userSession, String textPar ) {
+		try {
+			userSession.getAsyncRemote().sendText(textPar);
+		}catch(Exception e) {
+			LOG.error("sendText(Session userSession, String textPar ) { ;", e) ;
+		}
+	}
     
     Properties pairs= new Properties();
     public Properties id2pairs= new Properties();
