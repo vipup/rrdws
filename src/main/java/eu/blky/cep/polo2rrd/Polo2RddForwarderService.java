@@ -180,5 +180,7 @@ public class Polo2RddForwarderService {
 
 	public void setPoloWS(PoloWSEndpoint poloWS) {
 		this.poloWS = poloWS;
+		MessageHandler msgHandler = new UpdateCounter();
+		this.poloWS.addMessageHandler(msgHandler );
 	}
 }
