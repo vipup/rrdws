@@ -37,7 +37,7 @@ public class HTMLNodeUtil extends HTMLNodePath {
   }
   
   public String getCommonIndexPath(HTMLNode element1, HTMLNode element2) {
-    if(element1 == null || element1 == null) return null;
+    if(element1 == null || element2 == null) return null;
     String path1 = getIndexPath(element1);
     String path2 = getIndexPath(element2);
     return getCommonIndexPath(path1, path2);

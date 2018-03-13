@@ -15,11 +15,14 @@ import java.text.SimpleDateFormat;
 public class SystemOutPrintlnAction implements Action {
  
 			
-			public static final SimpleDateFormat SDF = new SimpleDateFormat(RrdUpdateAction.MM_DD_YYYY_HH_MM_SS_SSS);
+			public static final SimpleDateFormat getSDF() {
+				return new SimpleDateFormat(RrdUpdateAction.MM_DD_YYYY_HH_MM_SS_SSS);
+				
+			}
 			@Override
 			public Object perform(String xpath, String timestamp, String data) {
 				try {
-					long timestampTmp =  SDF.parse(timestamp).getTime();
+					long timestampTmp =  getSDF().parse(timestamp).getTime();
 					Object cmdTmp =perform( xpath,   timestampTmp,  data);
 					return cmdTmp;
 				} catch (ParseException e) {
