@@ -141,12 +141,12 @@
 		<dependency>
 			<groupId>mibble</groupId>
 			<artifactId>mibble-mibs</artifactId>
-			<version>2.9.2</version>
+			<version>2.9.3</version>
 		</dependency>
 		<dependency>
 			<groupId>mibble</groupId>
 			<artifactId>mibble-parser</artifactId>
-			<version>2.9.2</version>
+			<version>2.9.3</version>
 		</dependency>
 		<dependency>
 			<groupId>mibble</groupId>
