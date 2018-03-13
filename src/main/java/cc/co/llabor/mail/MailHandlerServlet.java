@@ -220,7 +220,7 @@ public class MailHandlerServlet extends HttpServlet {
 			out = resp.getWriter();			
 			byte[] b = getResourceAsBA(resourceName);
 			String newVal = new String(b);
-			newVal.replace("123123123", ""+(""+System.currentTimeMillis()).hashCode());			
+			newVal = newVal.replace("123123123", ""+(""+System.currentTimeMillis()).hashCode());			
 			out.print( newVal );
 			out.flush();
 		} catch (IOException e) { 
