@@ -55,7 +55,7 @@ public class DestroyableWebSocketClientEndpoint {
 	    	container.setDefaultMaxSessionIdleTimeout(1);
 	    	CloseReason reason = new CloseReason(CloseCodes.CLOSED_ABNORMALLY,  "destroyed by owner");
 	
-    		userSession.close( reason  );
+    		if (userSession!=null) userSession.close( reason  ); // TODO WTF?!
     	}catch(Throwable e) {
     		e.printStackTrace();
     		LOG.error("public void destroy() throws IOException {"+this, e);
