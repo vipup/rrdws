@@ -344,34 +344,32 @@ public class SNMPObjectIdentifier extends SNMPObject
 	
 	
 	
-	/**
-	*	Test two obeject identifiers for equality.
-	*/
-	
-	public boolean equals(Object other)
-	{
-		int[] otherDigits = (int[])((SNMPObjectIdentifier)(other)).getValue();
-		
-		boolean areEqual = true;
-		
-		if (digits.length != otherDigits.length)
-		{
-			areEqual = false;
-		}
-		else
-		{
-			for (int i = 0; i < digits.length; i++)
-			{
-				if (digits[i] != otherDigits[i])
-				{
-					areEqual = false;
-					break;
-				}
-			}
-		}
-		
-		return areEqual;
-			
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(digits);
+		result = prime * result + tag;
+		return result;
+	}
+
+
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SNMPObjectIdentifier other = (SNMPObjectIdentifier) obj;
+		if (!Arrays.equals(digits, other.digits))
+			return false;
+		if (tag != other.tag)
+			return false;
+		return true;
 	}
 	
 	
