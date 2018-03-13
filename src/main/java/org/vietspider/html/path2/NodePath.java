@@ -28,8 +28,8 @@ public class NodePath {
     return builder.toString();
   }
   
-  public boolean equals(NodePath nodePath) {
-    INode [] newINodes = nodePath.getNodes();
+  public boolean equals(Object nodePath) {
+    INode [] newINodes = ((NodePath)nodePath).getNodes();
     if(newINodes.length != nodes.length) return false;
     for(int i = 0; i < nodes.length; i++) {
       if(!nodes[i].equals(newINodes[i])) return false;

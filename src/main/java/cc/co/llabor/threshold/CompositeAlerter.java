@@ -241,7 +241,7 @@ public abstract class CompositeAlerter extends MVELActionist /*implements List<T
 			CompositeAlerter o = (CompositeAlerter)obj;
 			return
 			o.rrdName.equals( this.rrdName  )&&
-			o.getClass().getName() .equals( this.getClass().getName()   )&&
+			o.getClass() .equals( this.getClass()  )&&
 			o.aList.length == this.aList.length;				
 		}
 		else {

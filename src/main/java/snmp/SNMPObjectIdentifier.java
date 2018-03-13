@@ -348,9 +348,9 @@ public class SNMPObjectIdentifier extends SNMPObject
 	*	Test two obeject identifiers for equality.
 	*/
 	
-	public boolean equals(SNMPObjectIdentifier other)
+	public boolean equals(Object other)
 	{
-		int[] otherDigits = (int[])(other.getValue());
+		int[] otherDigits = (int[])((SNMPObjectIdentifier)(other)).getValue();
 		
 		boolean areEqual = true;
 		
