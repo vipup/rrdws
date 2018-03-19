@@ -9,10 +9,7 @@
 		</parent>
 -->
 	<scm>
-		<connection>scm:hg:${scm.base}/${pom.artifactId}</connection>
-		<developerConnection>
-			scm:hg:${scm.base}/${pom.artifactId}
-		</developerConnection>
+ 
 		<url>${l.base}/JSPWiki/Wiki.jsp?page=${pom.artifactId}</url>
 	</scm>
 	<!-- this section is common for all l-parent childs ))) -->
