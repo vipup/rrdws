@@ -83,34 +83,79 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 		super();
 	}
 	
-	static String rrdUID = "rrdws/heartbeat/alive";
+
+   private static final String heart = ""+	
+		   "       ****                        ****                                      \n"+
+		   "    ***********                  ***********                                 \n"+    
+		   " *****************            *****************                                 \n"+    
+		   "*********************        *********************                                 \n"+    
+		   "***********************      ***********************                                 \n"+    
+		   "************************    ************************                                 \n"+    
+		   "*************************  *************************                                 \n"+    
+		   "**************************************************                                 \n"+    
+		   " ************************************************                                 \n"+    
+		   "   ********************************************                                 \n"+    
+		   "     ****************************************                                 \n"+    
+		   "        **********************************                                 \n"+    
+		   "          ******************************                                 \n"+    
+		   "             ************************                                 \n"+    
+		   "               ********************                                 \n"+    
+		   "                  **************                                 \n"+    
+		   "                    **********                                 \n"+    
+		   "                      ******                                 \n"+    
+		   "                        **                                 \n"+
+		   "";
+	
+   static String rrdUID = "rrdws/heartbeat/alive";
+   static int  lastHeart = 1;
 	
 	private void beat( ) {  	  
 		beatCounter++;
-		// this DIFF should be exactly equals 
-		long beatDiff  = lastBeat -(beatStart + initialDelay + beatCounter * period) ;
 		String timeMs = ""+  System.currentTimeMillis() ; 
 		Thread.currentThread().setContextClassLoader(RrdKeeper.class.getClassLoader());
 		Action rrdUpdateAction =  new RrdUpdateAction(); 
-		double beatVal = ((double)beatDiff)/(double)beatCounter;
-		String data = beatCounter==0?(""+beatDiff):(""+beatVal);
-		Object retval = rrdUpdateAction.perform(  rrdUID ,  timeMs , data);
-		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/updateCounter" ,  timeMs , ""+updateCounter ); 
-		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/warningCounter" ,  timeMs , ""+warningCounter ); 
-		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/createCounter" ,  timeMs , ""+createCounter ); 
-		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/fatalCounter" ,  timeMs , ""+fatalCounter ); 
-		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/errorCounter" ,  timeMs , ""+errorCounter ); 
-		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/successCounter" ,  timeMs , ""+successCounter );
+		rrdUpdateAction.perform(  rrdUID ,  timeMs , calcHeart() );
+		rrdUpdateAction.perform(   "rrdws/heartbeat/updateCounter" ,  timeMs , ""+updateCounter ); 
+		rrdUpdateAction.perform(   "rrdws/heartbeat/warningCounter" ,  timeMs , ""+warningCounter ); 
+		rrdUpdateAction.perform(   "rrdws/heartbeat/createCounter" ,  timeMs , ""+createCounter ); 
+		rrdUpdateAction.perform(   "rrdws/heartbeat/fatalCounter" ,  timeMs , ""+fatalCounter ); 
+		rrdUpdateAction.perform(   "rrdws/heartbeat/errorCounter" ,  timeMs , ""+errorCounter ); 
+		rrdUpdateAction.perform(   "rrdws/heartbeat/successCounter" ,  timeMs , ""+successCounter );
 		
-		double  rrdPerSec = 1.0D/((double)(1+lastBeat- System.currentTimeMillis())); 
-		retval = rrdUpdateAction.perform(   "rrdws/heartbeat/rrdPerSec" ,  timeMs , ""+rrdPerSec ); 
+		double  rrdPerSec = (beatCounter*1000.0D)/((double)(1+System.currentTimeMillis()-beatStart )); 
+		Object retval = rrdUpdateAction.perform(   "rrdws/heartbeat/rrdPerSec" ,  timeMs , ""+rrdPerSec ); 
  		// IT IS REALLY BAD :(
 		if (retval instanceof RrdException){
 			rrdUID = "rrdws/heartbeat/RIP";
 		}else { 
-			log.debug("processed :{}=[{}]", rrdUID, beatVal );
+			log.debug("processed :{}=[{}]", rrdUID, Runtime.getRuntime().freeMemory() );
 		}
 		lastBeat =  System.currentTimeMillis() ;
+	}
+	private static String calcHeart() {
+		String retval = "0"; // base level
+		lastHeart = 0 - lastHeart ;
+		String lines[] = heart.split("\\n");
+		int secondsFromStart = (int) ((System.currentTimeMillis()-beatStart) / 1000); 
+		int maxLen = 0;
+		for (int i=0;i<lines.length;i++) {
+			String l = lines[i];
+			maxLen = maxLen<l.length()?l.length():maxLen ;
+		}
+		for (int i=0;i<lines.length;i++) {
+			String l = lines[i] +"                                                                            ";
+			int beginIndex=secondsFromStart%maxLen;
+			int endIndex=beginIndex+1;
+
+			if (lastHeart>0) {
+				retval = "" + i ;
+				if ("*".equals( l.substring(beginIndex, endIndex))) break;
+			}else {
+				retval = "-" + i ;
+				if ("*".equals( l.substring(beginIndex, endIndex))) break;
+			}
+		}
+		return retval;
 	} 
  
     

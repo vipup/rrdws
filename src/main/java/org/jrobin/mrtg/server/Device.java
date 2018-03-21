@@ -130,7 +130,7 @@ class Device {
 		buff += "active=" + active + "\n";
 		// dump links
 		for(int i = 0; i < links.size(); i++) {
-            Port link = (Port) links.get(i);
+            Port link = (Port) links.get(""+i);
 			buff += "  Link: " + link + "\n";
 		}
 		return buff;

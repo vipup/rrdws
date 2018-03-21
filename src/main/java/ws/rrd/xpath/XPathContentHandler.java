@@ -35,7 +35,7 @@ public class XPathContentHandler implements ContentHandler {
 	String xpath = null;
 	
 	Action action = null;
-	private String timestamp = SystemOutPrintlnAction.SDF.format( new Date()); 
+	private String timestamp = SystemOutPrintlnAction.getSDF().format( new Date()); 
 
 	public XPathContentHandler(Action a){
 		this.action = a;

@@ -63,7 +63,7 @@ public class NodeList implements List<HTMLNode>, Serializable {
 
   public boolean contains(Object o) { return values.contains(o); }
 
-  public boolean containsAll(Collection<?> c) { return values.contains(c); }
+  public boolean containsAll(Collection<?> c) { return values.containsAll(c); }
 
   public HTMLNode get(int index) { return values.get(index); }
 

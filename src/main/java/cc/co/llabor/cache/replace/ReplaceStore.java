@@ -69,7 +69,7 @@ public class ReplaceStore {
 			
 			do{
 				String parentURl = path.substring(0, path.lastIndexOf("/"));
-				if ("".equals(parentURl) || parentURl == scriptURL ) break ;
+				if ("".equals(parentURl) || parentURl .equals( scriptURL ) ) break ;
 				Properties pTmp = getByURL(parentURl);
 				if (pTmp!=null){ 
 					mergeProperties(pTmp, retval);

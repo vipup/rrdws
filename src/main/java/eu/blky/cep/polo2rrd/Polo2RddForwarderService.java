@@ -60,6 +60,7 @@ public class Polo2RddForwarderService {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
+ 
 //		
 		try {			 
 			initCEP();
@@ -75,6 +76,7 @@ public class Polo2RddForwarderService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+ 
 	}
 	
 	public Polo2RddForwarderService(){

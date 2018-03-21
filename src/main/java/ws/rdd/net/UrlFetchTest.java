@@ -1,7 +1,5 @@
 package ws.rdd.net;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+ 
 import gnu.inet.encoding.Punycode;
 import gnu.inet.encoding.PunycodeException;
 
@@ -59,7 +57,8 @@ import org.apache.http.message.BasicStatusLine;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.esxx.js.protocol.GAEConnectionManager;
-import org.jrobin.cmd.RrdCommander; 
+import org.jrobin.cmd.RrdCommander;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,8 +94,9 @@ public class UrlFetchTest implements Serializable{
 	/**
 	 * Cookie expiry date format for parsing.
 	 */
-	volatile static protected SimpleDateFormat mFormat = new SimpleDateFormat(
-			"EEE, dd-MMM-yy kk:mm:ss z");
+	static protected SimpleDateFormat getSDF () {
+		return new SimpleDateFormat( "EEE, dd-MMM-yy kk:mm:ss z");
+	}
 
 	public UrlFetchTest(HttpSession sessionTmp) {
 		this.session = sessionTmp ;
@@ -106,6 +106,7 @@ public class UrlFetchTest implements Serializable{
 		// TODO Auto-generated constructor stub
 	}
 
+	@Test
 	public String testFetchUrl(String toFetchStr)
 			throws ClientProtocolException, IOException {
 		HttpResponse respTmp = fetchGetResp(toFetchStr);
@@ -199,8 +200,20 @@ public class UrlFetchTest implements Serializable{
 				Header[] hTmp = respTmp.getHeaders( "WWW-Authenticate");
 				if (hTmp.length == 0)
 					bRealm = bRealm.replace("$$$$$$", "Tomcat Manager Application");
-				else
-					bRealm = bRealm.replace("$$$$$$", ""+hTmp);
+				else {
+					String valsTmp = "";
+					String suffixTmp="";
+					for (Header x :hTmp){
+						valsTmp +=x.getName();
+						valsTmp +=": = :";
+						valsTmp +=x.getValue();
+						valsTmp +=suffixTmp;
+						suffixTmp=";";
+						
+					}
+					bRealm = bRealm.replace("$$$$$$", ""+valsTmp);
+				}
+					
 				respTmp.addHeader("WWW-Authenticate", bRealm);
 				respTmp.setStatusCode(401);
 				respTmp.setStatusLine(statusLine);
@@ -553,7 +566,7 @@ public class UrlFetchTest implements Serializable{
 							String comma = tokenizer.nextToken();
 							String rest = tokenizer.nextToken();
 						
-							Date date = mFormat.parse(value + comma + rest);
+							Date date = getSDF().parse(value + comma + rest);
 							// http://download.oracle.com/javaee/1.4/api/javax/servlet/http/Cookie.html#setMaxAge(int)
 							// cookie.setMaxAge((int) (date.getTime() - System
 							// .currentTimeMillis()) / 1000);
