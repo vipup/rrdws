@@ -21,10 +21,8 @@ public class GifgenRenderingController extends AbstractController{
 
 	@Override
 	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {		  
-	    response.setContentType("image/gif");
-	    response.setHeader("Content-Disposition", "inline;filename=sss.gif" );
-	    response.setHeader("Pragma", "no-cache");
-		response.setHeader("Cache-Control","no-cache"); //HTTP 1.1
+
+		response.setHeader("Cache-Control","max-age=0, must-revalidate"); //HTTP 1.1
 		response.setHeader("Pragma","no-cache"); //HTTP 1.0
 		response.setDateHeader ("Expires", 0); //prevents caching at the proxy server
 		
@@ -44,16 +42,21 @@ public class GifgenRenderingController extends AbstractController{
 
 			if (o instanceof org.jrobin.svg.RrdGraphInfo) {
 				org.jrobin.svg.RrdGraphInfo oInf = (org.jrobin.svg.RrdGraphInfo) o;
-				session.setAttribute("svg", oInf.getBytes());
+				response.setContentType("image/svg");
+				response.setHeader("Content-Disposition", "inline;filename=i"+System.currentTimeMillis()+".svg" );
+				session.setAttribute("DATA", oInf.getBytes());
 			}
 			if (o instanceof org.jrobin.graph.RrdGraphInfo) {
+				response.setContentType("image/gif");
+				response.setHeader("Content-Disposition", "inline;filename=i"+System.currentTimeMillis()+".gif" );
 				org.jrobin.graph.RrdGraphInfo oInf = (org.jrobin.graph.RrdGraphInfo) o;
-				session.setAttribute("gif", oInf.getBytes());
+				session.setAttribute("DATA", oInf.getBytes());
 			}
+			
 		}
 
 		
-		java.io.InputStream fio = new  java.io.ByteArrayInputStream( (byte[])session.getAttribute("gif") );
+		java.io.InputStream fio = new  java.io.ByteArrayInputStream( (byte[])session.getAttribute("DATA") );
 		byte[]buf = new byte[1023];
 		for (int i=fio.read(buf);i>0;i=fio.read(buf)){
 			response.getOutputStream().write(buf,0,i);

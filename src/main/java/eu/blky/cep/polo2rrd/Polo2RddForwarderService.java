@@ -60,14 +60,15 @@ public class Polo2RddForwarderService {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-//		
-		try {			 
-			initCEP();
-			System.out.println("initCEP() done");
-		} catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//
+// TODO		
+//		try {			 
+//			EPRuntime cepTmp = initCEP();
+//			System.out.println("initCEP() done ::"+cepTmp);
+//		} catch (Throwable e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 	
 	public Polo2RddForwarderService(){

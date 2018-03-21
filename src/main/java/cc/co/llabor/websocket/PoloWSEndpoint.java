@@ -99,7 +99,7 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
     }
     
     Properties pairs= new Properties();
-    public Properties id2pairs= new Properties();
+    public final Properties id2pairs= new Properties();
     
     {
     	try {
@@ -128,6 +128,7 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
      * @param message The text message
      */
     @OnMessage
+    @Override
     public void onMessage(String message) {
         if (this.messageHandler != null) {
         	try {
