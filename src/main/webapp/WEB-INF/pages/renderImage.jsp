@@ -110,9 +110,7 @@
 					}
 				}
 				;
-			};
-			
-
+			}; 
 			var updateImage = function (){
 				console.log(" reload image... &uuidtimestamp=" + new Date().getTime() );
 				processScroll();
@@ -123,7 +121,21 @@
 			// -  processScroll() --not need it by scroll at all -  processScroll();
 			//addEventListener('scroll', processScroll);
 			
+			var processScrollTimeout = 0;
+			var scheduleProcessScroll = function(){
+				processScrollTimeout += 1000; // in 100 ms
+			}
+			var scrollUpdated = function(){
+				setTimeout(scrollUpdated, 1000); // call itselft any sec
+				if (processScrollTimeout >0){
+					setTimeout(processScroll, 200);
+					processScrollTimeout = 0;
+				}
+			}
+			addEventListener('scroll', scheduleProcessScroll);
+			
 			setTimeout(updateImage , 1000);
+			setTimeout(scrollUpdated , 1000);
 
 		});
 	</script>
