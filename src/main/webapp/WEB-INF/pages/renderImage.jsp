@@ -71,7 +71,7 @@
 				}else{
 					el._bak_src = el._bak_src; // nothingtodo
 				} 
-				var src = el._bak_src + "#IiD#" + new Date().getTime()  ; // + "&uuidtimestamp=" + new Date().getTime() 
+				var src = el._bak_src + "&uuidtimestamp=" + new Date().getTime();  // + "#IiD#" + new Date().getTime()  ; 
 				img.src 		= src;
 				img.id 			= el.id;
 				img._bak_src 	= el._bak_src;
