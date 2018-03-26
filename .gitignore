@@ -1,6 +1,7 @@
 /target/
 /targetnull
 /rrd.war
+/*.log
 /hs_err_pid12781.log
 /catalina.base_IS_UNDEFINED/
 /ch.qos.logback.classic.joran.ReconfigureOnChangeTask.class
