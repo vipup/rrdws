@@ -53,6 +53,7 @@ public class RenderingController extends AbstractController {
 		model.addObject("_v", _v);
 		model.addObject("_start", _start);
 		model.addObject("dbTmp", dbTmp);
+		model.addObject("imgId", new AutoIncrementedId());
 		model.addObject("_h", _h);
 		model.addObject("_end", _end);
 		model.addObject("_end", _end);
