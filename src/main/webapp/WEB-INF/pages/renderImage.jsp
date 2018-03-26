@@ -52,56 +52,65 @@
 				return Object.prototype.hasOwnProperty.call(obj, key);
 			};
 
+			//Where el is the DOM element you'd like to test for visibility
+			function isHidden(el) {
+			    var style = window.getComputedStyle(el);
+			    return (style.display === 'none')
+			}
+			
 			function elementInViewport(el) {
 				var rect = el.getBoundingClientRect()
 
 				return (rect.top >= 0 && rect.left >= 0 && rect.top <= (window.innerHeight || document.documentElement.clientHeight))
 			}
-
-			function loadImage(el, fn) {
-				var img = new Image();
-				
+			 
+			function loadImage(el, fn) {  
+				var img = new Image(); 
 				if (!el._bak_src ){ // first assignment
 					el._bak_src = el.getAttribute("src"); 
 				}else{
 					el._bak_src = el._bak_src; // nothingtodo
 				} 
-				var src = el._bak_src + "&uuidtimestamp=" + new Date().getTime();
+				var src = el._bak_src + "&uuidtimestamp=" + new Date().getTime();  // + "#IiD#" + new Date().getTime()  ; 
+				img.src 		= src;
+				img.id 			= el.id;
+				img._bak_src 	= el._bak_src;
+				// 200%
+				img.setAttribute("_bak_src",  el._bak_src);
+				img.setAttribute("class",  "lazy"); 
+				img.setAttribute("id",  el.id); 
 				
-				var theid = el.id;
-
 				img.onload = function() {
-					this.id = theid;
+					 
 					if (el.parentElement) {
 						el.parentElement.replaceChild(img, el);
 						img.src = src;
 					} else {
 						el.src = src;
 					}
-					fn ? fn() : null;
+					fn ? fn() : null; // callback
 				}
-				img.src = src;
-				img.setAttribute("_bak_src",  el._bak_src);
+
 			}
 			
-			var images = new Array();
-			var query = $q('img.lazy');
 			var processScroll = function() {
+				var images = new Array();
+				var query = $q('img.lazy');
+				// Array.prototype.slice.call is not callable under our lovely IE8
+				for (var i = 0; i < query.length; i++) {
+					images.push(query[i]);
+				}  
 				for (var i = 0; i < images.length; i++) {
 					if (elementInViewport(images[i])) {
-						loadImage(images[i], function() {
-							images.splice(i, i);
+						loadImage(images[i], function(newImageObj) {
+							//images.splice(i, i);
+							//images.splice(0,1,newImageObj);
+							console.log("loadImage("+images[i]+", ->("+newImageObj+") ") ;
 						});
 					}
 				}
 				;
-			};
-			
-			// Array.prototype.slice.call is not callable under our lovely IE8
-			for (var i = 0; i < query.length; i++) {
-				images.push(query[i]);
-			}
-			;
+			}; 
 			var updateImage = function (){
 				console.log(" reload image... &uuidtimestamp=" + new Date().getTime() );
 				processScroll();
@@ -109,10 +118,24 @@
 			    setTimeout(updateImage, 11000);
 			}
 
-			//processScroll();
-			addEventListener('scroll', processScroll);
+			// -  processScroll() --not need it by scroll at all -  processScroll();
+			//addEventListener('scroll', processScroll);
+			
+			var processScrollTimeout = 0;
+			var scheduleProcessScroll = function(){
+				processScrollTimeout += 1000; // in 100 ms
+			}
+			var scrollUpdated = function(){
+				setTimeout(scrollUpdated, 1000); // call itselft any sec
+				if (processScrollTimeout >0){
+					setTimeout(processScroll, 200);
+					processScrollTimeout = 0;
+				}
+			}
+			addEventListener('scroll', scheduleProcessScroll);
 			
 			setTimeout(updateImage , 1000);
+			setTimeout(scrollUpdated , 1000);
 
 		});
 	</script>
