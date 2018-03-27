@@ -8,11 +8,12 @@ import ws.rrd.csv.Action;
 import ws.rrd.csv.RrdKeeper;
 import ws.rrd.csv.RrdUpdateAction;
 
-public class UpdateCounter implements MessageHandler {
+public class RrdCountUpdater implements MessageHandler {
 	private int updateCounter = 0;
 	private long lastOut = 0;
 	private long lastUp = 0;
 	
+
 	@Override
 	public void handleMessage(String message) throws ErrorProcessingException {
 		if (updateCounter%1000==0) {

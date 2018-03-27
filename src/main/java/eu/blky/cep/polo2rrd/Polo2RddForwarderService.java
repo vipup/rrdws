@@ -123,9 +123,9 @@ public class Polo2RddForwarderService {
 	    //
 	    getCepConfig().addEventType("OrderTick", OrderTick.class.getName());
 	    
-	    cep = EPServiceProviderManager.getProvider("myCEPEngine#"+engineCounter++, getCepConfig());
-		cepRT = cep.getEPRuntime(); 
-	    cepAdm = cep.getEPAdministrator();
+	    setCep(EPServiceProviderManager.getProvider("myCEPEngine#"+engineCounter++, getCepConfig()));
+		setCepRT(getCep().getEPRuntime()); 
+	    setCepAdm(getCep().getEPAdministrator());
 	    int intPairCounter = 0;
 
 	
@@ -156,8 +156,8 @@ public class Polo2RddForwarderService {
 			    				+ ")"
 						+ "";  
 			    //System.out.println(avg10sec);
-			    EPStatement notNullEventsTmp = cepAdm.createEPL(avg10sec); 	
-			    notNullEventsTmp.addListener(new RrdDirectUpdated(symTmp,properyNameTmp ));
+			    EPStatement notNullEventsTmp = getCepAdm().createEPL(avg10sec); 	
+			    notNullEventsTmp.addListener(new RrdDirectUpdater(symTmp,properyNameTmp ));
 			    				
 			     
 	    	}
@@ -168,7 +168,7 @@ public class Polo2RddForwarderService {
 	    		"select  'PoloTick' type,  symbol, count(*) as cnt\n" + 
 	    		"from PoloTick.win:time_batch(11 second)\n" + 
 	    		"group by symbol";
-	    EPStatement statStmtTmp = cepAdm.createEPL(eql4); 
+	    EPStatement statStmtTmp = getCepAdm().createEPL(eql4); 
 	    //statStmtTmp.addListener(new StatisticPrinter());
 	    
 	    
@@ -178,10 +178,10 @@ public class Polo2RddForwarderService {
 	    		"select   type , sum(  cnt  )" + 
 	    		"from TicksPerSecond.win:time_batch(1 second) " + 
 	    		"group by type";
-	    EPStatement statByTypeTmp = cepAdm.createEPL(eql5); 
+	    EPStatement statByTypeTmp = getCepAdm().createEPL(eql5); 
 	    statByTypeTmp.addListener(new StatisticPrinter());	    
 	    
-	    return cepRT;
+	    return getCepRT();
 	
 	}
 
@@ -199,7 +199,33 @@ public class Polo2RddForwarderService {
 
 	public void setPoloWS(PoloWSEndpoint poloWS) {
 		this.poloWS = poloWS;
-		MessageHandler msgHandler = new UpdateCounter();
+		MessageHandler msgHandler = new RrdCountUpdater();
 		this.poloWS.addMessageHandler(msgHandler );
+		MessageHandler XXX = new XXXEsperHandler(this);
+		this.poloWS.addMessageHandler(XXX );
+	}
+
+	public EPRuntime getCepRT() {
+		return cepRT;
+	}
+
+	public void setCepRT(EPRuntime cepRT) {
+		this.cepRT = cepRT;
+	}
+
+	public EPServiceProvider getCep() {
+		return cep;
+	}
+
+	public void setCep(EPServiceProvider cep) {
+		this.cep = cep;
+	}
+
+	public EPAdministrator getCepAdm() {
+		return cepAdm;
+	}
+
+	public void setCepAdm(EPAdministrator cepAdm) {
+		this.cepAdm = cepAdm;
 	}
 }
