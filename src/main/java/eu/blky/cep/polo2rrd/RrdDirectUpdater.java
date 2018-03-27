@@ -12,18 +12,19 @@ import ws.rrd.csv.Action;
 import ws.rrd.csv.RrdUpdateAction;
 
 public class RrdDirectUpdater implements UpdateListener {
-	private String symbol;
-	private String properyName;
+ 
 	private String ns;
 	private String logns;
+	private String propertyName = "data";
 	/** Logger */
 	private static Logger LOG = LoggerFactory.getLogger(PoloHandler.class);
 
 
-	public RrdDirectUpdater(String symTmp, String properyNameTmp) {
-		this.symbol = symTmp;
-		this.properyName = properyNameTmp;
-		this.ns = "rrdws/RrdDirectUpdater/"+symbol+"/"+properyName;
+	public RrdDirectUpdater(String nsPar, String properyNameTmp) { 
+		if (null!=properyNameTmp) {
+			propertyName  = properyNameTmp;
+		}
+		this.ns = nsPar;
 		this.logns = ns+":{}";
 	}
 
@@ -35,7 +36,7 @@ public class RrdDirectUpdater implements UpdateListener {
 			double value = 0;
 			try {
 				System.out.println(logns + eBean );
-				value = Double.valueOf(""+ eBean.get("data")) ;
+				value = Double.valueOf(""+ eBean.get(propertyName )) ;
 				rrdUpdate( value );
 				
 			}catch(Exception ex) {

@@ -9,20 +9,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.espertech.esper.client.EPAdministrator;
-import com.espertech.esper.client.EPRuntime;
-import com.espertech.esper.client.EPServiceProvider;
+import com.espertech.esper.client.EPRuntime; 
 import com.espertech.esper.client.EPStatement;
 import com.espertech.esper.client.UpdateListener;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.ObjectMapper; 
 
 import cc.co.llabor.websocket.ErrorProcessingException;
 import cc.co.llabor.websocket.MessageHandler;
-import cc.co.llabor.websocket.PoloHandler;
-import cc.co.llabor.websocket.RRDWSEndpoint;
-import cc.co.llabor.websocket.RrdOrderUpdater;
+import cc.co.llabor.websocket.PoloHandler; 
 import cc.co.llabor.websocket.WS2RRDPump;
 import cc.co.llabor.websocket.cep.DiffTracker;
 import cc.co.llabor.websocket.cep.OrderTick;
@@ -42,53 +38,42 @@ public class XXXEsperHandler implements MessageHandler {
 	private static Logger LOG = LoggerFactory.getLogger(PoloHandler.class);
 	UpdateListener diffTracker = null;
 	private Map<String, RrdDirectUpdater> updaterRepo = new HashMap<String, RrdDirectUpdater>();
-	private long lastHandledTimestamp = 0;
-	private long messageCounter = 0;
-	private long messagesPerSec = 0;
-	private long sizePerSec = 0;
-	private long errorCounter = 0;
-	private RrdDirectUpdater directRRDUpdater = new RrdDirectUpdater("-", "-");	
-	
 	// http://www.espertech.com/esper/solution-patterns/#aggregate-3
 	// select avg(value) as avgValue, count(value) as countValue,
 	//min(value) as minValue, max(value) as maxValue from MyEvent#time(60 sec)
 	// TODO http://www.espertech.com/esper/solution-patterns/#triple-bottom-pattern
-	private void esperXXXYYY(RrdDirectUpdater rrdWS, String MARKET_PAIR, JsonNode nodeTmp) {
+	private void esperXXXYYY(  String MARKET_PAIR, JsonNode nodeTmp) {
 		JsonNode xxx = nodeTmp.get(2).get(0);
 		if ("o".equals( xxx.get(0).asText() ) ) {
 			String typeTMP = xxx.get(1).asText() ;
 			BigDecimal priceTMP = new BigDecimal(xxx.get(2).asText()); 
-			BigDecimal volTMP = new BigDecimal(xxx.get(3).asText());
-
+			BigDecimal volTMP = new BigDecimal(xxx.get(3).asText()); 
 			
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 10 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 10 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 10 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 60 );
-//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 60 );
-//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 60 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 300 );
-//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 300 );
-//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 300 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 600 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 1200 );
-			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "price", 2400 );
-//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "volume", 600 );
-//			registerRRDUpdaterIfAny(rrdWS, MARKET_PAIR, typeTMP,  "total", 600 );
+			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 10 );
+			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 10 );
+			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 10 );
+			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 60 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 60 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 60 );
+			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 300 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 300 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 300 );
+			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 600 );
+			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 1200 );
+			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 2400 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 600 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 600 );
 			
 			OrderTick order = new OrderTick(MARKET_PAIR, typeTMP, priceTMP, volTMP );
 			// processing Event
 		    getCepRT().sendEvent(order); 
-
-		    
-	 
-			
+ 
 		}else {
 			LOG.debug( "TODO XXXYYY_O:" + xxx);
 		}		
 	}
 
-	private void registerRRDUpdaterIfAny(RrdDirectUpdater rrdWS, String MARKET_PAIR, String typeTMP, String propPar, int timeWindowAverage) {
+	private void registerRRDUpdaterIfAny(String MARKET_PAIR, String typeTMP, String propPar, int timeWindowAverage) {
 			String XPATH_PREFIX = WS2RRDPump.PO_LO + "/EQLOrder/" +MARKET_PAIR +"/"+ typeTMP ;
 			// PRICE
 			String nsTmp = XPATH_PREFIX + "/"+ propPar+"_"+timeWindowAverage+"sec";
@@ -96,6 +81,7 @@ public class XXXEsperHandler implements MessageHandler {
 			// TODO even don't think about sync :)))
 			if (updaterRepo.get(nsTmp)== null) {
 				  
+				RrdDirectUpdater rrdWS = new RrdDirectUpdater(nsTmp, null );
 				if ("price".equals(propPar)) {
 					// step 1 : 
 					
@@ -120,6 +106,7 @@ public class XXXEsperHandler implements MessageHandler {
 	//								+ " and type = true " // only buy  
 									+ "\n";
 				EPStatement cepDEFsec= getCepAdm().createEPL(eqlDEFsecSELLBUY);
+				LOG.trace("cepDEFsec::", cepDEFsec);
 	 		
 					
 					// step 2 : 10 sec
@@ -149,6 +136,7 @@ public class XXXEsperHandler implements MessageHandler {
 					
 					//RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, "price");
 					//cep10sec.addListener(rrdUpdaterTmp);
+					
 					cep10sec.addListener(rrdWS); // <-- DirectRrdUpdater
 					updaterRepo.put(nsTmp,rrdWS);
 					
@@ -163,6 +151,7 @@ public class XXXEsperHandler implements MessageHandler {
 							+ " '"+propPar+ "' name \n"
 							+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
 					EPStatement cepDEFsec= getCepAdm().createEPL(eqlDEFsec);
+					LOG.trace("cepDEFsec::", cepDEFsec);
 					// step 2 : 10 sec
 					String eql10sec = "  "
 							+ " select "
@@ -175,6 +164,7 @@ public class XXXEsperHandler implements MessageHandler {
 					
 					//RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, propPar);
 					//cep10sec.addListener(rrdUpdaterTmp);
+					
 					cep10sec.addListener(rrdWS); // <-- DirectRrdUpdater
 					//updaterRepo.put(nsTmp,rrdUpdaterTmp);
 					updaterRepo.put(nsTmp,rrdWS);	
@@ -189,6 +179,7 @@ public class XXXEsperHandler implements MessageHandler {
 			    		"from OrderTick.win:time_batch(10 second)\n" + 
 			    		"group by pair";
 			    EPStatement statStmtTmp = getCepAdm().createEPL(eql4); 
+			    LOG.trace("statStmtTmp:::::", statStmtTmp);
 			    //statStmtTmp.addListener(new StatisticPrinter());
 			}
 		}
@@ -253,15 +244,7 @@ public class XXXEsperHandler implements MessageHandler {
 
 	@Override
 	public void handleMessage(String message) throws ErrorProcessingException {
-		messageCounter ++; 
-		messagesPerSec++; 
-		sizePerSec+=message.length();
-		// The channels are:
-		// 1001 = trollbox (you will get nothing but a heartbeat)
-		// 1002 = ticker
-		// 1003 = base coin 24h volume stats
-		// 1010 = heartbeat
-		// 'MARKET_PAIR' = market order books
+		message.length();
 
 		LOG.trace( "<<<<POLO<<<<" + message);
 		ObjectMapper mapper = new ObjectMapper();
@@ -270,13 +253,13 @@ public class XXXEsperHandler implements MessageHandler {
 			JsonNode nodeTmp = mapper.readTree(message);
 			//if (message.length()>1000) LOG.debug("["+message.length()+"]:::"+nodeTmp);
 			String theType = "" + nodeTmp.get(0);
-			boolean existPairs = false;
-			try{
-				((TextNode) nodeTmp.get(2).get(0).get(1).get("currencyPair")).textValue();
-				existPairs = true;
-			}catch(Exception e) {
-				// ignore
-			}
+			//ignore TODO boolean existPairs = false;
+			//ignore TODO try{
+			//ignore TODO 				((TextNode) nodeTmp.get(2).get(0).get(1).get("currencyPair")).textValue();
+			//ignore TODO 				existPairs = true;
+			//ignore TODO 			}catch(Exception e) {
+			//ignore TODO 				// ignore
+			//ignore TODO 			}
 			//ignore TODO if ("1001".equals(theType)) {
 			//ignore TODO process1001(poloHandler.rrdWS,  nodeTmp); 
 			//ignore TODO } else if (nodeTmp.get(2).size()==1 && existPairs)
@@ -285,10 +268,9 @@ public class XXXEsperHandler implements MessageHandler {
 			if (parentService.getPoloWS().getPairNameByID(theType) != null ) {
 			//ignore TODO String MARKET_PAIR = poloHandler.poloWS.getPairNameByID(theType);
 				String MARKET_PAIR = parentService.getPoloWS().getPairNameByID(theType);
-				 
-				//ignore TODO processXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
+			//ignore TODO processXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
 			//ignore TODO esperXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
-				esperXXXYYY(directRRDUpdater , MARKET_PAIR, nodeTmp);
+				esperXXXYYY( MARKET_PAIR, nodeTmp);
 			//ignore TODO } else if ("1002".equals(theType)) {
 			//ignore TODO 				process1002(poloHandler.rrdWS,  nodeTmp);
 			//ignore TODO 				esper1002(poloHandler.rrdWS,  nodeTmp);
@@ -302,7 +284,6 @@ public class XXXEsperHandler implements MessageHandler {
 		} catch (IOException e) {
 			LOG.error("public void handleMessage(String message) throws ErrorProcessingException {;", e);
 		} catch (RuntimeException e) {e.printStackTrace();
-			errorCounter++;
 			// ignore
 			LOG.debug( "error processing  message: "+message);
 			throw new ErrorProcessingException(message);
