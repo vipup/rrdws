@@ -1,1 +1,0 @@
-mvn -o -e help:active-profiles tomcat:redeploy -Dcccache -Dmaven.test.skip=true -Dmyserver 
