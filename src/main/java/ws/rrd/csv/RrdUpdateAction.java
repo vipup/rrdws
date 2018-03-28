@@ -116,7 +116,7 @@ public class RrdUpdateAction implements Action {
 			String rrddb = xpath2Hash(xpath);
 			String cmdCreate = "rrdtool create " +
 				""+rrddb+" --start "+(((timestampTmp-10000)/1000L))+"" + 
-				" --step 60 " +
+				" --step 1 " +
 				"				DS:data:GAUGE:240:U:U " +
 				"				RRA:AVERAGE:0.5:3:480 " +
 				"				RRA:AVERAGE:0.5:17:592 " +
