@@ -14,8 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;    
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.collectd.DataWorker; 
+ 
 import org.jrobin.core.RrdDbPool;
 import org.jrobin.core.RrdException;
 import org.jrobin.mrtg.MrtgException;
@@ -47,12 +46,9 @@ public class StartStopServlet extends HttpServlet {
 	private static final String SUCCESSFUL = "SUCCESSFUL";
 	private static Logger log = LoggerFactory.getLogger(cc.co.llabor.system.StartStopServlet.class);
 
-
-	
-	ServerLauncher serverLauncher;
+ 
 	 
-
-	DataWorker worker = null;
+ 
 	public static boolean isGAE() {
 		return !(System.getProperty("com.google.appengine.runtime.version")==null);
 	}
@@ -64,9 +60,7 @@ public class StartStopServlet extends HttpServlet {
 		restoreDBfromBackup();
 		
 		initShutdownHookPROC();	
-		
-		initCollectD();		
-		
+		 
 		initAlerter(); 
 
 		
@@ -120,18 +114,7 @@ public class StartStopServlet extends HttpServlet {
 		}
 	}
 
-
-	private void initCollectD() {
-		if ( !isGAE()){
-				String[] arg0=new String[]{};
-			// collectd SERVER
-			status.put("collectd-SERVER", startCollectdServer(arg0) );
-			// collectd CLIENT (agent)
-			status.put("collectd-CLIENT", startColelctdClient() );
-			// start collectd queue-worker
-			status.put("collectd-Worker", startCollectdWorker() );
-		}
-	}
+ 
 
 
 	private void initShutdownHookPROC() {
@@ -294,36 +277,8 @@ public class StartStopServlet extends HttpServlet {
 
 
 
-	/**
-	 * @author vipup
-	 * @return 
-	 */
-	private String startCollectdWorker() { 
-		//rrdDataWorker.dat
-		log_info(Repo.getBanner( "rrdDataWorker"));
-			worker = new DataWorker(); 
-			Thread t1 = new Thread(ServletListener.getDefaultThreadGroup(), worker, "rrd DataWorker");
-			t1.setDaemon(true);
-			t1.start();
-		return SUCCESSFUL; 	
-	}
-
-	
-	/**
-	 * @author vipup
-	 * @param arg0
-	 */
-	private String startCollectdServer(final String[] arg0) {
-		String retval = SUCCESSFUL;
-		log_info(Repo.getBanner( "collectServer"));
-		serverLauncher = new ServerLauncher(arg0);
-		ThreadGroup dtgTmp = ServletListener.getDefaultThreadGroup();
-		Thread t1 = new Thread ( dtgTmp , serverLauncher, "jcollectd_Server");
-		t1.setDaemon(true);
-		t1.start();	
-		return retval;
-	}
-
+ 
+ 
 	private void log_info(String s) {
 		if (log!=null) log.info(s);
 		else System.out.println(s);
@@ -370,18 +325,10 @@ public class StartStopServlet extends HttpServlet {
     }
     
     public void doStop() {
-		log_info("Shutting down...");
-		serverLauncher.destroyServer();
+		log_info("Shutting down..."); 
 		// close all RRDs..
 		RrdDbPool instance;
-		try {
-			instance = RrdDbPool.getInstance();
-			instance.reset();
-
-			worker.kill();
-		} catch (RrdException e1) {
-			log.error("doStop() failed", e1);
-		} 
+ 
  	 
 		try {
 			Server.getInstance().stop();
@@ -403,14 +350,7 @@ public class StartStopServlet extends HttpServlet {
 			// TODO Auto-generated catch block
 			// e.  printStackTrace();
 		}
-		
-		try {
-			clientLauncher.killProcessTree();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			// e.  printStackTrace();
-		}
-
+		 
 		
 		try {
 			RrdKeeper.getInstance().destroy();
