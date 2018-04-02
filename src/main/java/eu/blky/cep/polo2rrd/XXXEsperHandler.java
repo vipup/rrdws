@@ -59,8 +59,8 @@ public class XXXEsperHandler implements MessageHandler {
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 300 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 300 );
 			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 600 );
-			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 1200 );
-			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 2400 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 1200 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 2400 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 600 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 600 );
 			

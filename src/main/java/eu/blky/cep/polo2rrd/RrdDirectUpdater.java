@@ -35,12 +35,12 @@ public class RrdDirectUpdater implements UpdateListener {
 			MapEventBean eBean = (MapEventBean)e;
 			double value = 0;
 			try {
-				System.out.println(logns + eBean );
+				LOG.trace(logns,  eBean );
 				value = Double.valueOf(""+ eBean.get(propertyName )) ;
 				rrdUpdate( value );
 				
 			}catch(Exception ex) {
-				LOG.error("{}", ex);
+				LOG.trace("{}", ex);
 			}
 		}		
 	}
