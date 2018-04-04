@@ -169,7 +169,7 @@ public class DestroyableWebSocketClientEndpoint {
 		if (errorCounter> MAX_ALLOWED_ERROR_BEFORE_RESTART) {
 			synchronized (DestroyableWebSocketClientEndpoint.class) {
 				isAlive = false; // stop all firther errors...
-				
+				LOG.error("errorCounter> MAX_ALLOWED_ERROR_BEFORE_RESTART");
 		        final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
 		        
 		        ses.schedule(new Runnable() {
