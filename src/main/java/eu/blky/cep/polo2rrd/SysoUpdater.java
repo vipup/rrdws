@@ -33,7 +33,7 @@ public class SysoUpdater implements UpdateListener {
 			try {
 				LOG.trace(logns,  eBean );
 				value = Double.valueOf(""+ eBean.get(properyName )) ;
-				System.out.println("§"+uuid+"§["+updateCounter+"]§"+properyName+" == \\\\"+ value+ "///"+logns);				 
+				System.out.println("-"+uuid+"+["+updateCounter+"]!"+properyName+" == \\\\"+ value+ "///"+logns);				 
 			}catch(Exception ex) {
 				LOG.trace("{}", ex);
 			}
