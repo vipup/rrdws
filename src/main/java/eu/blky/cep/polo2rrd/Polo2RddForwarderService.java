@@ -7,6 +7,8 @@ import java.net.URISyntaxException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import com.espertech.esper.client.EPStatement;
 import cc.co.llabor.websocket.DestroyTracker;
 import cc.co.llabor.websocket.DestroyableWebSocketClientEndpoint;
 import cc.co.llabor.websocket.MessageHandler;
+import cc.co.llabor.websocket.PoloHandler;
 import cc.co.llabor.websocket.PoloWSEndpoint;
 import cc.co.llabor.websocket.cep.OrderTick;
 import cc.co.llabor.websocket.cep.PoloTick; 
@@ -44,6 +47,8 @@ public class Polo2RddForwarderService {
 	private EPServiceProvider cep;
 	private EPAdministrator cepAdm;
 	String esper1002PROPS[] = {"N/A", "PRICELAST", "priceMax","PriceMin","PriceDiff", "volume24H","volumeTotal", "hight24H","low24H"};
+	/** Logger */
+	private static Logger LOG = LoggerFactory.getLogger(Polo2RddForwarderService.class);
 
 	
 	@PostConstruct
@@ -90,16 +95,16 @@ public class Polo2RddForwarderService {
 		System.out.println("Polo2RddForwarderService destroy method called");
 		System.out.println("Polo2RddForwarderService destroy method called");
 		System.out.println("Polo2RddForwarderService destroy method called");
-		System.out.println("Polo2RddForwarderService destroy method called");
-		System.out.println("Polo2RddForwarderService destroy method called");
-		System.out.println("Polo2RddForwarderService destroy method called");
-		System.out.println("Polo2RddForwarderService destroy method called");
-		System.out.println("Polo2RddForwarderService destroy method called");
-		System.out.println("Polo2RddForwarderService destroy method called");
+		LOG.error("Polo2RddForwarderService destroy method called");
+		LOG.error("Polo2RddForwarderService destroy method called");
+		LOG.error("Polo2RddForwarderService destroy method called");
+		LOG.error("Polo2RddForwarderService destroy method called");
+		LOG.error("Polo2RddForwarderService destroy method called");
+		
 		try {
 			getPoloWS().destroy();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			LOG.error("public void destroy(){}", e);
 			e.printStackTrace();
 		}
 		 
@@ -157,7 +162,7 @@ public class Polo2RddForwarderService {
 						+ "";  
 			    //System.out.println(avg10sec);
 			    EPStatement notNullEventsTmp = getCepAdm().createEPL(avg10sec); 	
-			    notNullEventsTmp.addListener(new RrdDirectUpdater(symTmp,properyNameTmp ));
+			    notNullEventsTmp.addListener(new SysoUpdater(symTmp,properyNameTmp ));
 			    				
 			     
 	    	}

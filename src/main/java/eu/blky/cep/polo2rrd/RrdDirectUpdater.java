@@ -17,7 +17,7 @@ public class RrdDirectUpdater implements UpdateListener {
 	private String logns;
 	private String propertyName = "data";
 	/** Logger */
-	private static Logger LOG = LoggerFactory.getLogger(PoloHandler.class);
+	private static Logger LOG = LoggerFactory.getLogger(RrdDirectUpdater.class);
 
 
 	public RrdDirectUpdater(String nsPar, String properyNameTmp) { 
