@@ -35,7 +35,7 @@ public class XXXEsperHandler implements MessageHandler {
 	//private EPRuntime cepRT;
 	//EPServiceProvider cep;
 	/** Logger */
-	private static Logger LOG = LoggerFactory.getLogger(PoloHandler.class);
+	private static Logger LOG = LoggerFactory.getLogger(XXXEsperHandler.class);
 	UpdateListener diffTracker = null;
 	private Map<String, RrdDirectUpdater> updaterRepo = new HashMap<String, RrdDirectUpdater>();
 	// http://www.espertech.com/esper/solution-patterns/#aggregate-3
@@ -59,8 +59,8 @@ public class XXXEsperHandler implements MessageHandler {
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 300 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 300 );
 			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 600 );
-			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 1200 );
-			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 2400 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 1200 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 2400 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 600 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 600 );
 			
@@ -77,11 +77,11 @@ public class XXXEsperHandler implements MessageHandler {
 			String XPATH_PREFIX = WS2RRDPump.PO_LO + "/EQLOrder/" +MARKET_PAIR +"/"+ typeTMP ;
 			// PRICE
 			String nsTmp = XPATH_PREFIX + "/"+ propPar+"_"+timeWindowAverage+"sec";
-			String AGGRSUFFIX = (""+nsTmp.hashCode()).replaceAll("-", "_");
+			String AGGRSUFFIX = (""+nsTmp.hashCode()+System.currentTimeMillis()).replaceAll("-", "_");
 			// TODO even don't think about sync :)))
 			if (updaterRepo.get(nsTmp)== null) {
 				  
-				RrdDirectUpdater rrdWS = new RrdDirectUpdater(nsTmp, null );
+				
 				if ("price".equals(propPar)) {
 					// step 1 : 
 					
@@ -136,7 +136,7 @@ public class XXXEsperHandler implements MessageHandler {
 					
 					//RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, "price");
 					//cep10sec.addListener(rrdUpdaterTmp);
-					
+					RrdDirectUpdater rrdWS = new RrdDirectUpdater(nsTmp, "data" );
 					cep10sec.addListener(rrdWS); // <-- DirectRrdUpdater
 					updaterRepo.put(nsTmp,rrdWS);
 					
@@ -164,7 +164,7 @@ public class XXXEsperHandler implements MessageHandler {
 					
 					//RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, propPar);
 					//cep10sec.addListener(rrdUpdaterTmp);
-					
+					RrdDirectUpdater rrdWS = new RrdDirectUpdater(nsTmp, "data" );
 					cep10sec.addListener(rrdWS); // <-- DirectRrdUpdater
 					//updaterRepo.put(nsTmp,rrdUpdaterTmp);
 					updaterRepo.put(nsTmp,rrdWS);	
@@ -294,8 +294,10 @@ public class XXXEsperHandler implements MessageHandler {
 
 	@Override
 	public void destroy() {
+		LOG.error("public void destroy() {} . . . . . . ....", this);
 		this.getCepAdm().destroyAllStatements();
 		this.parentService.getCep().destroy();
+		LOG.error("DONE ! :::public void destroy() {} . . . . . . ....", this);
 	}
 
 }

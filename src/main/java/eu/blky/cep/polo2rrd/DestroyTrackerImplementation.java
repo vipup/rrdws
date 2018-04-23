@@ -1,18 +1,25 @@
 package eu.blky.cep.polo2rrd;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cc.co.llabor.websocket.DestroyTracker;
 import cc.co.llabor.websocket.DestroyableWebSocketClientEndpoint;
+import cc.co.llabor.websocket.PoloHandler;
 
 public class   DestroyTrackerImplementation implements DestroyTracker {
+	/** Logger */
+	private static Logger LOG = LoggerFactory.getLogger(DestroyTrackerImplementation.class);
+
 	@Override
 	public void stop() {
-		System.out.println("Watchdog stop called");
+		LOG.error("Watchdog stop called");
 		
 	}
 
 	@Override
 	public void destroyed(DestroyableWebSocketClientEndpoint destroyableWebSocketClientEndpoint) {
-		System.out.println("Watchdog destroyed() called::: "+destroyableWebSocketClientEndpoint);
+		LOG.error("Watchdog destroyed({}) called::: ",destroyableWebSocketClientEndpoint);
 		
 	}
 }

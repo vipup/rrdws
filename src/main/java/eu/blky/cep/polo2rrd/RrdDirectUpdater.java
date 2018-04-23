@@ -17,7 +17,7 @@ public class RrdDirectUpdater implements UpdateListener {
 	private String logns;
 	private String propertyName = "data";
 	/** Logger */
-	private static Logger LOG = LoggerFactory.getLogger(PoloHandler.class);
+	private static Logger LOG = LoggerFactory.getLogger(RrdDirectUpdater.class);
 
 
 	public RrdDirectUpdater(String nsPar, String properyNameTmp) { 
@@ -35,12 +35,12 @@ public class RrdDirectUpdater implements UpdateListener {
 			MapEventBean eBean = (MapEventBean)e;
 			double value = 0;
 			try {
-				System.out.println(logns + eBean );
+				LOG.trace(logns,  eBean );
 				value = Double.valueOf(""+ eBean.get(propertyName )) ;
 				rrdUpdate( value );
 				
 			}catch(Exception ex) {
-				LOG.error("{}", ex);
+				LOG.trace("{}", ex);
 			}
 		}		
 	}

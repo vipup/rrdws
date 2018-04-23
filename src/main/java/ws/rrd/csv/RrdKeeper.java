@@ -122,9 +122,15 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 		rrdUpdateAction.perform(   "rrdws/heartbeat/errorCounter" ,  timeMs , ""+errorCounter ); 
 		rrdUpdateAction.perform(   "rrdws/heartbeat/successCounter" ,  timeMs , ""+successCounter );
 		
-		double  rrdPerSec = (beatCounter*1000.0D)/((double)(1+System.currentTimeMillis()-beatStart )); 
-		Object retval = rrdUpdateAction.perform(   "rrdws/heartbeat/rrdPerSec" ,  timeMs , ""+rrdPerSec ); 
- 		// IT IS REALLY BAD :(
+		double  rrdPerSec = (successCounter*1000.0D)/((double)(1+System.currentTimeMillis()-beatStart )); 
+		rrdUpdateAction.perform(   "rrdws/heartbeat/rrdPerSec" ,  timeMs , ""+ rrdPerSec ); 
+		
+		double  beatPerSec = (beatCounter*1000.0D)/((double)(1+System.currentTimeMillis()-beatStart )); 
+		Object retval = rrdUpdateAction.perform(   "rrdws/heartbeat/beatPerSec" ,  timeMs , ""+beatPerSec ); 
+		
+		
+ 		
+		// IT IS REALLY BAD :(
 		if (retval instanceof RrdException){
 			rrdUID = "rrdws/heartbeat/RIP";
 		}else { 

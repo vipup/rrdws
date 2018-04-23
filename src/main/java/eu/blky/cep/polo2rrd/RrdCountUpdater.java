@@ -2,8 +2,12 @@ package eu.blky.cep.polo2rrd;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cc.co.llabor.websocket.ErrorProcessingException;
 import cc.co.llabor.websocket.MessageHandler;
+import cc.co.llabor.websocket.PoloHandler;
 import ws.rrd.csv.Action;
 import ws.rrd.csv.RrdKeeper;
 import ws.rrd.csv.RrdUpdateAction;
@@ -12,6 +16,8 @@ public class RrdCountUpdater implements MessageHandler {
 	private int updateCounter = 0;
 	private long lastOut = 0;
 	private long lastUp = 0;
+	/** Logger */
+	private static Logger LOG = LoggerFactory.getLogger(RrdCountUpdater.class);
 	
 
 	@Override
@@ -42,6 +48,7 @@ public class RrdCountUpdater implements MessageHandler {
 	@Override
 	public void destroy() throws IOException {
 		// TODO Auto-generated method stub
+		LOG.error("public void destroy() throws IOException {}",this);
 
 	}
 
