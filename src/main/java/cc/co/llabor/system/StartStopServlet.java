@@ -33,8 +33,8 @@ import cc.co.llabor.features.Repo;
 import cc.co.llabor.threshold.AlertCaptain;
 import cc.co.llabor.threshold.TholdException;
 import cc.co.llabor.threshold.rrd.Threshold;
-import eu.blky.springmvc.BackupController;
-import eu.blky.springmvc.RestoreController;
+import eu.blky.springmvc.BackupService;
+
  
 
 public class StartStopServlet extends HttpServlet {
@@ -55,6 +55,10 @@ public class StartStopServlet extends HttpServlet {
 
 	DataWorker worker = null;
 	private StatusMonitor statusMonitor;
+	private BackupService myBackupService;
+	
+	
+	
 	Map<String, String> getStatus(){
 		return statusMonitor.getStatus();
 	}
@@ -67,7 +71,9 @@ public class StartStopServlet extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException{
 	    super.init();
 	    ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-	    statusMonitor= (StatusMonitor) applicationContext.getBean("StatusMonitor");		
+	    statusMonitor= (StatusMonitor) applicationContext.getBean("StatusMonitor");
+	    
+	    myBackupService =   (BackupService) applicationContext.getBean("myBackupService");
 
 		initShutdownHookPROC();	
 		
@@ -173,7 +179,7 @@ public class StartStopServlet extends HttpServlet {
 	 * monitorArgs=\!(dvalue > 1 && dvalue < 111)
 	 * monitorType=mvel
 	 * A.datasource=test.rrd
-	 * A.dsName=speed
+	 * A.dsName=speed 
 	 * A.actionArgs=hiLog4J @{}\#{} {} ,{} 
 	 * A.spanLength=600
 	 * A.class=cc.co.llabor.threshold.Log4JActionist
@@ -429,7 +435,7 @@ public class StartStopServlet extends HttpServlet {
 		// redeploy ?!?!?! DB will be deleted from  tomcat - try to backup it temporary
 		// backup the DB
 		
-		File zzz = BackupController.backup(getStatus());
+		File zzz = myBackupService.backup();
 		log_info("Stoped + backedUp into ["+zzz.getAbsolutePath()+"]");
 	}
 

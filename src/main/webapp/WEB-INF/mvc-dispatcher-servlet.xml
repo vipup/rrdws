@@ -13,9 +13,16 @@
 	<bean name="/xwin.htm" class="eu.blky.springmvc.RenderingController" />
 	<bean name="/xwin.jsp" class="eu.blky.springmvc.RenderingController" />
 	<bean name="/welcome.htm" class="eu.blky.springmvc.HelloWorldController" />
-	<bean name="/status.htm" class="eu.blky.springmvc.StatusController" />
-	<bean name="/backup.htm" class="eu.blky.springmvc.BackupController" />
-	<bean name="/restore.htm" class="eu.blky.springmvc.RestoreController" />
+	<bean name="/status.htm" class="eu.blky.springmvc.StatusController" >
+		<property name="statusMonitor" ref="StatusMonitor"></property>
+	</bean>
+	<bean name="/backup.htm" class="eu.blky.springmvc.BackupController" >
+	 
+		<property name="myBackupService" ref="myBackupService"></property>
+	</bean>
+	<bean name="/restore.htm" class="eu.blky.springmvc.RestoreController" >
+		<property name="restoreService" ref="RestoreService"></property>
+	</bean>
 	<!-- http://localhost:8080/rrdsaas/gifgen.jsp ... -->
 	<bean name="/gifgen.htm" class="eu.blky.springmvc.GifgenRenderingController" />
 	<bean name="/mvel.htm" class="eu.blky.springmvc.MVELController" />

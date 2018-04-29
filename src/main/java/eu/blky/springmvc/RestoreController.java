@@ -1,7 +1,10 @@
 package eu.blky.springmvc; 
-import java.io.File; 
+import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List; 
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -56,7 +59,7 @@ public class RestoreController extends AbstractController{
                 e.printStackTrace();
             }
             
-            restore( null );
+            restore();
         }else {
     		ModelAndView model = new ModelAndView("restore");
     		model.addObject("msg", "hello world");
@@ -64,14 +67,22 @@ public class RestoreController extends AbstractController{
     		return model;        	
         }
         
-        
-		return null;
+		return new ModelAndView ("justrebootyourserver");
  
 	}
+	
+	private RestoreService  restoreService;
+	
+	private void restore() {		
+		restoreService.restore( );
+	}
 
-	private void restore(Object object) {
-		throw new RuntimeException("Not yet implemented!!!! ");
-		
+	public RestoreService getRestoreService() {
+		return restoreService;
+	}
+
+	public void setRestoreService(RestoreService restoreService) {
+		this.restoreService = restoreService;
 	}
  
 }

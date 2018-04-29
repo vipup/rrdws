@@ -1,25 +1,15 @@
 package eu.blky.springmvc; 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.HashMap; 
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.tomcat.util.http.fileupload.FileUploadException; 
+import javax.annotation.PostConstruct; 
+ 
 import org.jrobin.mrtg.server.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.AbstractController;
+import org.springframework.stereotype.Service; 
 
 import cc.co.llabor.system.StatusMonitor;
 import cc.co.llabor.system.Unzipper; 
@@ -84,5 +74,9 @@ public class RestoreService  {
 			log.error("restoreDB", e);
 			status.put("restoreDB", "DB restore is not possible! New Server/instance/App/Node/DB?");
 		}
+	}
+
+	public void restore() {
+		this.restore(this.status);		
 	}
 }

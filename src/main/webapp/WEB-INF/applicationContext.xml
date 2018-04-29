@@ -28,10 +28,16 @@
 	
 	<!-- RestoreService.restore(status); -->
 	<bean name="RestoreService" class="eu.blky.springmvc.RestoreService" >
-			<constructor-arg ref="StatusMonitor">		
-		 
+			<constructor-arg ref="StatusMonitor">	 
 			</constructor-arg>
 	</bean>
+	
+	<!-- myBackupController -->
+	<bean name="myBackupService" class="eu.blky.springmvc.BackupService" >
+			<constructor-arg ref="StatusMonitor">	 
+			</constructor-arg>
+	</bean>	
+	
 	<!-- CEP initialisation -->
 	<bean name="cepConfiguration" class="com.espertech.esper.client.Configuration" />  
 	<bean name="poloWebsocketEP" class="cc.co.llabor.websocket.PoloWSEndpoint">
