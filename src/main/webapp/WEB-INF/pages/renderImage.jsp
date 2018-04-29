@@ -178,6 +178,8 @@
 		<img  id="${imgId}"  class="lazy" src="xgen.jsp?db=${dbTmp}&_start=end-1week&_t=end-1week"/>.
 		<img  id="${imgId}"  class="lazy" src="xgen.jsp?db=${dbTmp}&_start=end-2week&_t=end-2week"/>. 
 		<img  id="${imgId}"  class="lazy" src="xgen.jsp?db=${dbTmp}&_start=end-4week&_t=end-4week"/>.
+		<img  id="${imgId}"  class="lazy" src="xgen.jsp?db=${dbTmp}&_start=end-8week&_t=end-8week"/>.
+		<img  id="${imgId}"  class="lazy" src="xgen.jsp?db=${dbTmp}&_start=end-16week&_t=end-16week"/>.
 	</div> 
 	 
  </body>

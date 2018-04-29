@@ -33,6 +33,7 @@ import cc.co.llabor.features.Repo;
 import cc.co.llabor.threshold.AlertCaptain;
 import cc.co.llabor.threshold.TholdException;
 import cc.co.llabor.threshold.rrd.Threshold;
+import eu.blky.cep.polo2rrd.Polo2RddForwarderService;
 import eu.blky.springmvc.BackupService;
 
  
@@ -74,6 +75,13 @@ public class StartStopServlet extends HttpServlet {
 	    statusMonitor= (StatusMonitor) applicationContext.getBean("StatusMonitor");
 	    
 	    myBackupService =   (BackupService) applicationContext.getBean("myBackupService");
+	    try {
+	    	eu.blky.cep.polo2rrd.Polo2RddForwarderService polo2rrd =    (Polo2RddForwarderService) applicationContext.getBean("polo2rrd");
+	    	// crazyOverDozedWorkaround 
+	    	polo2rrd.setStatusMonitor(statusMonitor);
+	    }catch(Throwable e) {
+	    	e.printStackTrace();
+	    }
 
 		initShutdownHookPROC();	
 		

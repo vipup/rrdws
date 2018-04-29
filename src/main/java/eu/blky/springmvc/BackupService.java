@@ -35,6 +35,7 @@ public class BackupService {
 		System.out.println("backup c.............alled.............................................................");
 		System.out.println("..................backup called.............................................................");
 		if (restoreService.restorePerformedFromExternal()) {
+			this.sm.getStatus().put("BackupService","backup process was suspendet from prev Restore-Action. Try to restart APP before.");
 			System.out.println("backup process was suspendet from prev Restore-Action. Try to restart APP before.");
 			return null;
 		}
