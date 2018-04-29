@@ -52,13 +52,13 @@ public class XXXEsperHandler implements MessageHandler {
 			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 10 );
 			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 10 );
 			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 10 );
-			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 60 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 60 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 60 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 60 );
-			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 300 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 300 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 300 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 300 );
-			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 600 );
+//			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 600 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 1200 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 2400 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 600 );

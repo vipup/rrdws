@@ -25,7 +25,7 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
     private static Logger LOG = LoggerFactory.getLogger(PoloWSEndpoint.class);	
  
 
-    public PoloWSEndpoint(URI endpointURI, DestroyTracker watchDog, Object just4IgnoreExc) {
+    public PoloWSEndpoint(URI endpointURI, DestroyTracker watchDog, Object thisObjectIsUsedOnlyAsFlagForCallThisConstructor) {
     	super(watchDog);
         try {
         	ClassLoader clBAK = Thread.currentThread().getContextClassLoader();

@@ -24,7 +24,8 @@ import org.jrobin.mrtg.server.IfDsicoverer;
 import org.jrobin.mrtg.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
- 
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import ws.rrd.csv.RrdKeeper;
 import ws.rrd.logback.ServletListener;
@@ -53,16 +54,21 @@ public class StartStopServlet extends HttpServlet {
 	 
 
 	DataWorker worker = null;
+	private StatusMonitor statusMonitor;
+	Map<String, String> getStatus(){
+		return statusMonitor.getStatus();
+	}
 	public static boolean isGAE() {
 		return !(System.getProperty("com.google.appengine.runtime.version")==null);
 	}
 	 
-	static Map<String, String> status = new TreeMap<String, String>(); 
+	
 	
 	public void init(ServletConfig config) throws ServletException{
-		// restore prev RRDDB, if any
-		restoreDBfromBackup();
-		
+	    super.init();
+	    ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+	    statusMonitor= (StatusMonitor) applicationContext.getBean("StatusMonitor");		
+
 		initShutdownHookPROC();	
 		
 		initCollectD();		
@@ -75,7 +81,7 @@ public class StartStopServlet extends HttpServlet {
 		
 		System.out.println("................................." );
 		System.out.println("................................." );
-		System.out.println(".   status :"+status  );
+		System.out.println(".   status :"+getStatus()  );
 		System.out.println("................................." );
 		System.out.println("................................." );
 		super.init(config); 
@@ -98,10 +104,10 @@ public class StartStopServlet extends HttpServlet {
 			AlertCaptain ac = AlertCaptain.getInstance(ServletListener.getDefaultThreadGroup());
 			
 			ac.init();		
-			status.put("AlertCaptain", SUCCESSFUL );
+			getStatus().put("AlertCaptain", SUCCESSFUL );
 			 
 		} catch (Throwable e) {
-			status.put("AlertCaptain", BROCKEN+e.getMessage());
+			getStatus().put("AlertCaptain", BROCKEN+e.getMessage());
 			// TODO Auto-generated catch block
 			// e.  printStackTrace();
 		}
@@ -111,10 +117,10 @@ public class StartStopServlet extends HttpServlet {
 	private void initMRTG() {
 		try{
 			 
-			status.put("MrtgServer (SNMP-backend)", startMrtgServer()  );
+			getStatus().put("MrtgServer (SNMP-backend)", startMrtgServer()  );
 				 
 		}catch(Throwable e){
-			status.put("MrtgServer (SNMP-backend)", BROCKEN+e.getMessage());
+			getStatus().put("MrtgServer (SNMP-backend)", BROCKEN+e.getMessage());
 			log.error("MrtgServer (SNMP-backend)", e.getMessage());		
 			// e.  printStackTrace();
 		}
@@ -125,32 +131,30 @@ public class StartStopServlet extends HttpServlet {
 		if ( !isGAE()){
 				String[] arg0=new String[]{};
 			// collectd SERVER
-			status.put("collectd-SERVER", startCollectdServer(arg0) );
+				getStatus().put("collectd-SERVER", startCollectdServer(arg0) );
 			// collectd CLIENT (agent)
-			status.put("collectd-CLIENT", startColelctdClient() );
+				getStatus().put("collectd-CLIENT", startColelctdClient() );
 			// start collectd queue-worker
-			status.put("collectd-Worker", startCollectdWorker() );
+				getStatus().put("collectd-Worker", startCollectdWorker() );
 		}
 	}
 
 
 	private void initShutdownHookPROC() {
 		try {
-			status.put("initShutdownHook", initShutdownHook()); 
+			getStatus().put("initShutdownHook", initShutdownHook()); 
 		} catch (Exception e) {
-			status.put("initShutdownHook", BROCKEN+e.getMessage());
+			getStatus().put("initShutdownHook", BROCKEN+e.getMessage());
 			log.error("RRD initShutdownHook : ", e);
 		}catch(Throwable e){
-			status.put("initShutdownHook", BROCKEN+e.getMessage());
+			getStatus().put("initShutdownHook", BROCKEN+e.getMessage());
 			log.error("RRD initShutdownHook : ", e);			
 			// e.  printStackTrace();
 		}
 	}
 
 
-	private void restoreDBfromBackup() {
-		RestoreController.restore(status);
-	}
+
  
 	
 	/**
@@ -425,7 +429,7 @@ public class StartStopServlet extends HttpServlet {
 		// redeploy ?!?!?! DB will be deleted from  tomcat - try to backup it temporary
 		// backup the DB
 		
-		File zzz = BackupController.backup(status);
+		File zzz = BackupController.backup(getStatus());
 		log_info("Stoped + backedUp into ["+zzz.getAbsolutePath()+"]");
 	}
 
@@ -433,6 +437,6 @@ public class StartStopServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		resp.getWriter().write(""+status);
+		resp.getWriter().write(""+getStatus());
 	}
 }
