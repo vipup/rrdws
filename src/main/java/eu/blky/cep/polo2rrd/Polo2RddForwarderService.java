@@ -19,6 +19,7 @@ import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPServiceProviderManager;
 import com.espertech.esper.client.EPStatement;
 
+import cc.co.llabor.system.StatusMonitor;
 import cc.co.llabor.websocket.DestroyTracker;
 import cc.co.llabor.websocket.DestroyableWebSocketClientEndpoint;
 import cc.co.llabor.websocket.MessageHandler;
@@ -47,10 +48,15 @@ public class Polo2RddForwarderService {
 	private EPServiceProvider cep;
 	private EPAdministrator cepAdm;
 	String esper1002PROPS[] = {"N/A", "PRICELAST", "priceMax","PriceMin","PriceDiff", "volume24H","volumeTotal", "hight24H","low24H"};
+//	private StatusMonitor statusMonitor;
 	/** Logger */
 	private static Logger LOG = LoggerFactory.getLogger(Polo2RddForwarderService.class);
 
-	
+		
+//	@PostConstruct
+//	public void setStatusMonitor(StatusMonitor sm){
+//		this.statusMonitor = sm;
+//	}
 	@PostConstruct
 	public void init(){
 		System.out.println("Polo2RddForwarderService init method called. cepConfig == "+getCepConfig());
@@ -77,6 +83,7 @@ public class Polo2RddForwarderService {
 			System.out.println("initCEP() done");
 			System.out.println("initCEP() done");
 			System.out.println("initCEP() done");
+//			statusMonitor.getStatus().put("initCEP", "done");
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -100,6 +107,7 @@ public class Polo2RddForwarderService {
 		LOG.error("Polo2RddForwarderService destroy method called");
 		LOG.error("Polo2RddForwarderService destroy method called");
 		LOG.error("Polo2RddForwarderService destroy method called");
+//		statusMonitor.getStatus().put("destroyCEP", "Polo2RddForwarderService destroy method called");
 		
 		try {
 			getPoloWS().destroy();

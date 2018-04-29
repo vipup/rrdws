@@ -1,9 +1,7 @@
 package eu.blky.springmvc; 
-import java.io.File;
-import java.util.HashMap;
+import java.io.File; 
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.List; 
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -75,6 +73,7 @@ public class RestoreController extends AbstractController{
 	
 	private void restore() {		
 		restoreService.restore( );
+		restoreService.setRestorePerformedFromExternal(true);
 	}
 
 	public RestoreService getRestoreService() {

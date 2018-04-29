@@ -1,6 +1,5 @@
 package eu.blky.springmvc;
-import java.io.File; 
-import java.util.Map;
+import java.io.File;  
  
 import org.jrobin.mrtg.server.Config;
 import org.springframework.stereotype.Service; 
@@ -13,6 +12,7 @@ public class BackupService {
  
  
 	private StatusMonitor sm;
+	private RestoreService restoreService; 
 
 
 	{
@@ -28,6 +28,16 @@ public class BackupService {
  
 
 	public File backup() {
+		System.out.println("backup called.............................................................");
+		System.out.println("..........backup called.............................................................");
+		System.out.println("backup cal...........led.............................................................");
+		System.out.println("backup ..............called.............................................................");
+		System.out.println("backup c.............alled.............................................................");
+		System.out.println("..................backup called.............................................................");
+		if (restoreService.restorePerformedFromExternal()) {
+			System.out.println("backup process was suspendet from prev Restore-Action. Try to restart APP before.");
+			return null;
+		}
 		// restore prev RRDDB, if any
 		try{
 			File workdirTmp = new File ( Config.CALC_DEFAULT_WORKDIR() );
@@ -43,6 +53,16 @@ public class BackupService {
 		}
 		return null;
 		
+	}
+
+
+	public RestoreService getRestoreService() {
+		return restoreService;
+	}
+
+
+	public void setRestoreService(RestoreService restoreService) {
+		this.restoreService = restoreService;
 	}
 
 

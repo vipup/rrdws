@@ -27,15 +27,17 @@
 	<bean name="StatusMonitor" class="cc.co.llabor.system.StatusMonitor" />
 	
 	<!-- RestoreService.restore(status); -->
-	<bean name="RestoreService" class="eu.blky.springmvc.RestoreService" >
+	<bean name="RestoreService" class="eu.blky.springmvc.RestoreService"  init-method="restore" >
 			<constructor-arg ref="StatusMonitor">	 
 			</constructor-arg>
 	</bean>
 	
 	<!-- myBackupController -->
-	<bean name="myBackupService" class="eu.blky.springmvc.BackupService" >
+	<bean name="myBackupService" class="eu.blky.springmvc.BackupService" destroy-method="backup"  >
 			<constructor-arg ref="StatusMonitor">	 
 			</constructor-arg>
+			
+			<property name="restoreService" ref="RestoreService"></property>
 	</bean>	
 	
 	<!-- CEP initialisation -->
@@ -58,5 +60,9 @@
 	<bean name="polo2rrd" class="eu.blky.cep.polo2rrd.Polo2RddForwarderService"  destroy-method="destroy" init-method="init">
 		<property name="cepConfig" ref="cepConfiguration"></property>
 		<property name="poloWS" ref="poloWebsocketEP"></property>
+		<!-- 
+		<property name="statusMonitor" ref="StatusMonitor"></property>
+		 -->
+		
 	</bean>
 </beans>

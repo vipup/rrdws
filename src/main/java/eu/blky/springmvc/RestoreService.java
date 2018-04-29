@@ -1,11 +1,13 @@
 package eu.blky.springmvc; 
 import java.io.File;
-import java.io.FilenameFilter;
-import java.util.HashMap; 
-import java.util.Map;
+import java.io.FilenameFilter; 
 
-import javax.annotation.PostConstruct; 
- 
+import javax.annotation.PostConstruct;
+
+import org.jrobin.core.RrdDbPool;
+import org.jrobin.core.RrdFileBackend;
+import org.jrobin.core.RrdFileBackendFactory;
+import org.jrobin.core.jrrd.RRDFile;
 import org.jrobin.mrtg.server.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,18 +19,20 @@ import cc.co.llabor.system.Unzipper;
 @Service
 public class RestoreService  {
 	 
+ 
 
-	private Map<String, String> status;
+	private StatusMonitor st;
+	private boolean restorePerformedFromExternal=false;
 
 	public RestoreService ( StatusMonitor st ) {
-		this.status = st.getStatus();
+		this.st = st;
 
 		System.out.println("RestoreController created....");
 	}
 
 	@PostConstruct
 	public void init() {
-		this.restore(status);
+		this.restore( );
 		System.out.println("RestoreController inited."	+ "");
 	}
 	
@@ -39,8 +43,8 @@ public class RestoreService  {
 	}
 	 
 
-	public void restore( Map<String, String> status) {
-		status = status==null?new HashMap<String, String>():status;
+	public void restore( ) { 
+		
 		try{
 			File workdirTmp = new File ( Config.CALC_DEFAULT_WORKDIR() );
 			File tmpdirTmp = new File (System.getProperty("java.io.tmpdir"));
@@ -48,7 +52,10 @@ public class RestoreService  {
 
 				@Override
 				public boolean accept(File dir, String name) {
-					return name.startsWith("rrd") && name.endsWith(".backup") ; 
+					return  // internal - reuse locally stored between restart-redeploy-etc
+							(name.startsWith("rrd") && name.endsWith(".backup"))||
+							// external - use externally uploaded zip
+							(name.startsWith("backup") && name.endsWith(".zip")); 
 				} 
 			}; 
 			// search last backup
@@ -65,18 +72,28 @@ public class RestoreService  {
 			}
 			
 			if (toRestore != null){
-				
+				RrdDbPool.getInstance().reset();
 				Unzipper zTmp = new Unzipper(toRestore, workdirTmp);
 				zTmp.unzip();
-				status.put("restoreDB", "DB restore Done"); 
+				st.getStatus().put("restoreDB", "DB restore Done"); 
+
 			}
 		}catch(Exception e){
 			log.error("restoreDB", e);
-			status.put("restoreDB", "DB restore is not possible! New Server/instance/App/Node/DB?");
+			st.getStatus().put("restoreDB", "DB restore is not possible! New Server/instance/App/Node/DB?");
 		}
 	}
 
-	public void restore() {
-		this.restore(this.status);		
+	public boolean restorePerformedFromExternal() { 
+		return isRestorePerformedFromExternal();
 	}
+
+	public boolean isRestorePerformedFromExternal() {
+		return restorePerformedFromExternal;
+	}
+
+	public void setRestorePerformedFromExternal(boolean restorePerformedFromExternal) {
+		this.restorePerformedFromExternal = restorePerformedFromExternal;
+	}
+ 
 }
