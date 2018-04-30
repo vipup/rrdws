@@ -1,4 +1,4 @@
-<%@page import="ws.rrd.json.Tool"%><%@page 
+<%@ page session="false" %><%@page import="ws.rrd.json.Tool"%><%@page 
 import="java.util.HashMap"%><%@page 
 import="java.util.Map"%><%@page 
 import="ws.rrd.csv.Registry"%><%@page 

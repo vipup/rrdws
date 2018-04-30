@@ -1,4 +1,4 @@
-<%@page import="org.jrobin.GraphInfo"
+<%@ page session="false" %><%@page import="org.jrobin.GraphInfo"
 %><%@page import="java.io.File"
 %><%@page import="java.io.OutputStream"
 %><%@page import="org.jrobin.cmd.RrdCommander"
