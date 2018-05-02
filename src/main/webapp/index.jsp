@@ -40,7 +40,7 @@
 		<a href="push.jsp" target="_blank"><IMG SRC="img/ninja_ico_consock.jpg">push</a>
 		<a href="getput.jsp" target="_blank"><IMG SRC="img/ninja_ico_consock.jpg">+<IMG SRC="img/ninja_ico_listen.jpg">get2put</a>		
 		<a href="l/aHR0cDovL2hhYnJhaGFici5ydS8=" target="_blank"><IMG SRC="img/ajax-loader.gif">habr</a>
-		<a href="l/aHR0cDovL2ZpZHVjaWEuZGUv" target="_blank"><IMG SRC="img/ajax-loader.gif">I</a>		
+		<a href="l/aHR0cHM6Ly9kYXJrd2VibmV3cy5jb20vZGFyay13ZWItbWFya2V0LWxpc3Qv" target="_blank"><IMG SRC="img/ajax-loader.gif">I</a>		
     </div>    
 
 <!-- TUTORIAL --->

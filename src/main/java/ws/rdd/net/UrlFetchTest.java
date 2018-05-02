@@ -271,7 +271,7 @@ public class UrlFetchTest implements Serializable{
 		cliTmp.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true); 
 		cliTmp.getParams().setParameter(ClientPNames.HANDLE_AUTHENTICATION , true); 
 		cliTmp.getParams().setParameter(ClientPNames.REJECT_RELATIVE_REDIRECT, true); 
-		cliTmp.getParams().setParameter(ClientPNames.MAX_REDIRECTS, 18); 
+		cliTmp.getParams().setParameter(ClientPNames.MAX_REDIRECTS, 32); 
 		return cliTmp;
 	}
 
