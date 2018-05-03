@@ -23,10 +23,10 @@
 	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="/security/icons/apple-touch-icon-72x72-precomposed.png" />
     
     <link rel="Stylesheet" href="css/corner.css" type="text/css">
-<link rel="stylesheet" type="text/css" media="screen,print" href="//www.ibm.com/common/v14/table.css" /> 
-<link rel="stylesheet" type="text/css" href="//www.ibm.com/common/v14/main.css" />
-<link rel="stylesheet" type="text/css" media="all" href="//www.ibm.com/common/v14/screen.css" />
-<link rel="stylesheet" type="text/css" media="print" href="//www.ibm.com/common/v14/print.css" />
+<link rel="stylesheet" type="text/css" media="screen,print" href="man/table.css" /> 
+<link rel="stylesheet" type="text/css" href="man/main.css" />
+<link rel="stylesheet" type="text/css" media="all" href="man/screen.css" />
+<link rel="stylesheet" type="text/css" media="print" href="man/print.css" />
  
 </head>
 <body  onLoad="return 1;"> 

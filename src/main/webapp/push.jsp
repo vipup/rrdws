@@ -15,11 +15,6 @@
 <link type="text/css" title="www" rel="stylesheet" media="handheld"  href="css/handheld.css" />
 
 
-<link type="text/css" title="www" rel="stylesheet" media="screen,projection" href="http://rrd.llabor.co.cc/css/screen.css" />
-<link type="text/css" title="www" rel="stylesheet" media="screen,projection" href="http://rrd.llabor.co.cc/css/screen-fonts.css" />
-<link type="text/css" title="www" rel="stylesheet" media="print"  href="http://rrd.llabor.co.cc/css/print.css" />
-<link type="text/css" title="www" rel="stylesheet" media="handheld"  href="http://rrd.llabor.co.cc/css/handheld.css" />
-
  </head>
 <body>
 <pre> 
