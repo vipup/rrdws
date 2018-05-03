@@ -1,6 +1,6 @@
 package cc.co.llabor.math.squares;
 
-public class SquareFitter {
+public class TrendFitter {
 
 	private double count;
 	private double sumX;
@@ -11,7 +11,7 @@ public class SquareFitter {
 	private double sumX4;
 	private double sumX2Y;
 
-	public SquareFitter() {
+	public TrendFitter() {
 		this.count = 0;
 		this.sumX = 0;
 		this.sumX2 = 0;
@@ -22,7 +22,7 @@ public class SquareFitter {
 		this.sumX2Y = 0;
 	}
 
-	SquareFitter add(int x, double y) {
+	TrendFitter add(int x, double y) {
 		this.count++;
 		this.sumX += x;
 		this.sumX2 += x * x;
@@ -43,30 +43,21 @@ public class SquareFitter {
 	}
 
 	static double squareProject(double[] data ) {
-		SquareFitter fitter = new SquareFitter(); 
+		TrendFitter fitter = new TrendFitter(); 
 	    for (int i = 0; i < data.length; i++)
 	    {
 	        fitter.add(i, data[i]);
 	    }
-	    return fitter.project(60);
+	    return fitter.project(data.length+1);
 	}
 
 	public static void main(String[] args) {
 
-		System.out.println("=== SquareFitter Project ===");
-		double[] data = new double[] { 21410, 21886, 21837, 21895, 21564, 21714, 21571, 21324, 21310, 21390, 21764,
-				21598, 21493, 21352, 21478, 21058, 20942, 20825, 21321, 20950, 21039, 21117, 20733, 20773, 20929, 20900,
-				20687, 20999 };
-		/*
-		 * 
->>> squareProject([
-        21410, 21886, 21837, 21895, 21564, 21714, 21571, 21324, 21310, 21390,
-        21764, 21598, 21493, 21352, 21478, 21058, 20942, 20825, 21321, 20950,
-        21039, 21117, 20733, 20773, 20929, 20900, 20687, 20999
-    ], 60);
-19282.85862700518
-		 */
-		System.out.println("= =" + squareProject(data ));
+		System.out.println("=== trendline ===");
+		double[] data = new double[] {20,				32,				51,				43,				62,
+								63,				82,				75,				92,				89};
+		/* https://www.excel-easy.com/examples/trendline.html 		 */
+		System.out.println(" trendline = " + squareProject(data));
 
 	}
 }

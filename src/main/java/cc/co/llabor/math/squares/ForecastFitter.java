@@ -1,6 +1,6 @@
 package cc.co.llabor.math.squares;
 
-public class LineFitter {
+public class ForecastFitter {
 
 	private double count;
 	private double sumX;
@@ -8,7 +8,7 @@ public class LineFitter {
 	private double sumXY;
 	private double sumY; 
 
-	public LineFitter() {
+	public ForecastFitter() {
 		this.count = 0;
 		this.sumX = 0;
 		this.sumX2 = 0;
@@ -16,7 +16,7 @@ public class LineFitter {
 		this.sumY = 0;
 	}
   
-	LineFitter add(int x, double y) {
+	ForecastFitter add(int x, double y) {
 			this.count++;
 	        this.sumX += x;
 	        this.sumX2 += x*x;
@@ -35,7 +35,7 @@ public class LineFitter {
  
 	static double linearProject(double [] data, double x)
 	{
-		LineFitter fitter = new LineFitter();
+		ForecastFitter fitter = new ForecastFitter();
 	    for (int i = 0; i < data.length; i++)
 	    {
 	        fitter.add(i, data[i]);
@@ -45,26 +45,12 @@ public class LineFitter {
 
 	public static void main(String[] args) {
 
-		System.out.println("=== linearProject ===");
-		double[] data = new double[] {
-              21410, 21886, 21837, 21895, 21564, 21714, 21571, 21324, 21310, 21390,
-              21764, 21598, 21493, 21352, 21478, 21058, 20942, 20825, 21321, 20950,
-              21039, 21117, 20733, 20773, 20929, 20900, 20687, 20999
+		System.out.println("=== forecast ===");
+		double[] data = new double[] {20,				32,				51,				43,				62,
+				63,				82,				75,				92,				89
 		};
-		/*
- * 
-You can do a least-squares fit of a line. 
- 
-Example:
-
->>> linearProject([
-        21410, 21886, 21837, 21895, 21564, 21714, 21571, 21324, 21310, 21390,
-        21764, 21598, 21493, 21352, 21478, 21058, 20942, 20825, 21321, 20950,
-        21039, 21117, 20733, 20773, 20929, 20900, 20687, 20999
-    ], 60);
-19489.614121510676
- */
-		System.out.println(" ="+linearProject (data , 60) );
+		/*  https://www.excel-easy.com/examples/forecast-trend.html */
+		System.out.println("forecast-trend ="+linearProject (data , 11) );
 
 	}
 }
