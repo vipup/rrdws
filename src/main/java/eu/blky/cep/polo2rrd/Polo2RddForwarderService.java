@@ -54,6 +54,7 @@ public class Polo2RddForwarderService {
 	private StatusMonitor statusMonitor;
 //	@PostConstruct -  workaround via StartStopServlet 
 	public void setStatusMonitor(StatusMonitor sm){
+		System.out.println("Assigned StatusMonitor:"+sm);
 		this.statusMonitor = sm;
 	}
 	@PostConstruct
