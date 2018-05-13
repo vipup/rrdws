@@ -89,9 +89,14 @@ public class Registry implements Serializable{
 	}
 
 	public Map<String, String> getDb2path() {//db2path.size()
-			return Collections.unmodifiableMap(db2path);			
+			return Collections.unmodifiableMap(db2path);		
 	}
 
+	public void dirtiClean() {
+		db2path.clear();	
+		path2db.clear();
+	}
+	
 	public Map<String, String> getPath2db() {			
 			return  Collections.unmodifiableMap(path2db);
 	}
