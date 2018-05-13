@@ -4,9 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cc.co.llabor.websocket.DestroyTracker;
-import cc.co.llabor.websocket.DestroyableWebSocketClientEndpoint;
-import cc.co.llabor.websocket.PoloHandler;
-
+import cc.co.llabor.websocket.DestroyableWebSocketClientEndpoint; 
 public class   DestroyTrackerImplementation implements DestroyTracker {
 	/** Logger */
 	private static Logger LOG = LoggerFactory.getLogger(DestroyTrackerImplementation.class);

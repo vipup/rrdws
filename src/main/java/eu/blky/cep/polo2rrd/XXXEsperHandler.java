@@ -17,8 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper; 
 
 import cc.co.llabor.websocket.ErrorProcessingException;
-import cc.co.llabor.websocket.MessageHandler;
-import cc.co.llabor.websocket.PoloHandler; 
+import cc.co.llabor.websocket.MessageHandler; 
 import cc.co.llabor.websocket.WS2RRDPump;
 import cc.co.llabor.websocket.cep.DiffTracker;
 import cc.co.llabor.websocket.cep.OrderTick;
@@ -96,8 +95,7 @@ public class XXXEsperHandler implements MessageHandler {
 							+ "   ( min ( count( price )  + avg ( (price)  / 1000000 )  )   ) priceMIN ,  \n"
 							+ "   ( count ( price )  ) dataCNT ,  \n"
 							+ "   (  sum ( price ) / count( price ) ) dataCAL , \n"
-							+ "   (  sum (total) / sum (volume) ) dataTOV , \n"
-															
+							+ "   (  sum (total) / sum (volume) ) dataTOV , \n"															
 							+ "   "+ timeWindowAverage +" timewindow , \n"
 							+ " 'price' name \n"
 							+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) "
@@ -185,7 +183,7 @@ public class XXXEsperHandler implements MessageHandler {
 		}
 
 	public EPAdministrator getCepAdm() {
-		return this.parentService.getCepAdm();
+		return this.parentService.getCepKeeper().getCepAdm();
 	}
 
 	public void setCepAdm(EPAdministrator cepAdm) {
@@ -193,7 +191,7 @@ public class XXXEsperHandler implements MessageHandler {
 	}
 
 	public EPRuntime getCepRT() {
-		return this.parentService.getCepRT();
+		return this.parentService.getCepKeeper().getCepRT();
 	}
 
 	public void setCepRT(EPRuntime cepRT) {
@@ -201,17 +199,8 @@ public class XXXEsperHandler implements MessageHandler {
 	}
 
 	private void step3_doItOnlyOnce() {
-			// step 3 : diffTracker 
-			// TODO init it only once
-			if (diffTracker == null) {
-	/*
-						+ "		avg (dataMAX) dataMAX, "
-						+ "		avg (dataMIN) dataMIN, "
-						+ "		avg (dataAVG) dataAVG, "
-						+ "		avg (dataCNT) dataCNT, "
-						+ "		avg (dataCAL) dataCAL, "	
-						+ "		avg (dataTOV) dataTOV, "				
-	 */ 
+			// step 3 : diffTracker  
+			if (diffTracker == null) { 
 				String eql3 = "" + 
 						"select BOS, name, timewindow, "
 						+ "( dataAVG - (1000000.0000000000001* (dataMAX%1.0000000000000000001))    )							diffMAX , \n"
@@ -250,33 +239,12 @@ public class XXXEsperHandler implements MessageHandler {
 		ObjectMapper mapper = new ObjectMapper();
 
 		try {
-			JsonNode nodeTmp = mapper.readTree(message);
-			//if (message.length()>1000) LOG.debug("["+message.length()+"]:::"+nodeTmp);
+			JsonNode nodeTmp = mapper.readTree(message); 
 			String theType = "" + nodeTmp.get(0);
-			//ignore TODO boolean existPairs = false;
-			//ignore TODO try{
-			//ignore TODO 				((TextNode) nodeTmp.get(2).get(0).get(1).get("currencyPair")).textValue();
-			//ignore TODO 				existPairs = true;
-			//ignore TODO 			}catch(Exception e) {
-			//ignore TODO 				// ignore
-			//ignore TODO 			}
-			//ignore TODO if ("1001".equals(theType)) {
-			//ignore TODO process1001(poloHandler.rrdWS,  nodeTmp); 
-			//ignore TODO } else if (nodeTmp.get(2).size()==1 && existPairs)
-			//ignore TODO process121(poloHandler.rrdWS,  nodeTmp);
-			//ignore TODO else if (poloHandler.poloWS.getPairNameByID(theType) != null ) {
-			if (parentService.getPoloWS().getPairNameByID(theType) != null ) {
-			//ignore TODO String MARKET_PAIR = poloHandler.poloWS.getPairNameByID(theType);
-				String MARKET_PAIR = parentService.getPoloWS().getPairNameByID(theType);
-			//ignore TODO processXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
-			//ignore TODO esperXXXYYY(poloHandler.rrdWS, MARKET_PAIR, nodeTmp);
-				esperXXXYYY( MARKET_PAIR, nodeTmp);
-			//ignore TODO } else if ("1002".equals(theType)) {
-			//ignore TODO 				process1002(poloHandler.rrdWS,  nodeTmp);
-			//ignore TODO 				esper1002(poloHandler.rrdWS,  nodeTmp);
-			//ignore TODO 			} else {
-			//ignore TODO process1003(poloHandler.rrdWS,   nodeTmp);
-			//ignore TODO }
+ 
+			if (parentService.getPoloWS().getPairNameByID(theType) != null ) { 
+				String MARKET_PAIR = parentService.getPoloWS().getPairNameByID(theType); 
+				esperXXXYYY( MARKET_PAIR, nodeTmp); 
 			}
 
 		} catch (JsonProcessingException e) {
@@ -296,7 +264,7 @@ public class XXXEsperHandler implements MessageHandler {
 	public void destroy() {
 		LOG.error("public void destroy() {} . . . . . . ....", this);
 		this.getCepAdm().destroyAllStatements();
-		this.parentService.getCep().destroy();
+		this.parentService.getCepKeeper().getCep().destroy();
 		LOG.error("DONE ! :::public void destroy() {} . . . . . . ....", this);
 	}
 

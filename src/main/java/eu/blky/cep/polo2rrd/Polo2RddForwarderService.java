@@ -1,8 +1,6 @@
 package eu.blky.cep.polo2rrd;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException; 
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -31,22 +29,26 @@ import cc.co.llabor.system.StatusMonitor;
 
 @Service
 public class Polo2RddForwarderService {
-
-
-	private static final String WSS_API2_POLONIEX_COM = "wss://api2.poloniex.com";
+	private CepKeeper cepKeeper;
+	/**
+	 * @return the cepKeeper
+	 */
+	public CepKeeper getCepKeeper() {
+		return cepKeeper;
+	}
+	/**
+	 * @param cepKeeper the cepKeeper to set
+	 */
+	public void setCepKeeper(CepKeeper cepKeeper) {
+		this.cepKeeper = cepKeeper;
+	}
+	
 	// @Autowired not works correctly - use applicationContext.xml def
 	@Autowired
 	private PoloWSEndpoint poloWS;
 	
 	private int engineCounter;
 
-    // The Configuration is meant only as an initialization-time object.
-	@Autowired
-	private Configuration cepConfig ;//= new Configuration();
-    
-	private EPRuntime cepRT;
-	private EPServiceProvider cep;
-	private EPAdministrator cepAdm;
 	String esper1002PROPS[] = {"N/A", "PRICELAST", "priceMax","PriceMin","PriceDiff", "volume24H","volumeTotal", "hight24H","low24H"};
 	/** Logger */
 	private static Logger LOG = LoggerFactory.getLogger(Polo2RddForwarderService.class);
@@ -59,20 +61,7 @@ public class Polo2RddForwarderService {
 	}
 	@PostConstruct
 	public void init(){
-		System.out.println("Polo2RddForwarderService init method called. cepConfig == "+getCepConfig());
-// will be done over applicationContex.xml		
-//		try {
-//			createPoloWS();			 
-//			System.out.println("createPoloWS() done");
-//		} catch (URISyntaxException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (Throwable e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
- 
-//		
+		System.out.println("Polo2RddForwarderService init method called. cepConfig == "+cepKeeper.getCepConfig()); 
 		try {			 
 			initCEP();
 			System.out.println("initCEP() done");
@@ -118,43 +107,23 @@ public class Polo2RddForwarderService {
 		 
 		
 	}		
-	// will be done over applicationContex.xml	
-//	private void createPoloWS() throws URISyntaxException {
-//		URI endpointURI = new URI(WSS_API2_POLONIEX_COM);
-//		DestroyTracker watchDog = new DestroyTrackerImplementation();
-//		MessageHandler directMessageHandler = new DirectRddUpdater();
-//		setPoloWS(new PoloWSEndpoint(endpointURI, watchDog));
-//
-//		// add listener - parce and "distribute
-//		getPoloWS().addMessageHandler(directMessageHandler);
-//	}
+ 
 
-	private EPRuntime initCEP(){
-	
+	private EPRuntime initCEP(){ 
 
-	    getCepConfig().addEventType("PoloTick", PoloTick.class.getName());	
-	    //
-	    getCepConfig().addEventType("OrderTick", OrderTick.class.getName());
-	    
-	    setCep(EPServiceProviderManager.getProvider("myCEPEngine#"+engineCounter++, getCepConfig()));
-		setCepRT(getCep().getEPRuntime()); 
-	    setCepAdm(getCep().getEPAdministrator());
-	    int intPairCounter = 0;
-
-	
-		
-	    for ( Object key : getPoloWS().id2pairs.keySet()) {
-	    	intPairCounter++;
+		cepKeeper.getCepConfig().addEventType("PoloTick", PoloTick.class.getName());  
+		cepKeeper.getCepConfig().addEventType("OrderTick", OrderTick.class.getName()); 
+		cepKeeper.setCep(EPServiceProviderManager.getProvider("myCEPEngine#"+engineCounter++, cepKeeper.getCepConfig()));
+	    cepKeeper.setCepRT(cepKeeper.getCep().getEPRuntime()); 
+	    cepKeeper.setCepAdm(cepKeeper.getCep().getEPAdministrator()); 
+	    for ( Object key : getPoloWS().id2pairs.keySet()) { 
 	    	//if (intPairCounter<10)
 	    	for (int pi=1; pi<esper1002PROPS.length;pi++) { // 
 	    		String properyNameTmp =  esper1002PROPS[pi];
 	    		String symTmp = (String) getPoloWS().id2pairs.get(key);
 	    		
 	    		String merticTmp = "_"+symTmp +"_"+properyNameTmp;
-	    		{// TODO GOTO process1001
-		    		String CID=symTmp;
-					String theNameOfProp=properyNameTmp; 
-	    		} 
+ 
 			    // step 2 :  split / agregate by 10 sec	    
 			    String avg10sec = "insert into BigEvents "
 			    		+ "select "
@@ -167,9 +136,8 @@ public class Polo2RddForwarderService {
 			    				+ "	symbol='"+symTmp+"'  "
 			    		+ "  "
 			    				+ ")"
-						+ "";  
-			    //System.out.println(avg10sec);
-			    EPStatement notNullEventsTmp = getCepAdm().createEPL(avg10sec); 	
+						+ "";   
+			    EPStatement notNullEventsTmp = cepKeeper.getCepAdm().createEPL(avg10sec); 	
 			    notNullEventsTmp.addListener(new SysoUpdater(symTmp,properyNameTmp ));
 			    				
 			     
@@ -181,8 +149,8 @@ public class Polo2RddForwarderService {
 	    		"select  'PoloTick' type,  symbol, count(*) as cnt\n" + 
 	    		"from PoloTick.win:time_batch(11 second)\n" + 
 	    		"group by symbol";
-	    EPStatement statStmtTmp = getCepAdm().createEPL(eql4); 
-	    //statStmtTmp.addListener(new StatisticPrinter());
+	    EPStatement statStmtTmp = cepKeeper.getCepAdm().createEPL(eql4); 
+	    statStmtTmp.addListener(new Statistic2RddUpdater("TicksPerSecond"));
 	    
 	    
 	    
@@ -191,24 +159,13 @@ public class Polo2RddForwarderService {
 	    		"select   type , sum(  cnt  )" + 
 	    		"from TicksPerSecond.win:time_batch(1 second) " + 
 	    		"group by type";
-	    EPStatement statByTypeTmp = getCepAdm().createEPL(eql5); 
+	    EPStatement statByTypeTmp = cepKeeper.getCepAdm().createEPL(eql5); 
 	    statByTypeTmp.addListener(new StatisticPrinter());	    
 	    
-	    return getCepRT();
+	    return cepKeeper.getCepRT();
 	
 	}
 
-	public Configuration getCepConfig() {
-		return cepConfig;
-	}
-
-	public void setCepConfig(Configuration cepConfig) {
-		this.cepConfig = cepConfig;
-	}
-
-	public PoloWSEndpoint getPoloWS() {
-		return poloWS;
-	}
 
 	public void setPoloWS(PoloWSEndpoint poloWS) {
 		this.poloWS = poloWS;
@@ -218,27 +175,12 @@ public class Polo2RddForwarderService {
 		this.poloWS.addMessageHandler(XXX );
 	}
 
-	public EPRuntime getCepRT() {
-		return cepRT;
-	}
 
-	public void setCepRT(EPRuntime cepRT) {
-		this.cepRT = cepRT;
-	}
 
-	public EPServiceProvider getCep() {
-		return cep;
-	}
 
-	public void setCep(EPServiceProvider cep) {
-		this.cep = cep;
-	}
+	public PoloWSEndpoint getPoloWS() {
+		return poloWS;
+	}	
 
-	public EPAdministrator getCepAdm() {
-		return cepAdm;
-	}
 
-	public void setCepAdm(EPAdministrator cepAdm) {
-		this.cepAdm = cepAdm;
-	}
 }

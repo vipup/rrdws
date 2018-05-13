@@ -32,7 +32,7 @@
 			</constructor-arg>
 	</bean>
 	
-	<!-- myBackupController -->
+	<!-- service for myBackupController -->
 	<bean name="myBackupService" class="eu.blky.springmvc.BackupService" destroy-method="backup"  >
 			<constructor-arg ref="StatusMonitor">	 
 			</constructor-arg>
@@ -57,11 +57,17 @@
 		</constructor-arg>
 	</bean>
 
-	<bean name="polo2rrd" class="eu.blky.cep.polo2rrd.Polo2RddForwarderService"  destroy-method="destroy" init-method="init">
+	<bean name="cepKeeper" class="eu.blky.cep.polo2rrd.CepKeeper" >
 		<property name="cepConfig" ref="cepConfiguration"></property>
+	</bean>
+	<bean name="polo2rrd" class="eu.blky.cep.polo2rrd.Polo2RddForwarderService"  destroy-method="destroy" init-method="init">
+		<property name="cepKeeper" ref="cepKeeper"></property>
 		<property name="poloWS" ref="poloWebsocketEP"></property>
-		<!-- ??		--> 
+		<!-- ??
+			<property name="cepConfig" ref="cepConfiguration"></property>		
+		--> 
 		<property name="statusMonitor" ref="StatusMonitor"></property>
+		
 		 
 		
 	</bean>
