@@ -147,20 +147,20 @@ public class FetchRequest {
 
 	private void validate() throws RrdException {
 		if (!ArcDef.isValidConsolFun(consolFun)) {
-			throw new RrdException("Invalid consolidation function in fetch request: " + consolFun);
+			throw new RrdException("Invalid consolidation function in fetch request: ",  consolFun);
 		}
 		if (fetchStart < 0) {
-			throw new RrdException("Invalid start time in fetch request: " + fetchStart);
+			throw new RrdException("Invalid start time in fetch request: " , fetchStart);
 		}
 		if (fetchEnd < 0) {
-			throw new RrdException("Invalid end time in fetch request: " + fetchEnd);
+			throw new RrdException("Invalid end time in fetch request: " , fetchEnd);
 		}
 		if (fetchStart > fetchEnd) {
-			throw new RrdException("Invalid start/end time in fetch request: " + fetchStart +
-					" > " + fetchEnd);
+			throw new RrdException("Invalid start/end time in fetch request: " , new Object []{fetchStart ,
+					" > " , fetchEnd } );
 		}
 		if (resolution <= 0) {
-			throw new RrdException("Invalid resolution in fetch request: " + resolution);
+			throw new RrdException("Invalid resolution in fetch request: " , resolution);
 		}
 	}
 

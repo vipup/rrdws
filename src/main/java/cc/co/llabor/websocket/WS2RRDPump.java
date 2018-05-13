@@ -388,14 +388,23 @@ public class WS2RRDPump implements DestroyTracker {
 	public static final String makeCreateCMD(long timestampTmp, String xpath) {
 		String rrddb = xpath2Hash(xpath);
 		String cmdCreate = "rrdtool create " + "" + rrddb + " --start " + (((timestampTmp - 10000) / 1000L)) + " --no-overwrite "
-				+ " --step 1 " + "				DS:data:GAUGE:240:U:U " + "				RRA:AVERAGE:0.5:3:480 "
-				+ "				RRA:AVERAGE:0.5:17:592 " + "				RRA:AVERAGE:0.5:131:340 "
-				+ "				RRA:AVERAGE:0.5:731:719 " + "				RRA:AVERAGE:0.5:10000:273 "
-				+ "				RRA:MAX:0.5:3:480 " + "				RRA:MAX:0.5:17:592 "
-				+ "				RRA:MAX:0.5:131:340 " + "				RRA:MAX:0.5:731:719 "
-				+ "				RRA:MAX:0.5:10000:273 " + "				RRA:MIN:0.5:3:480 "
-				+ "				RRA:MIN:0.5:17:592 " + "				RRA:MIN:0.5:131:340 "
-				+ "				RRA:MIN:0.5:731:719 " + "				RRA:MIN:0.5:10000:273 " + " ";
+				+ " --step 1 " 
+				+ "				DS:data:GAUGE:240:U:U " 
+				+ "				RRA:AVERAGE:0.5:3:480 "
+				+ "				RRA:AVERAGE:0.5:17:592 " 
+				+ "				RRA:AVERAGE:0.5:131:340 "
+				+ "				RRA:AVERAGE:0.5:731:719 " 
+				+ "				RRA:AVERAGE:0.5:100000:273 "
+				+ "				RRA:MAX:0.5:3:480 " 
+				+ "				RRA:MAX:0.5:17:592 "
+				+ "				RRA:MAX:0.5:131:340 " 
+				+ "				RRA:MAX:0.5:731:719 "
+				+ "				RRA:MAX:0.5:100000:273 " 
+				+ "				RRA:MIN:0.5:3:480 "
+				+ "				RRA:MIN:0.5:17:592 " 
+				+ "				RRA:MIN:0.5:131:340 "
+				+ "				RRA:MIN:0.5:731:719 " 
+				+ "				RRA:MIN:0.5:100000:273 " + " ";
 		return cmdCreate;
 	}
 

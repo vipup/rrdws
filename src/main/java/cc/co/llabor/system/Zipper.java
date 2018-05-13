@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -13,6 +14,7 @@ public class Zipper {
 	private List <String> fileList =  new ArrayList < String > ();
 	private String inForlderToZip;
 	private String outputZipArchiveFileName;
+	static final Logger log = Logger.getLogger(Zipper.class.getName());
 
  
 	    public Zipper(String inName, String outName) {
@@ -46,9 +48,9 @@ public class Zipper {
 	        	
 	            fos = new FileOutputStream(zipFile);
 	            zos = new ZipOutputStream(fos);
-	            zos.setLevel(9);
+	            zos.setLevel(1);
 
-	            System.out.println("Output to Zip : " + zipFile);
+	            log.fine( "Output to Zip : " + zipFile);
 	            FileInputStream in = null;
 
 	            for (String file: this.fileList) {
