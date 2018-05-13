@@ -630,13 +630,15 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 	}
 	 
 	
-	Map<String, Long> exceptionsRTRepo = new HashMap<String, Long>(); 
+	private Map<String, String> exceptionsRepo = new HashMap<String, String>(); 
+	private Map<String, Long> exceptionsRTRepo = new HashMap<String, Long>(); 
 	
 	static long lastUpdated = 0;
 	
 	public void error(RrdException rrdException) {
 		this.error();
 		String uuid= rrdException.getUUID();
+		registerErrMEssageIfNotRegistered(uuid , rrdException.getMessage());
 		Long exCounter = getAndIncrementCounter(uuid);		
 		if ( System.currentTimeMillis()  < (lastUpdated +1000)    ) {
 			return;
@@ -648,6 +650,10 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 			lastUpdated  = System.currentTimeMillis();
 		}
 	}
+	private void registerErrMEssageIfNotRegistered(String key, String message) {
+			exceptionsRepo.put(key, message);
+	}
+	
 	private Long getAndIncrementCounter(String key) {
 		Long exCounter = new Long(-1);
 		synchronized (exceptionsRTRepo) {
@@ -662,6 +668,24 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 		
 		return exCounter;
 	}
-
+	/**
+	 * @return the exceptionsRTRepo
+	 */
+	public Map<String, Long> getExceptionsRTRepo() {
+		return exceptionsRTRepo;
+	}
+	/**
+	 * @return the exceptionsRepo
+	 */
+	public Map<String, String> getExceptionsRepo() {
+		return exceptionsRepo;
+	}
+	/**
+	 * @param exceptionsRepo the exceptionsRepo to set
+	 */
+	public void setExceptionsRepo(Map<String, String> exceptionsRepo) {
+		this.exceptionsRepo = exceptionsRepo;
+	}
+ 
 }
  

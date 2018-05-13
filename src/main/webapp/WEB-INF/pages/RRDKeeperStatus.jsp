@@ -8,8 +8,13 @@
 	<h6>S-MVC Not works:</h6>
 	<h5>${msg}</h5>
 	<h6>BUT works:</h6>
-	<h4><%=request.getAttribute("msg")%></h4>
+	<h4>RrdKeeper.getInstance().isAlive() :: <%=request.getAttribute("msg")%></h4>
 
+	<h4>runtimeexceptions:: <%=request.getAttribute("runtimeexceptions")%></h4>
+
+	<h4>runtimeexceptionMessages :: <%=request.getAttribute("runtimeexceptionMessages")%></h4>
+	
+ 
 	<h3>Status::</h3>
 	<pre>${status}</pre>
 </body>

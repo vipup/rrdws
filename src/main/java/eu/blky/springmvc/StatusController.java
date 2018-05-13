@@ -26,7 +26,13 @@ public class StatusController extends AbstractController{
 		HttpServletResponse response) throws Exception {
 
 		ModelAndView model = new ModelAndView("RRDKeeperStatus");
-		model.addObject("msg", RrdKeeper.getInstance().isAlive() ?"alive":"DEAD");
+		if (RrdKeeper.getInstance() != null) {
+			model.addObject("msg", RrdKeeper.getInstance().isAlive() ?"alive":"DEAD");
+			Map<String, Long> allExceptionsTmp  = RrdKeeper.getInstance().getExceptionsRTRepo();
+			String allExceptionsAsString = exToString (allExceptionsTmp);
+			model.addObject("runtimeexceptions", allExceptionsAsString );
+			model.addObject("runtimeexceptionMessages", mapToString( RrdKeeper.getInstance().getExceptionsRepo() ) );
+		}
 		model.addObject("todo", AlertCaptain.getInstance().getToDo().toString() );
 		model.addObject("status", mapToString ( statusMonitor.getStatus()  ) );
 		
@@ -42,7 +48,46 @@ public class StatusController extends AbstractController{
 		this.statusMonitor = statusMonitor;
 	}
 	
-	 public static String mapToString(Map<String, String> map) {
+	public static String exToString(Map<String, Long> map) {
+		StringBuilder stringBuilder = new StringBuilder();
+
+		for (String key : map.keySet()) {
+			if (stringBuilder.length() > 0) {
+				stringBuilder.append(", ");
+			}
+			String value = ""+map.get(key);
+			try {
+				stringBuilder.append((key != null ? URLEncoder.encode(key, "UTF-8") : ""));
+				stringBuilder.append("=");
+				stringBuilder.append(value != null ? URLEncoder.encode(value, "UTF-8") : "");
+			} catch (UnsupportedEncodingException e) {
+				throw new RuntimeException("This method requires UTF-8 encoding support", e);
+			}
+		}
+
+		return stringBuilder.toString();
+	}
+	public static String mapToString(Map<String, String> map) {
+		StringBuilder stringBuilder = new StringBuilder();
+
+		for (String key : map.keySet()) {
+			if (stringBuilder.length() > 0) {
+				stringBuilder.append(", ");
+			}
+			String value = map.get(key);
+			try {
+				stringBuilder.append((key != null ? URLEncoder.encode(key, "UTF-8") : ""));
+				stringBuilder.append("=");
+				stringBuilder.append(value != null ? URLEncoder.encode(value, "UTF-8") : "");
+			} catch (UnsupportedEncodingException e) {
+				throw new RuntimeException("This method requires UTF-8 encoding support", e);
+			}
+		}
+
+		return stringBuilder.toString();
+	} 
+ 
+	public static String mapToURL(Map<String, String> map) {
 		   StringBuilder stringBuilder = new StringBuilder();
 
 		   for (String key : map.keySet()) {

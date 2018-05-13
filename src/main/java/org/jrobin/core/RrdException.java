@@ -65,11 +65,14 @@ public class RrdException extends Exception {
 	public RrdException(String string, Object errorObject) {
 		this.message = string;
 		this.errorObject = errorObject ;
-		
-	}	
+	}
+	
+	public String getMessage() {
+		return this.message;
+	}
 	
 	public String toString () {
-		return this.message + ""+ errorObject;
+		return this.message + "::::::::"+ errorObject;
 	}
 
 	static String ENABLED_THIS ="11111111111111111111111";
