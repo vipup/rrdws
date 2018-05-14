@@ -5,9 +5,29 @@
 </head>
 <body>
 	<h3>CEP page</h3>
+	
+	StatementNames:
+	
+	<pre>${StatementNames}</pre>
+	statements_:
+	
+	<pre>${statements}</pre>
+	
 	ENV: 
 	<pre>${env}</pre>
-	VARS:
-	<pre>${vars}</pre>	
+	
+	dataflows:
+	<pre>${dataflows}</pre>	
+	savedConfiguratios:
+	<pre>${savedConfiguratios}</pre>	
+	savedInstances:
+	<pre>${savedInstances}</pre>
+	
+		 	VARs: 
+	<pre>${vars}</pre>
+	
+		 	getEventTypeNames: 
+	<pre>${etnames}</pre>
+	
 </body>
 </html>
