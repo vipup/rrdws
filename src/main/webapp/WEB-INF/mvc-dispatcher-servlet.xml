@@ -8,6 +8,9 @@
 	<!-- below are beans for mvc-dispatcher Servlet -->
 
 	<!-- context:component-scan base-package="cc.co.llabor.sso"/> -->
+	
+	<context:component-scan base-package="eu.blky.springmvc"/>
+	
 	<bean name="/cep.htm" class="eu.blky.springmvc.CepController" >
 	 
 		<property name="cepKeeper" ref="cepKeeper"></property>

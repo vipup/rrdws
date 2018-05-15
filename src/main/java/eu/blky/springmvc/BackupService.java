@@ -2,18 +2,20 @@ package eu.blky.springmvc;
 import java.io.File;  
  
 import org.jrobin.mrtg.server.Config;
-import org.springframework.stereotype.Service; 
+//!! import org.springframework.stereotype.Service; 
 
 import cc.co.llabor.system.StatusMonitor;
 import cc.co.llabor.system.Zipper;  
 
-@Service
+//!! not possible to use ANNOTATION  together with  /rrd/src/main/webapp/WEB-INF/applicationContext.xml !! 
+//!! @Service
 public class BackupService {
  
  
 	private StatusMonitor sm;
 	private RestoreService restoreService; 
-
+	
+ 
 
 	{
 		System.out.println("BackupService inited");

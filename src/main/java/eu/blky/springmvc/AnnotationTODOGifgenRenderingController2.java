@@ -25,11 +25,13 @@ public class AnnotationTODOGifgenRenderingController2 {
 	{
 		System.out.println(this.getClass().getName() + " inited");
 	}
-	@RequestMapping(value = "/gifgen.htm", method = RequestMethod.GET)
+	@RequestMapping(value = "/anogifgen.htm", method = RequestMethod.GET)
 	public void downloadFile(HttpServletResponse response,
 	                         HttpServletRequest request) throws IOException
 	{
 	    
+		System.out.println("servletContext:::::"+servletContext);
+		
 	    response.setContentType("image/gif");
 	    response.setHeader("Content-Disposition", "inline;filename=sss.gif" );
 	    response.setHeader("Pragma", "no-cache");
