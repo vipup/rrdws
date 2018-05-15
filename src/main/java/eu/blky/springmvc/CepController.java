@@ -1,6 +1,7 @@
 package eu.blky.springmvc;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,6 +12,8 @@ import org.springframework.web.servlet.mvc.AbstractController;
 
 import com.espertech.esper.client.ConfigurationVariable;
 import com.espertech.esper.client.EPStatement;
+import com.espertech.esper.client.StatementAwareUpdateListener;
+import com.espertech.esper.client.UpdateListener;
 
 import cc.co.llabor.system.StatusMonitor;
 import eu.blky.cep.polo2rrd.CepKeeper;
@@ -57,14 +60,11 @@ public class CepController extends AbstractController{
 		try { 
 			String[] StatementNames = cepKeeper.getCepAdm().getStatementNames();
 			model.addObject("StatementNames", array2string(StatementNames) );
-			ArrayList<String> statementsList= new ArrayList();
-			for(String name:StatementNames) {
-				EPStatement stmtTmp = cepKeeper.getCepAdm().getStatement(name);
-				statementsList.add(stmtTmp.getText());
-			}
-			Object[] statements = statementsList.toArray();
+			Object[] statements = listAllStatements(StatementNames);
 			model.addObject("statements", array2string(statements ) );
 			
+			Object[] listeners = listAllListeners(StatementNames);
+			model.addObject("statementsListeners", array2string(listeners ) );
 			
 			// RT
 			String[] dataflows = cepKeeper.getCepRT().getDataFlowRuntime().getDataFlows() ;
@@ -85,6 +85,36 @@ public class CepController extends AbstractController{
 		
 
 		return model;
+	}
+	private Object[] listAllListeners(String[] StatementNames) {
+		ArrayList<String>  listSet= new ArrayList<String>();
+		for(String name:StatementNames) {
+			EPStatement stmtTmp = cepKeeper.getCepAdm().getStatement(name);
+			// getUpdateListeners
+			Iterator<UpdateListener> listTmp = stmtTmp.getUpdateListeners() ;
+			while (listTmp.hasNext()   ) {
+				UpdateListener l = listTmp.next(); 
+				listSet.add(  name +" = { " + l +"} \n");
+			}
+			// getStatementAwareListeners
+			Iterator<StatementAwareUpdateListener> stnlistenersTmp = stmtTmp.getStatementAwareListeners();
+			while (stnlistenersTmp.hasNext()   ) {
+				StatementAwareUpdateListener l = stnlistenersTmp.next(); 
+				listSet.add(  name +" <=st= {{ " + l +"}} \n");
+			}
+			
+		}
+		Object[] listeners = listSet.toArray();
+		return listeners;
+	}
+	private Object[] listAllStatements(String[] StatementNames) {
+		ArrayList<String> statementsList= new ArrayList();
+		for(String name:StatementNames) {
+			EPStatement stmtTmp = cepKeeper.getCepAdm().getStatement(name);
+			statementsList.add( name +" =  '" + stmtTmp.getText() +"' \n");
+		}
+		Object[] statements = statementsList.toArray();
+		return statements;
 	}
 
 	

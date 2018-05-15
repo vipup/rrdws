@@ -16,6 +16,9 @@ public class SysoUpdater implements UpdateListener {
 	private int uuid;
 	private int updateCounter;
 	private static int UUID = 0;
+	public String toString() {
+		return SysoUpdater.class.getName()+":"+uuid+":"+logns+"/"+properyName;
+	} 	
 
 	public SysoUpdater(String lognsPar, String properyNamePar) {
 		this.logns = lognsPar;
@@ -29,7 +32,7 @@ public class SysoUpdater implements UpdateListener {
 		for (Object e:newEvents) { 
 			MapEventBean eBean = (MapEventBean)e;
 			double value = 0;
-			if (uuid==5)
+			if (uuid==17)
 			try {
 				LOG.trace(logns,  eBean );
 				value = Double.valueOf(""+ eBean.get(properyName )) ;

@@ -49,7 +49,7 @@ public class Polo2RddForwarderService {
 	
 	private int engineCounter;
 
-	String esper1002PROPS[] = {"N/A", "PRICELAST", "priceMax","PriceMin","PriceDiff", "volume24H","volumeTotal", "hight24H","low24H"};
+	
 	/** Logger */
 	private static Logger LOG = LoggerFactory.getLogger(Polo2RddForwarderService.class);
 
@@ -110,49 +110,28 @@ public class Polo2RddForwarderService {
  
 
 	private EPRuntime initCEP(){ 
-
-		cepKeeper.getCepConfig().addEventType("PoloTick", PoloTick.class.getName());  
+		// used /rrd/src/main/java/cc/co/llabor/websocket/cep/OrderTick.java
+		// NOT user anymore ! cepKeeper.getCepConfig().addEventType("PoloTick", PoloTick.class.getName());
+		// used /rrd/src/main/java/cc/co/llabor/websocket/cep/OrderTick.java
 		cepKeeper.getCepConfig().addEventType("OrderTick", OrderTick.class.getName()); 
 		cepKeeper.setCep(EPServiceProviderManager.getProvider("myCEPEngine#"+engineCounter++, cepKeeper.getCepConfig()));
 	    cepKeeper.setCepRT(cepKeeper.getCep().getEPRuntime()); 
-	    cepKeeper.setCepAdm(cepKeeper.getCep().getEPAdministrator()); 
-	    for ( Object key : getPoloWS().id2pairs.keySet()) { 
-	    	//if (intPairCounter<10)
-	    	for (int pi=1; pi<esper1002PROPS.length;pi++) { // 
-	    		String properyNameTmp =  esper1002PROPS[pi];
-	    		String symTmp = (String) getPoloWS().id2pairs.get(key);
-	    		
-	    		String merticTmp = "_"+symTmp +"_"+properyNameTmp;
- 
-			    // step 2 :  split / agregate by 10 sec	    
-			    String avg10sec = "insert into BigEvents "
-			    		+ "select "
-			    		+ "		'"+merticTmp+"' metric, "
-			    		+ "		(sum(price)/count(price)) avgA   "
-			    		+ " "
-			    		+ "from PoloTick.win:time_batch(10 sec) "
-			    		+ "where  ("
-			    		+ "			name='"+properyNameTmp+"' and "
-			    				+ "	symbol='"+symTmp+"'  "
-			    		+ "  "
-			    				+ ")"
-						+ "";   
-			    EPStatement notNullEventsTmp = cepKeeper.getCepAdm().createEPL(avg10sec); 	
-			    notNullEventsTmp.addListener(new SysoUpdater(symTmp,properyNameTmp ));
-			    				
-			     
-	    	}
-	    }
+	    cepKeeper.setCepAdm(cepKeeper.getCep().getEPAdministrator());  
 	    
+	 // used / /rrd/src/main/java/cc/co/llabor/websocket/cep/OrderTick.java 
+	    // step 2 :  split / agregate by 10 sec	    
+//		private double price;
+//		private double volume;
+//		private String pair;
+//		private boolean type;
+//		private double total;	  	    
 	    // step 4: summaryze that all
 	    String eql4 = "insert into TicksPerSecond\n" + 
-	    		"select  'PoloTick' type,  symbol, count(*) as cnt\n" + 
-	    		"from PoloTick.win:time_batch(11 second)\n" + 
-	    		"group by symbol";
+	    		"select  'PoloTick' type,  pair, count(*) as cnt\n" + 
+	    		"from OrderTick.win:time_batch(11 second)\n" + 
+	    		"group by pair";
 	    EPStatement statStmtTmp = cepKeeper.getCepAdm().createEPL(eql4); 
-	    statStmtTmp.addListener(new Statistic2RddUpdater("TicksPerSecond"));
-	    
-	    
+	    statStmtTmp.addListener(new Statistic2RddUpdater("TicksPerSecond")); 
 	    
 	    // step 5: summaryze that all
 	    String eql5 = "" + 

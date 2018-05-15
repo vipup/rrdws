@@ -15,6 +15,9 @@ public class RrdDirectUpdater implements UpdateListener {
 	private String propertyName = "data";
 	/** Logger */
 	private static Logger LOG = LoggerFactory.getLogger(RrdDirectUpdater.class);
+	public String toString() {
+		return RrdDirectUpdater.class.getName()+":"+ns;
+	} 
 
 
 	public RrdDirectUpdater(String nsPar, String properyNameTmp) { 

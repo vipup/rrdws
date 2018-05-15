@@ -4,7 +4,12 @@ import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.UpdateListener;
 import com.espertech.esper.event.map.MapEventBean;
 
+ 
+
 public class StatisticPrinter implements UpdateListener {
+	public String toString() {
+		return StatisticPrinter.class.getName() ;
+	} 	
 
 	@Override
 	public void update(EventBean[] newEvents, EventBean[] oldEvents) {

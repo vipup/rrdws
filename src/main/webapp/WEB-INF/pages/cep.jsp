@@ -4,18 +4,15 @@
 <%@ page isELIgnored="false"%>
 </head>
 <body>
-	<h3>CEP page</h3>
-	
-	StatementNames:
-	
+	<h3>CEP page</h3>	
+	statementsListeners:	
+	<pre>${statementsListeners}</pre>	
+	StatementNames:	
 	<pre>${StatementNames}</pre>
-	statements_:
-	
+	statements_:	
 	<pre>${statements}</pre>
-	
 	ENV: 
 	<pre>${env}</pre>
-	
 	dataflows:
 	<pre>${dataflows}</pre>	
 	savedConfiguratios:
