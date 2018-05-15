@@ -23,6 +23,12 @@
 	<packaging>war</packaging>
 
 	<dependencies>
+		<!-- Jackson JSON Mapper -->
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>	
 <!--
 	<dependency>
 		<groupId>ESPER_HelloWorld</groupId>
@@ -727,7 +733,8 @@
 	
 	 	
 		<jstl.version>1.2</jstl.version>
-		<spring.version>2.5.6</spring.version>
+		<spring.version>3.2.18.RELEASE</spring.version>
+		<jackson.version>1.9.10</jackson.version>
 			
 		<!--
 			This is just for "eclipse:eclipse" goal to always attempt
