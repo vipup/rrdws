@@ -12,8 +12,7 @@ import ws.rrd.csv.RrdUpdateAction;
 
 public class Statistic2RddUpdater implements UpdateListener {
 	private final String logns = Statistic2RddUpdater.class.getName();
-	private final String ns;
-	private double value = 0;
+	private final String ns; 
 	/** Logger */
 	private static Logger LOG = LoggerFactory.getLogger(Statistic2RddUpdater.class);	 
 	public String toString() {
