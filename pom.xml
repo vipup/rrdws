@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<!--  ((( this section is common for all l-parent childs 
-	<parent>
-		<groupId>cc.co.llabor</groupId>
-		<artifactId>l-parent</artifactId>
-		<version>1.14</version>
-		</parent>
--->
+	<!-- ((( this section is common for all l-parent childs <parent> <groupId>cc.co.llabor</groupId> 
+		<artifactId>l-parent</artifactId> <version>1.14</version> </parent> -->
 	<scm>
- 
+
 		<url>${l.base}/JSPWiki/Wiki.jsp?page=${pom.artifactId}</url>
 	</scm>
 	<!-- this section is common for all l-parent childs ))) -->
@@ -25,55 +21,50 @@
 	<dependencies>
 		<!-- Jackson JSON Mapper -->
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>	
-<!--
-	<dependency>
-		<groupId>ESPER_HelloWorld</groupId>
-		<artifactId>ESPER_HelloWorld</artifactId>
-		<version>0.0.2</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.2.3</version>
+		</dependency>
+		<!-- <dependency> <groupId>ESPER_HelloWorld</groupId> <artifactId>ESPER_HelloWorld</artifactId> 
+			<version>0.0.2</version> </dependency> -->
 
-	</dependency>  -->
+		<dependency>
+			<groupId>com.espertech</groupId>
+			<artifactId>esper</artifactId>
+			<version>7.0.0</version>
+		</dependency>
 
-	<dependency>
-		<groupId>com.espertech</groupId>
-		<artifactId>esper</artifactId>
-		<version>7.0.0</version>
-	</dependency>
-	
-	<!--  https://wiki.base22.com/display/btg/How+to+setup+SLF4J+and+LOGBack+in+a+web+app+-+fast -->
-<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
-<dependency>
-    <groupId>ch.qos.logback</groupId>
-    <artifactId>logback-classic</artifactId>
-    <version>1.2.3</version>
-    
-</dependency>
-	
-	
-<!-- https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-websocket -->
-<dependency>
-    <groupId>org.apache.tomcat.embed</groupId>
-    <artifactId>tomcat-embed-websocket</artifactId>
-    <version>8.5.15</version>
-    <!--  <scope>provided</scope>  -->
-</dependency>	
-	<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
-	<dependency>
-	    <groupId>io.jsonwebtoken</groupId>
-	    <artifactId>jjwt</artifactId>
-	    <version>0.6.0</version>
-	</dependency>
-	
-	<!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
-	<dependency>
-	    <groupId>org.freemarker</groupId>
-	    <artifactId>freemarker</artifactId>
-	    <version>2.3.20</version>
-	</dependency>
-	
+		<!-- https://wiki.base22.com/display/btg/How+to+setup+SLF4J+and+LOGBack+in+a+web+app+-+fast -->
+		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
+
+		</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-websocket -->
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-websocket</artifactId>
+			<version>8.5.15</version>
+			<!-- <scope>provided</scope> -->
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.6.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>2.3.20</version>
+		</dependency>
+
 		<!-- JSTL -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -87,58 +78,57 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 			<version>${spring.version}</version>
-		</dependency>	
-	
-	<dependency>
-		<groupId>com.yahoo.platform.yui</groupId>
-		<artifactId>yuicompressor</artifactId>
-		<version>2.4.6</version>
-		<scope>test</scope>
-	</dependency>	
-	
+		</dependency>
+
+		<dependency>
+			<groupId>com.yahoo.platform.yui</groupId>
+			<artifactId>yuicompressor</artifactId>
+			<version>2.4.6</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>net.sf.jtidy</groupId>
 			<artifactId>jtidy</artifactId>
 			<version>r938</version>
 		</dependency>
- 
-	<dependency>
-		<groupId>org.igniterealtime.smack</groupId>
-		<artifactId>smack</artifactId>
-		<version>3.2.1</version>
-		<scope>provided</scope><!--have to be fixed before using -->
-	</dependency>
-	<dependency>
-		<groupId>commons-lang</groupId>
-		<artifactId>commons-lang</artifactId>
-		<version>2.6</version>
-	</dependency>
-	
-	<!-- uncomment it if you really know what you do!!! :) JMX logging 
-	-->	
-	<dependency>
-		<groupId>jmxlogger</groupId>
-		<artifactId>jmx-logger-log4j</artifactId>
-		<version>0.3.1</version>
-		<scope>provided</scope>
-	</dependency>
-		 
-	<dependency>
-		<groupId>jmxlogger</groupId>
-		<artifactId>jmxlogger</artifactId>
-		<version>0.3.0</version>
-		<scope>provided</scope>
-	</dependency>
-	
 
-	
-	<dependency>
-		<groupId>org.mvel</groupId>
-		<artifactId>mvel2</artifactId>
-		<version>2.0.14</version>
-	</dependency>
-            
-	 	
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack</artifactId>
+			<version>3.2.1</version>
+			<scope>provided</scope><!--have to be fixed before using -->
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+
+		<!-- uncomment it if you really know what you do!!! :) JMX logging -->
+		<dependency>
+			<groupId>jmxlogger</groupId>
+			<artifactId>jmx-logger-log4j</artifactId>
+			<version>0.3.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>jmxlogger</groupId>
+			<artifactId>jmxlogger</artifactId>
+			<version>0.3.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+
+		<dependency>
+			<groupId>org.mvel</groupId>
+			<artifactId>mvel2</artifactId>
+			<version>2.0.14</version>
+		</dependency>
+
+
 
 		<!-- mibble-mibs-2.9.2.jar mibble-parser-2.9.2.jar grammatica-1.5.jar -->
 		<dependency>
@@ -178,42 +168,25 @@
 			<artifactId>xmlrpc</artifactId>
 			<version>1.2-b1</version>
 		</dependency>
-		<!--  reused from jcollectd-artefact
+		<!-- reused from jcollectd-artefact <dependency> <groupId>cc.co.llabor</groupId> 
+			<artifactId>jcollectd</artifactId> <version>0.1.9</version> </dependency> -->
+		<!-- <dependency> <groupId>cc.co.llabor</groupId> <artifactId>cachefs</artifactId> 
+			<version>0.0.13</version> </dependency> -->
 
-		<dependency>
-			<groupId>cc.co.llabor</groupId>
-			<artifactId>jcollectd</artifactId>
-			<version>0.1.9</version>
-		</dependency>
-		 -->
-		 <!-- 
-		<dependency>
-			<groupId>cc.co.llabor</groupId>
-			<artifactId>cachefs</artifactId>
-			<version>0.0.13</version>
-		</dependency>		
-		 -->
-		
 		<dependency>
 			<groupId>cc.co.llabor</groupId>
 			<artifactId>jdo</artifactId>
 			<version>1.1.1</version>
 		</dependency>
 
-		<!-- tomcat 
-			<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>catalina</artifactId>
-			<version>6.0.29</version>
-			<scope>provided</scope>
-			</dependency>
-		-->
-		<!-- javax MAIL 		-->
-			<dependency>
+		<!-- tomcat <dependency> <groupId>org.apache.tomcat</groupId> <artifactId>catalina</artifactId> 
+			<version>6.0.29</version> <scope>provided</scope> </dependency> -->
+		<!-- javax MAIL -->
+		<dependency>
 			<groupId>org.subethamail</groupId>
 			<artifactId>subethasmtp</artifactId>
 			<version>2.0.1</version>
-			</dependency>
+		</dependency>
 
 		<dependency>
 			<groupId>gnu.inet.encoding</groupId>
@@ -239,27 +212,11 @@
 			<artifactId>jsr107cache</artifactId>
 			<version>1.0</version>
 		</dependency>
-		<!-- TODO WEB-INF/lib 
-			<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-			<version>1.2.1</version>
-			</dependency>
-		-->
-		<!-- 
-			batik-awt-util-1.6.jar
-			batik-bridge-1.6.jar
-			batik-css-1.6.jar 
-			batik-dom-1.6.jar 
-			batik-ext-1.6-1.jar 
-			batik-gvt-1.6.jar 
-			batik-parser-1.6.jar 
-			batik-script-1.6.jar 
-			batik-svg-dom-1.6.jar 
-			batik-transcoder-1.6.jar 
-			batik-util-1.6.jar 
-			batik-xml-1.6.jar
-		-->
+		<!-- TODO WEB-INF/lib <dependency> <groupId>commons-fileupload</groupId> 
+			<artifactId>commons-fileupload</artifactId> <version>1.2.1</version> </dependency> -->
+		<!-- batik-awt-util-1.6.jar batik-bridge-1.6.jar batik-css-1.6.jar batik-dom-1.6.jar 
+			batik-ext-1.6-1.jar batik-gvt-1.6.jar batik-parser-1.6.jar batik-script-1.6.jar 
+			batik-svg-dom-1.6.jar batik-transcoder-1.6.jar batik-util-1.6.jar batik-xml-1.6.jar -->
 		<dependency>
 			<groupId>batik</groupId>
 			<artifactId>batik-awt-util</artifactId>
@@ -326,22 +283,22 @@
 			<version>${batik.version}</version>
 			<optional>true</optional>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
 			<version>2.5.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xmlParserAPIs</artifactId>
 			<version>2.0.2</version>
-		</dependency> 
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-				
+
 			<version>${junit.version}</version>
 		</dependency>
 		<dependency>
@@ -354,13 +311,8 @@
 			<artifactId>commons-io</artifactId>
 			<version>1.3.2</version>
 		</dependency>
-<!-- 		
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.0.4</version>
-		</dependency>
--->		
+		<!-- <dependency> <groupId>commons-logging</groupId> <artifactId>commons-logging</artifactId> 
+			<version>1.0.4</version> </dependency> -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -397,11 +349,8 @@
 
 
 
-		<!--
-			<dependency><groupId>batik</groupId><artifactId>batik-ext</artifactId>
-			<version>${batik.version}</version><optional>true</optional></dependency>
-			
-		-->
+		<!-- <dependency><groupId>batik</groupId><artifactId>batik-ext</artifactId> 
+			<version>${batik.version}</version><optional>true</optional></dependency> -->
 
 
 
@@ -437,7 +386,7 @@
 		<dependency>
 			<groupId>com.google.appengine</groupId>
 			<artifactId>datanucleus-jpa</artifactId>
-			 
+
 			<version>1.1.5</version>
 			<scope>runtime</scope>
 		</dependency>
@@ -448,45 +397,41 @@
 			<version>1.1.1</version>
 			<scope>runtime</scope>
 		</dependency>
- 
+
 		<dependency>
 			<groupId>com.google.appengine</groupId>
 			<artifactId>appengine-api-1.0-sdk</artifactId>
 			<version>${gae.version}</version>
-			 <scope>${gae.api.scope}</scope>
+			<scope>${gae.api.scope}</scope>
 		</dependency>
- 
-		<!-- 
-			GWT dependencies
-		-->
+
+		<!-- GWT dependencies -->
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-servlet</artifactId>
 			<version>${gwt.version}</version>
 			<scope>${gae.api.scope}</scope>
-			
+
 		</dependency>
 
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
 			<version>${gwt.version}</version>
-			
+
 			<scope>provided</scope>
 		</dependency>
 
-<!-- https://mvnrepository.com/artifact/javax.servlet/servlet-api -->
-  <dependency>
-    <groupId>javax</groupId>
-    <artifactId>javaee-web-api</artifactId>
-    <version>6.0</version>
-    <scope>provided</scope>
-  </dependency>
+		<!-- https://mvnrepository.com/artifact/javax.servlet/servlet-api -->
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-web-api</artifactId>
+			<version>6.0</version>
+			<scope>provided</scope>
+		</dependency>
 
- 
-		<!--
-			Make use of JSP tags. Remove, if you don't use JSPs
-		-->
+
+		<!-- Make use of JSP tags. Remove, if you don't use JSPs -->
 		<dependency>
 			<artifactId>standard</artifactId>
 			<groupId>taglibs</groupId>
@@ -496,46 +441,32 @@
 		</dependency>
 
 		<!-- These dependencies are here just for enabling logging -->
-<!-- 
+		<!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-api</artifactId> 
+			<version>1.5.6</version> </dependency> <dependency> <groupId>ch.qos.logback</groupId> 
+			<artifactId>logback-classic</artifactId> <version>0.9.15</version> </dependency> -->
+		<!-- lets use log4j! @see http://www.slf4j.org/codes.html#StaticLoggerBinder 
+			for details -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
+			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.5.6</version>
 		</dependency>
-
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>0.9.15</version>
-		</dependency>
-  -->
-          <!-- lets use log4j!
-          @see http://www.slf4j.org/codes.html#StaticLoggerBinder for details 
-          -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.6</version> 
-        </dependency>
 		<!-- Test scope -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.5</version>
-			<!-- scope>test</scope>  -->
+			<!-- scope>test</scope> -->
 		</dependency>
 
-		<!--
-			GAE libraries for local testing as described here:
-			http://code.google.com/appengine/docs/java/howto/unittesting.html
-		-->
-<dependency>
-	<groupId>com.google.appengine</groupId>
-	<artifactId>appengine-api-1.0-sdk</artifactId>
-	<version>1.6.2.1</version>
-</dependency>
-		
-		
+		<!-- GAE libraries for local testing as described here: http://code.google.com/appengine/docs/java/howto/unittesting.html -->
+		<dependency>
+			<groupId>com.google.appengine</groupId>
+			<artifactId>appengine-api-1.0-sdk</artifactId>
+			<version>1.6.2.1</version>
+		</dependency>
+
+
 		<dependency>
 			<groupId>com.google.appengine</groupId>
 			<artifactId>appengine-api-labs</artifactId>
@@ -601,18 +532,18 @@
 						<jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>
 					</systemPropertyVariables>
 				</configuration>
-			</plugin>	
-					
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            		
+			</plugin>
+
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
 			<!-- Java compiler version -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0</version>
+				<version>2.3.2</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
@@ -620,12 +551,12 @@
 				</configuration>
 			</plugin>
 
- 	
- 	
+
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<!--  version>[2.1.3</version>  -->
+				<!-- version>[2.1.3</version> -->
 				<configuration>
 					<workingDirectory>
 						${basedir}/target
@@ -647,22 +578,17 @@
 					</systemProperties>
 				</configuration>
 			</plugin>
-			  
-			<!--
-				The actual maven-gae-plugin. Type "mvn gae:run" to run
-				project, "mvn gae:deploy" to upload to GAE.
-			-->
+
+			<!-- The actual maven-gae-plugin. Type "mvn gae:run" to run project, "mvn 
+				gae:deploy" to upload to GAE. -->
 
 			<plugin>
 				<groupId>net.kindleit</groupId>
 				<artifactId>maven-gae-plugin</artifactId>
-				
+
 				<configuration>
-					<!-- jvmFlags>
-						<jvmFlag>-Xdebug</jvmFlag>
-						<jvmFlag>-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000</jvmFlag>
-						</jvmFlags>
-					-->
+					<!-- jvmFlags> <jvmFlag>-Xdebug</jvmFlag> <jvmFlag>-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000</jvmFlag> 
+						</jvmFlags> -->
 					<jvmFlags>
 						<jvmFlag>-Dmyenviroment=local</jvmFlag>
 						<jvmFlag>
@@ -671,9 +597,9 @@
 					</jvmFlags>
 
 				</configuration>
-			</plugin> 
+			</plugin>
 
-			 <!-- Java compiler version -->
+			<!-- Java compiler version -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -700,53 +626,44 @@
 		<!-- Build Settings -->
 		<extensions>
 			<!-- FIX 4 "Cannot find wagon which supports the requested protocol: svn" 
-			<extension>
-				<groupId>org.jvnet</groupId>
-				<artifactId>wagon-svn</artifactId>
-				<version>1.8</version>
-			</extension>
-			-->
+				<extension> <groupId>org.jvnet</groupId> <artifactId>wagon-svn</artifactId> 
+				<version>1.8</version> </extension> -->
 		</extensions>
 
 		<pluginManagement>
 			<plugins>
 
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <phase>none</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins> 
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>findbugs-maven-plugin</artifactId>
+					<executions>
+						<execution>
+							<phase>none</phase>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
 		</pluginManagement>
 	</build><!-- Specify hard-coded project properties here -->
 
 
 	<properties>
 		<failOnMissingWebXml>false</failOnMissingWebXml>
-	
-	 	<junit.version>4.8.1</junit.version>
+
+		<junit.version>4.8.1</junit.version>
 		<jacoco.version>0.7.5.201505241946</jacoco.version>
-	
-	 	
+
+
 		<jstl.version>1.2</jstl.version>
 		<spring.version>3.2.18.RELEASE</spring.version>
 		<jackson.version>1.9.10</jackson.version>
-			
-		<!--
-			This is just for "eclipse:eclipse" goal to always attempt
-			downloading sources
-		-->
+
+		<!-- This is just for "eclipse:eclipse" goal to always attempt downloading 
+			sources -->
 		<downloadSources>true</downloadSources>
 
-		<!--
-			Specify AppEngine version for your project. It should match
-			SDK version pointed to by ${gae.home} property (Typically,
-			one used by your Eclipse plug-in)
-		-->
+		<!-- Specify AppEngine version for your project. It should match SDK version 
+			pointed to by ${gae.home} property (Typically, one used by your Eclipse plug-in) -->
 		<gae.version>1.6.2.1</gae.version>
 
 		<!-- GWT version -->
@@ -756,34 +673,25 @@
 
 
 
-		<!--
-			Upload to http://0.latest.<applicationName>.appspot.com by
-			default
-		-->
+		<!-- Upload to http://0.latest.<applicationName>.appspot.com by default -->
 		<gae.application.version>0</gae.application.version>
 
 		<!-- port defaults to 8080 -->
 		<gae.port>8888</gae.port>
 
-		<!--
-			Produce detailed JS during GWT compilation for development
-			environment
-		-->
+		<!-- Produce detailed JS during GWT compilation for development environment -->
 		<gwt.style>DETAILED</gwt.style>
-		
-		
-		
+
+
+
 	</properties>
 
 	<profiles>
-	
-	  
-		<!--
-			We can configure our integration server to activate this
-			profile and perform gae:deploy, thus uploading latest
-			snapshot to the
-			http://1.latest.<applicationName>.appspot.com automatically
-		-->
+
+
+		<!-- We can configure our integration server to activate this profile and 
+			perform gae:deploy, thus uploading latest snapshot to the http://1.latest.<applicationName>.appspot.com 
+			automatically -->
 		<profile>
 			<id>integration-build</id>
 			<properties>
@@ -794,13 +702,10 @@
 			</properties>
 		</profile>
 
-		<!--
-			This profile will activate automatically during release and
-			upload application to the
-			http://2.latest.<applicationName>.appspot.com (We might want
-			to set the 2nd version as our applications Default version
-			to be accessible at http://<applicationName>.appspot.com)
-		-->
+		<!-- This profile will activate automatically during release and upload 
+			application to the http://2.latest.<applicationName>.appspot.com (We might 
+			want to set the 2nd version as our applications Default version to be accessible 
+			at http://<applicationName>.appspot.com) -->
 		<profile>
 			<id>release-build</id>
 			<activation>
@@ -811,16 +716,11 @@
 			</activation>
 
 			<properties>
-				<!--
-					During release, set application version in
-					appengine-web.xml to 2
-				-->
+				<!-- During release, set application version in appengine-web.xml to 
+					2 -->
 				<gae.application.version>2.1</gae.application.version>
 
-				<!--
-					Produce compressed JS during GWT compilation for
-					production environment
-				-->
+				<!-- Produce compressed JS during GWT compilation for production environment -->
 				<gwt.style>OBFUSCATED</gwt.style>
 			</properties>
 		</profile>
@@ -835,7 +735,7 @@
 				</property>
 			</activation>
 			<properties>
-				<!--   <scope>${gae.api.scope}</scope>  -->
+				<!-- <scope>${gae.api.scope}</scope> -->
 				<gae.api.scope>compile</gae.api.scope>
 				<gae.application.version>1</gae.application.version>
 			</properties>
@@ -850,7 +750,7 @@
 				</property>
 			</activation>
 			<properties>
-		  		<gae.api.scope>provided</gae.api.scope>
+				<gae.api.scope>provided</gae.api.scope>
 				<gae.application.version>xxx</gae.application.version>
 			</properties>
 			<build>
@@ -869,7 +769,7 @@
 						<includes>
 							<include>
 								log4j.properties
-							</include> 
+							</include>
 						</includes>
 						<targetPath>./</targetPath>
 					</resource>
@@ -878,7 +778,7 @@
 						<directory>
 							${basedir}/src/main/profiles
 						</directory>
-						<includes> 
+						<includes>
 							<include>
 								net.sf.jsr107cache.CacheFactory
 							</include>
@@ -890,21 +790,21 @@
 						<directory>
 							${basedir}/src/main/profiles
 						</directory>
-						<includes> 
+						<includes>
 							<include>
 								net.sf.jsr107cache.CacheFactory
 							</include>
 						</includes>
 						<targetPath>${basedir}/target/${pom.artifactId}-${pom.version}/WEB-INF/classes/META-INF/services</targetPath>
 					</resource>
-					
-					
+
+
 				</resources>
 			</build>
 		</profile>
 
 
-<!-- l/parent -->
+		<!-- l/parent -->
 		<profile>
 			<id>gpg</id>
 			<activation>
@@ -975,51 +875,21 @@
 	</profiles>
 
 	<repositories>
-        <repository>
+		<repository>
 			<id>java.net2</id>
 			<name>Repository hosting the jee6 artifacts</name>
 			<url>http://download.java.net/maven/2</url>
 		</repository>
-	
-		<!-- We go to mvnsearch.org after latest GAE SDK artifacts 
-		<repository>
-			<id>mvnsearch.org</id>
-			<name>MVN Search</name>
-			<url>http://www.mvnsearch.org/maven2</url>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-				<checksumPolicy>warn</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>DataNucleus_Repos2</id>
-			<name>DataNucleus Repository</name>
-			<url>http://www.datanucleus.org/downloads/maven2</url>
-		</repository>
 
-		
-		
-				 
-		<repository>
-			<id>pegasusRELEASE</id>
-			<name>Pegasus RELEASE-Dir</name>
-			<url>
-				https://pegasus.peras.fiducia.de/upme/up/RELEASES/
-			</url>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>	
-		
--->		
+		<!-- We go to mvnsearch.org after latest GAE SDK artifacts <repository> 
+			<id>mvnsearch.org</id> <name>MVN Search</name> <url>http://www.mvnsearch.org/maven2</url> 
+			<releases> <enabled>true</enabled> <updatePolicy>never</updatePolicy> <checksumPolicy>warn</checksumPolicy> 
+			</releases> <snapshots> <enabled>false</enabled> </snapshots> </repository> 
+			<repository> <id>DataNucleus_Repos2</id> <name>DataNucleus Repository</name> 
+			<url>http://www.datanucleus.org/downloads/maven2</url> </repository> <repository> 
+			<id>pegasusRELEASE</id> <name>Pegasus RELEASE-Dir</name> <url> https://pegasus.peras.fiducia.de/upme/up/RELEASES/ 
+			</url> <releases> <enabled>true</enabled> <updatePolicy>always</updatePolicy> 
+			</releases> <snapshots> <enabled>false</enabled> </snapshots> </repository> -->
 		<repository>
 			<id>maven-gae-plugin-repo</id>
 			<name>maven-gae-plugin repository</name>
@@ -1027,36 +897,19 @@
 				http://maven-gae-plugin.googlecode.com/svn/repository
 			</url>
 		</repository>
-		
-			<!-- wagon-svn id located here 
-		<repository>
-			<id>ZKgoogle</id>
-			<name>zkossAtGoogleCode</name>
-			<url>
-				http://zkoss.googlecode.com/svn/release-repository/
-			</url>
-			<layout>default</layout>
-		</repository>
--->		
-		
+
+		<!-- wagon-svn id located here <repository> <id>ZKgoogle</id> <name>zkossAtGoogleCode</name> 
+			<url> http://zkoss.googlecode.com/svn/release-repository/ </url> <layout>default</layout> 
+			</repository> -->
+
 	</repositories>
 
 	<pluginRepositories>
-	
 
-<!--	
-		<pluginRepository>
-			<id>DataNucleus_2</id>
-			<url>http://www.datanucleus.org/downloads/maven2/</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>maven-gae-plugin-repo</id>
-			<name>maven-gae-plugin repository</name>
-			<url>
-				http://maven-gae-plugin.googlecode.com/svn/repository
-			</url>
 
-		</pluginRepository>
--->
+		<!-- <pluginRepository> <id>DataNucleus_2</id> <url>http://www.datanucleus.org/downloads/maven2/</url> 
+			</pluginRepository> <pluginRepository> <id>maven-gae-plugin-repo</id> <name>maven-gae-plugin 
+			repository</name> <url> http://maven-gae-plugin.googlecode.com/svn/repository 
+			</url> </pluginRepository> -->
 	</pluginRepositories>
 </project>
