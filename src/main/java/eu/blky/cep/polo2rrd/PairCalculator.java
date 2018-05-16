@@ -87,7 +87,7 @@ public class PairCalculator {
 				"    {id: \""+i+++ "\", ort: \"Madrid\", name: \"Diego\", DoB: \"5.11.2001, ab 03 Uhr\" }\n" + 
 				"]";
 		try {
-			Cache diffCacher = CacheManager.getCache("DiffTracker");
+			Cache diffCacher = CacheManager.getCache(DiffTracker.class.getName());
 			Object data = diffCacher .get("last");//diffCacher.put("last", tableDataMessage);
 			tableDataMessage = data!=null?""+data:tableDataMessage;
 		}catch (Exception e) {

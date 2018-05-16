@@ -369,7 +369,7 @@ public final class PoloHandler implements MessageHandler {
  		
 				
 				// step 2 : 10 sec
-				String eql10sec = " insert into DiffTracker "
+				String eql10sec = " insert into NOT_USED_ANYMORE_OLD_DiffTracker "
 						+ "select "
 						
 						+ "		BOS BOS, "

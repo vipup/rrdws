@@ -20,17 +20,20 @@ import cc.co.llabor.websocket.ErrorProcessingException;
 import cc.co.llabor.websocket.MessageHandler; 
 import cc.co.llabor.websocket.WS2RRDPump; 
 import cc.co.llabor.websocket.cep.OrderTick;
+import eu.blky.cep.polo2rrd.updaters.PriceCalculator;
 import eu.blky.cep.polo2rrd.updaters.RrdDirectUpdater;
 
 public class XXXEsperHandler implements MessageHandler {
 	final Polo2RddForwarderService parentService;
 	public XXXEsperHandler (Polo2RddForwarderService parent) {
 		parentService=parent; 
+ 
+
 	} 
  
 	/** Logger */
 	private static Logger LOG = LoggerFactory.getLogger(XXXEsperHandler.class);
-	UpdateListener diffTracker = null;
+	
 	private Map<String, RrdDirectUpdater> updaterRepo = new HashMap<String, RrdDirectUpdater>();
 	// http://www.espertech.com/esper/solution-patterns/#aggregate-3
 	// select avg(value) as avgValue, count(value) as countValue,
@@ -41,11 +44,20 @@ public class XXXEsperHandler implements MessageHandler {
 		if ("o".equals( xxx.get(0).asText() ) ) {
 			String typeTMP = xxx.get(1).asText() ;
 			BigDecimal priceTMP = new BigDecimal(xxx.get(2).asText()); 
-			BigDecimal volTMP = new BigDecimal(xxx.get(3).asText()); 
-			
-			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 10 );
-			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 10 );
-			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 10 );
+			BigDecimal volTMP = new BigDecimal(xxx.get(3).asText());
+// --- TODO --> move to INIT_method::: 			initCEP(MARKET_PAIR, typeTMP);
+			OrderTick order = new OrderTick(MARKET_PAIR, typeTMP, priceTMP, volTMP );
+			// processing Event
+		    getCepRT().sendEvent(order);  
+		}else {
+			LOG.debug( "TODO XXXYYY_O:" + xxx);
+		}		
+	}
+
+	void initCEP(String MARKET_PAIR, String typeTMP) {
+		registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 10 );
+		registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 10 );
+		registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 10 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 60 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 60 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 60 );
@@ -57,14 +69,23 @@ public class XXXEsperHandler implements MessageHandler {
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "price", 2400 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "volume", 600 );
 //			registerRRDUpdaterIfAny(MARKET_PAIR, typeTMP,  "total", 600 );
-			
-			OrderTick order = new OrderTick(MARKET_PAIR, typeTMP, priceTMP, volTMP );
-			// processing Event
-		    getCepRT().sendEvent(order); 
- 
-		}else {
-			LOG.debug( "TODO XXXYYY_O:" + xxx);
-		}		
+	}
+	void postInitCEP() {
+		// step 3 : diffTracker  - PairGrid will be updated any 10 sec  
+		setupDiffTracker_____ONLY_ONCE(); 
+		// step 4 _ PairPrice
+		String eqlPairsPrice = " select "
+				+ "  dAVG , "
+				+ "  dTOV ,  "
+				+ "  dMAX  lastOnTimeWin, "
+				+ "  dMIN  firstOnTimeWin, " 
+				+ "  1 the_1 "
+				+ " from PairPrice "
+				+ "    "; //group by pair, type, name , timewindow, BOS
+		EPStatement priceSTMT = createEPStatement(eqlPairsPrice); 
+		UpdateListener priceCalculator = new PriceCalculator();
+		priceSTMT.addListener(priceCalculator );				
+
 	}
 
 	private void registerRRDUpdaterIfAny(String MARKET_PAIR, String typeTMP, String propPar, int timeWindowAverage) {
@@ -73,36 +94,34 @@ public class XXXEsperHandler implements MessageHandler {
 			String nsTmp = XPATH_PREFIX + "/"+ propPar+"_"+timeWindowAverage+"sec";
 			String AGGRSUFFIX = (""+nsTmp.hashCode()+System.currentTimeMillis()).replaceAll("-", "_");
 			// TODO even don't think about sync :)))
-			if (updaterRepo.get(nsTmp)== null) {
-				  
-				
+			if (updaterRepo.get(nsTmp)== null) { 
 				if ("price".equals(propPar)) {
-					// step 1 : 
+					// step 1 : collect data for timeWindowAverage
 					
-					String 	eqlDEFsecSELLBUY = " insert into OrderTick"+AGGRSUFFIX+"  \n"
+					String 	eqlDEFsecSELLBUY = " insert into OrderTick_Price"+AGGRSUFFIX+"   "
 							+ " select "
-							+ "   type BOS ,  \n"
-							+ "   ( avg ( price )  ) data ,  \n"
-							+ "   ( avg ( price )  ) dataAVG ,  \n" 
-							+ "   ( max ( count( price )  + avg ( (price * volume) ) / avg (volume)  / 1000000 )  ) dataMAX ,  \n"
-							+ "   ( min ( count( price )  + avg ( (price * volume) ) / avg (volume)  / 1000000 )  ) dataMIN ,  \n"
-							+ "   ( max ( count( price )  + avg ( (price)  / 1000000 )  )   ) priceMAX ,  \n"
-							+ "   ( min ( count( price )  + avg ( (price)  / 1000000 )  )   ) priceMIN ,  \n"
-							+ "   ( count ( price )  ) dataCNT ,  \n"
-							+ "   (  sum ( price ) / count( price ) ) dataCAL , \n"
-							+ "   (  sum (total) / sum (volume) ) dataTOV , \n"															
-							+ "   "+ timeWindowAverage +" timewindow , \n"
-							+ " 'price' name \n"
+							+ "   type BOS ,   "
+							+ "   ( avg ( price )  ) data ,   "
+							+ "   ( avg ( price )  ) dataAVG ,   " 
+							+ "   ( max ( count( price )  + avg ( (price * volume) ) / avg (volume)  / 1000000 )  ) dataMAX ,   "
+							+ "   ( min ( count( price )  + avg ( (price * volume) ) / avg (volume)  / 1000000 )  ) dataMIN ,   "
+							+ "   ( max ( count( price )  + avg ( (price)  / 1000000 )  )   ) priceMAX ,   "
+							+ "   ( min ( count( price )  + avg ( (price)  / 1000000 )  )   ) priceMIN ,   "
+							+ "   ( count ( price )  ) dataCNT ,   "
+							+ "   (  sum ( price ) / count( price ) ) dataCAL ,  "
+							+ "   (  sum (total) / sum (volume) ) dataTOV ,  "															
+							+ "   "+ timeWindowAverage +" timewindow ,  "
+							+ " 'price' name  "
 							+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) "
-									+ "where"
+									+ " where "
 									+ " volume >0 "
 	//								+ " and type = true " // only buy  
-									+ "\n";
-				EPStatement cepDEFsec= getCepAdm().createEPL(eqlDEFsecSELLBUY);
+									+ " ";
+				EPStatement cepDEFsec= createEPStatement(eqlDEFsecSELLBUY);
 				LOG.trace("cepDEFsec::", cepDEFsec);
 	 		
 					
-					// step 2 : 10 sec
+					// step 2 : ANY 10 sec   
 					String eql10sec = " insert into DiffTracker "
 							+ "select "
 							
@@ -111,8 +130,7 @@ public class XXXEsperHandler implements MessageHandler {
 							+ "		max (dataMAX) dataMAX, "
 							+ "		min (dataMIN) dataMIN, "
 							+ "		max (priceMAX) priceMAX, "
-							+ "		min (priceMIN) priceMIN, "
-							
+							+ "		min (priceMIN) priceMIN, "							
 							+ "		avg (dataAVG) dataAVG, "
 							+ "		max (dataCNT) dataCNT, "
 							+ "		avg (dataCAL) dataCAL, "	
@@ -120,91 +138,93 @@ public class XXXEsperHandler implements MessageHandler {
 							+ "		'price' type, "
 							+ "		'"+timeWindowAverage+"' timewindow, "
 							+ "		'price'  name, "
-							+ "		avg( data ) data from OrderTick"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) "
+							+ "		avg( data ) data from OrderTick_Price"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) "
 							+ " where name ='price' "
 							+ "group by BOS,timewindow, name "
 							
 											+ "";
-					EPStatement cep10sec= getCepAdm().createEPL(eql10sec); 
+					EPStatement cep10sec= createEPStatement(eql10sec); 
 					RrdDirectUpdater rrdWS = new RrdDirectUpdater(nsTmp, "data" );
 					cep10sec.addListener(rrdWS); // <-- DirectRrdUpdater
 					updaterRepo.put(nsTmp,rrdWS);
 					
 				
 				}else { // volume and total  
-					// step 1 : 
+					// step 1 : collect data for timeWindowAverage
 					 
-					String 	eqlDEFsec = " insert into OrderTick_ELSE"+AGGRSUFFIX+"  \n"
+					String 	eqlDEFsec = " insert into OrderTick_ELSE"+AGGRSUFFIX+"  "
 							+ " select "
-							+ "   avg ("+propPar+") data ,  \n"    
-							+ "   "+ timeWindowAverage +" timewindow , \n"
-							+ " '"+propPar+ "' name \n"
-							+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec) \n";
-					EPStatement cepDEFsec= getCepAdm().createEPL(eqlDEFsec);
+							+ "   avg ("+propPar+") data ,  "    
+							+ "   "+ timeWindowAverage +" timewindow , "
+							+ " '"+propPar+ "' name "
+							+ "from OrderTick(pair='"+MARKET_PAIR+"').win:time( "+timeWindowAverage+" sec)  ";
+					EPStatement cepDEFsec= createEPStatement(eqlDEFsec);
 					LOG.trace("cepDEFsec::", cepDEFsec);
-					// step 2 : 10 sec
+					// step 2 : ANY 10 sec   
 					String eql10sec = "  "
 							+ " select "
-							+ "   avg (data) data ,  \n"    
-							+ "   "+ timeWindowAverage +" timewindow , \n"
-							+ " '"+propPar+ "' name \n"
+							+ "   avg (data) data ,   "    
+							+ "   "+ timeWindowAverage +" timewindow , "
+							+ " '"+propPar+ "' name  "
 							+ "from OrderTick_ELSE"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) ";
 					
-					EPStatement cep10sec= getCepAdm().createEPL(eql10sec); 
+					EPStatement cep10sec= createEPStatement(eql10sec); 
 					RrdDirectUpdater rrdWS = new RrdDirectUpdater(nsTmp, "data" );
 					cep10sec.addListener(rrdWS); // <-- DirectRrdUpdater 
 					updaterRepo.put(nsTmp,rrdWS);	
 				}
-				
-				// step 3 : diffTracker 
-				step3_doItOnlyOnce(); 
-			     
-			}
+			}// if (updaterRepo.get(nsTmp)== null) { 
 		}
 
 	private EPAdministrator getCepAdm() {
-		return this.parentService.getCepKeeper().getCepAdm();
+		return getKeeper().getCepAdm();
+	}
+
+	private CepKeeper getKeeper() {
+		return this.parentService.getCepKeeper();
 	}
 
 
 	private EPRuntime getCepRT() {
-		return this.parentService.getCepKeeper().getCepRT();
+		return getKeeper().getCepRT();
 	}
 
-	
+	UpdateListener diffTracker = null;
 	// step 3 : diffTracker  
-	private void step3_doItOnlyOnce() {
+	private synchronized void setupDiffTracker_____ONLY_ONCE() {
 	// step 3 : diffTracker  
-			if (diffTracker == null) { 
-				String eql3 = "" + 
-						"select BOS, name, timewindow, "
-						+ "( dataAVG - (1000000.0000000000001* (dataMAX%1.0000000000000000001))    )							diffMAX , \n"
-						+ "( dataAVG - (1000000.0000000000001* (dataMIN%1.0000000000000000001))    )							diffMIN ,\n"
-						+ "( (1000000.0000000000001* (dataMAX%1.0000000000000000001))   - (1000000.0000000000001* (dataMIN%1.0000000000000000001))    )							diffDIF ,\n"
-						
-						+ "( (dataMAX + dataMIN)/2   - dataTOV )				diffTOV ,\n"
-						+ "( dataAVG - (dataMAX + dataMIN)/2 )/dataAVG*100 	middlePCENT ,\n"
-						+ "( dataAVG - dataTOV )/dataAVG*100				tovPCENT ,\n"
-						+ " dataAVG dAVG, \n"
-						+ " (1000000.0000000000001* (dataMAX%1.0000000000000000001))  dMAX, \n" // last  on timeWin
-						+ " (1000000.0000000000001* (dataMIN%1.0000000000000000001))  dMIN, \n" // first on timeWin
-						+ " 100 * (  (1000000.0000000000001* (dataMAX%1.0000000000000000001))  - (1000000.0000000000001* (dataMIN%1.0000000000000000001))  ) / (  dataTOV    )  percentDIFF, \n" // drowing in percent 
-						+ " 100 * (  (1000000.0000000000001* (priceMAX%1.0000000000000000001))  - (1000000.0000000000001* (priceMIN%1.0000000000000000001))  ) / (  dataTOV    )  priceDIFF, \n" // drowing in percent 
-						+ " dataCAL dCAL, \n"
-						+ " dataCNT dCNT, \n"
-						+ " dataTOV dTOV, \n"
-						+ " pair, \n" 
-						+ " type \n"
-						+ " \n" 
-						+ "from DiffTracker.win:time_batch(   10   sec) \n"
-						+ " where name='price' \n" 
-						+ " group by pair, type, name , timewindow, BOS \n"
-						+ " ";
-				EPStatement difftrackerTMP = getCepAdm().createEPL(eql3); 
-				diffTracker = new DiffTracker();
-				difftrackerTMP.addListener(diffTracker );
-			}
-		}
+ 			String eql3 = "insert into PairPrice " + 
+					"select BOS, name, timewindow, "
+					+ "( dataAVG - (1000000.0000000000001* (dataMAX%1.0000000000000000001))    )							diffMAX ,  "
+					+ "( dataAVG - (1000000.0000000000001* (dataMIN%1.0000000000000000001))    )							diffMIN , "
+					+ "( (1000000.0000000000001* (dataMAX%1.0000000000000000001))   - (1000000.0000000000001* (dataMIN%1.0000000000000000001))    )		diffDIF , "
+					+ "( (dataMAX + dataMIN)/2   - dataTOV )				diffTOV , "
+					+ "( dataAVG - (dataMAX + dataMIN)/2 )/dataAVG*100 	middlePCENT , "
+					+ "( dataAVG - dataTOV )/dataAVG*100				tovPCENT , "
+					+ " dataAVG dAVG,  "
+					+ " (1000000.0000000000001* (dataMAX%1.0000000000000000001))  dMAX,  " // last  on timeWin
+					+ " (1000000.0000000000001* (dataMIN%1.0000000000000000001))  dMIN,  " // first on timeWin
+					+ " 100 * (  (1000000.0000000000001* (dataMAX%1.0000000000000000001))  - (1000000.0000000000001* (dataMIN%1.0000000000000000001))  ) / (  dataTOV    )  percentDIFF,  " // drowing in percent 
+					+ " 100 * (  (1000000.0000000000001* (priceMAX%1.0000000000000000001))  - (1000000.0000000000001* (priceMIN%1.0000000000000000001))  ) / (  dataTOV    )  priceDIFF,  " // drowing in percent 
+					+ " dataCAL dCAL,  "
+					+ " dataCNT dCNT,  "
+					+ " dataTOV dTOV,  "
+					+ " pair,  " 
+					+ " type  "
+					+ "  " 
+					+ "from DiffTracker.win:time_batch(   10   sec)  "
+					+ " where name='price'  " 
+					+ " group by pair, type, name , timewindow, BOS  "
+					+ " ";
+			EPStatement difftrackerTMP = createEPStatement(eql3); 
+			diffTracker = new DiffTracker();
+			difftrackerTMP.addListener(diffTracker );
+ 
+	}
+
+	private EPStatement createEPStatement(String eql3) {
+		return getCepAdm().createEPL(eql3);
+	}
 
 	@Override
 	public void handleMessage(String message) throws ErrorProcessingException {
@@ -239,7 +259,7 @@ public class XXXEsperHandler implements MessageHandler {
 	public void destroy() {
 		LOG.error("public void destroy() {} . . . . . . ....", this);
 		this.getCepAdm().destroyAllStatements();
-		this.parentService.getCepKeeper().getCep().destroy();
+		getKeeper().getCep().destroy();
 		LOG.error("DONE ! :::public void destroy() {} . . . . . . ....", this);
 	}
 

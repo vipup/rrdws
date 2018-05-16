@@ -18,7 +18,7 @@ import net.sf.jsr107cache.Cache;
 public class DiffTracker implements UpdateListener {
 	private int callCounter = 0;
 	ObjectMapper objectMapper ;
-	Cache diffCacher = CacheManager.getInstance().getCache("DiffTracker",true);
+	Cache diffCacher = CacheManager.getCache(DiffTracker.class.getName(),true);
  
 	public DiffTracker (){
 		objectMapper = new ObjectMapper();  
@@ -28,7 +28,7 @@ public class DiffTracker implements UpdateListener {
 	
 	Map<String, JsonNode> pairsMap = new HashMap<String, JsonNode>();
 	// --name---
-	String []props = "pair---timewindow---BOS---percentDIFF---priceDIFF---middlePCENT---tovPCENT---dataFIRST---tovFIRST---iTOV---iAVG---pTOV---pAVG---dTOV---dAVG---dMIN---startTIMESTAMP---diffTIME---dCAL---dCNT---type---dMAX---name---stopTIME---startTIME".split("---");
+	String []props = "pair---BOS---percentDIFF---priceDIFF---middlePCENT---tovPCENT---dataFIRST---tovFIRST---iTOV---iAVG---pTOV---pAVG---dTOV---dMIN---dAVG---dMAX---startTIMESTAMP---diffTIME---dCAL---dCNT---type---stopTIME---startTIME".split("---");
 	
 	String []keyprops = "BOS---timewindow---type---pair".split("---");
 	
@@ -62,11 +62,8 @@ public class DiffTracker implements UpdateListener {
 		try {  
 			 
 	 
-			String valueAsString = objectMapper.writeValueAsString( list );
-			
-			//Object data = diffCacher .get("last");//diffCacher.put("last", tableDataMessage);
-			//tableDataMessage = data==null?""+data:tableDataMessage;
-			diffCacher .put("last", valueAsString);//diffCacher.put("last", tableDataMessage);
+			String valueAsString = objectMapper.writeValueAsString( list ); 
+			diffCacher .put("last", valueAsString); 
 		}catch (Exception ex) {
 			ex.printStackTrace();
 		}				

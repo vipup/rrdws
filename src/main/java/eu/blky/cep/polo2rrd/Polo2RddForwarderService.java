@@ -56,19 +56,27 @@ public class Polo2RddForwarderService {
 		System.out.println("Assigned StatusMonitor:"+sm);
 		this.statusMonitor = sm;
 	}
+	boolean isInited = false;
 	@PostConstruct
-	public void init(){
+	public synchronized void init(){
 		System.out.println("Polo2RddForwarderService init method called. cepConfig == "+cepKeeper.getCepConfig()); 
-		try {			 
-			initCEP();
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
+		if (!isInited)
+			try {			 
+				initCEP();
+				System.out.println("initCEP() done");
+				System.out.println("initCEP() done");
+				System.out.println("initCEP() done");
+				System.out.println("initCEP() done");
+				System.out.println("initCEP() done");
+				System.out.println("initCEP() done");
+				System.out.println("initCEP() done");
+				System.out.println("initCEP() done");
+				isInited = true;
+			} catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		try {		 
 			statusMonitor.getStatus().put("initCEP", "done");
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -137,14 +145,28 @@ public class Polo2RddForwarderService {
 		this.poloWS = poloWS;
 		MessageHandler msgHandler = new RrdCountUpdater();
 		this.poloWS.addMessageHandler(msgHandler );
-		MessageHandler XXX = new XXXEsperHandler(this);
+		XXXEsperHandler XXX = new XXXEsperHandler(this);
+		try {
+			init(); // TODO 
+			// for all pairs
+			for (Object key : this.poloWS.pairs.keySet()) { 
+				String MARKET_PAIR = ""+key;
+				for (String typeTMP : new String[] {"1","0"}) { // buy, sell
+					XXX.initCEP(MARKET_PAIR , typeTMP);
+				}
+			}
+			// only once
+			XXX.postInitCEP();
+		}catch(Throwable e) {
+			e.printStackTrace();
+		}
 		this.poloWS.addMessageHandler(XXX );
 	}
 
 
 
 
-	public PoloWSEndpoint getPoloWS() {
+	PoloWSEndpoint getPoloWS() {
 		return poloWS;
 	}	
 

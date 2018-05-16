@@ -27,7 +27,9 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
 
     public PoloWSEndpoint(URI endpointURI, DestroyTracker watchDog, Object thisObjectIsUsedOnlyAsFlagForCallThisConstructor) {
     	super(watchDog);
+    	
         try {
+        	initPairsFromFile();
         	ClassLoader clBAK = Thread.currentThread().getContextClassLoader();
         	ClassLoader cl = PoloWSEndpoint.class.getClassLoader();
         	//Thread.currentThread().setContextClassLoader(cl );
@@ -109,7 +111,7 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
 		}
 	}
     
-    Properties pairs= new Properties();
+    public Properties pairs= new Properties();
     public final Properties id2pairs= new Properties();
     
     {
