@@ -14,18 +14,13 @@ import com.espertech.esper.client.EPAdministrator;
 import com.espertech.esper.client.EPRuntime;
 import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPServiceProviderManager;
-import com.espertech.esper.client.EPStatement;
-import com.espertech.esper.client.UpdateListener;
+import com.espertech.esper.client.EPStatement; 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
-
-import cc.co.llabor.websocket.cep.CEPListener;
-import cc.co.llabor.websocket.cep.OLD_DiffTracker;
-import cc.co.llabor.websocket.cep.OrderTick;
-import cc.co.llabor.websocket.cep.Any3SecListener;
-import cc.co.llabor.websocket.cep.BigEventListener;
+ 
+import cc.co.llabor.websocket.cep.OrderTick; 
 import cc.co.llabor.websocket.cep.PoloTick;
 import cc.co.llabor.websocket.cep.RrdPusher;
 import cc.co.llabor.websocket.cep.StatisticPrinter; 
@@ -426,63 +421,9 @@ public final class PoloHandler implements MessageHandler {
 				RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, propPar);
 				cep10sec.addListener(rrdUpdaterTmp);
 				updaterRepo.put(nsTmp,rrdUpdaterTmp);				
-			}
-			
-			// step 3 : diffTracker 
-			step3_doItOnlyOnce(); 
-		    
-			// step 4: summaryze that all
-		    String eql4 = "insert into TicksPerSecond\n" + 
-		    		"select pair symbol, 'OrderTick' type,    count(*) as cnt\n" + 
-		    		"from OrderTick.win:time_batch(10 second)\n" + 
-		    		"group by pair";
-		    EPStatement statStmtTmp = cepAdm.createEPL(eql4); 
-		    //statStmtTmp.addListener(new StatisticPrinter());
+			}  
 		}
-	}
-
-	UpdateListener diffTracker = null;
-	private void step3_doItOnlyOnce() {
-		// step 3 : diffTracker 
-		// TODO init it only once
-		if (diffTracker == null) {
-/*
-					+ "		avg (dataMAX) dataMAX, "
-					+ "		avg (dataMIN) dataMIN, "
-					+ "		avg (dataAVG) dataAVG, "
-					+ "		avg (dataCNT) dataCNT, "
-					+ "		avg (dataCAL) dataCAL, "	
-					+ "		avg (dataTOV) dataTOV, "				
- */ 
-			String eql3 = "" + 
-					"select BOS, name, timewindow, "
-					+ "( dataAVG - (1000000.0000000000001* (dataMAX%1.0000000000000000001))    )							diffMAX , \n"
-					+ "( dataAVG - (1000000.0000000000001* (dataMIN%1.0000000000000000001))    )							diffMIN ,\n"
-					+ "( (1000000.0000000000001* (dataMAX%1.0000000000000000001))   - (1000000.0000000000001* (dataMIN%1.0000000000000000001))    )							diffDIF ,\n"
-					
-					+ "( (dataMAX + dataMIN)/2   - dataTOV )				diffTOV ,\n"
-					+ "( dataAVG - (dataMAX + dataMIN)/2 )/dataAVG*100 	middlePCENT ,\n"
-					+ "( dataAVG - dataTOV )/dataAVG*100				tovPCENT ,\n"
-					+ " dataAVG dAVG, \n"
-					+ " (1000000.0000000000001* (dataMAX%1.0000000000000000001))  dMAX, \n" // last  on timeWin
-					+ " (1000000.0000000000001* (dataMIN%1.0000000000000000001))  dMIN, \n" // first on timeWin
-					+ " 100 * (  (1000000.0000000000001* (dataMAX%1.0000000000000000001))  - (1000000.0000000000001* (dataMIN%1.0000000000000000001))  ) / (  dataTOV    )  percentDIFF, \n" // drowing in percent 
-					+ " 100 * (  (1000000.0000000000001* (priceMAX%1.0000000000000000001))  - (1000000.0000000000001* (priceMIN%1.0000000000000000001))  ) / (  dataTOV    )  priceDIFF, \n" // drowing in percent 
-					+ " dataCAL dCAL, \n"
-					+ " dataCNT dCNT, \n"
-					+ " dataTOV dTOV, \n"
-					+ " pair, \n" 
-					+ " type \n"
-					+ " \n" 
-					+ "from DiffTracker.win:time_batch(   10   sec) \n"
-					+ " where name='price' \n" 
-					+ " group by pair, type, name , timewindow, BOS \n"
-					+ " ";
-			EPStatement difftrackerTMP = cepAdm.createEPL(eql3); 
-			diffTracker = new OLD_DiffTracker();
-			difftrackerTMP.addListener(diffTracker );
-		}
-	}
+	} 
 
  
 	

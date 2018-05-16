@@ -171,9 +171,10 @@ public class XXXEsperHandler implements MessageHandler {
 		return this.parentService.getCepKeeper().getCepRT();
 	}
 
-
+	
+	// step 3 : diffTracker  
 	private void step3_doItOnlyOnce() {
-			// step 3 : diffTracker  
+	// step 3 : diffTracker  
 			if (diffTracker == null) { 
 				String eql3 = "" + 
 						"select BOS, name, timewindow, "
