@@ -10,7 +10,7 @@ import com.espertech.esper.event.map.MapEventBean;
 public class SysoUpdater implements UpdateListener {
 
 	/** Logger */
-	private static Logger LOG = LoggerFactory.getLogger(RrdDirectUpdater.class);
+	private static Logger LOG = LoggerFactory.getLogger(SysoUpdater.class);
 	private String logns;
 	private String properyName;
 	private int uuid;

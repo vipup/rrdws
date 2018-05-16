@@ -170,15 +170,7 @@ public class XXXEsperHandler implements MessageHandler {
 				
 				// step 3 : diffTracker 
 				step3_doItOnlyOnce(); 
-			    
-				// step 4: summaryze that all
-			    String eql4 = "insert into TicksPerSecond\n" + 
-			    		"select pair symbol, 'OrderTick' type,    count(*) as cnt\n" + 
-			    		"from OrderTick.win:time_batch(10 second)\n" + 
-			    		"group by pair";
-			    EPStatement statStmtTmp = getCepAdm().createEPL(eql4); 
-			    LOG.trace("statStmtTmp:::::", statStmtTmp);
-			    //statStmtTmp.addListener(new StatisticPrinter());
+			     
 			}
 		}
 
