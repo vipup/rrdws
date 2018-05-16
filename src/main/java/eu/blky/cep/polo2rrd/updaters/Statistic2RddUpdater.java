@@ -1,4 +1,4 @@
-package eu.blky.cep.polo2rrd;
+package eu.blky.cep.polo2rrd.updaters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

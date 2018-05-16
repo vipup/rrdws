@@ -15,12 +15,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import cc.co.llabor.cache.CacheManager;
 import net.sf.jsr107cache.Cache;
 
-public class DiffTracker implements UpdateListener {
+public class OLD_DiffTracker implements UpdateListener {
 	private int callCounter = 0;
 	ObjectMapper objectMapper ;
-	Cache diffCacher = CacheManager.getInstance().getCache("DiffTracker",true);
+	Cache diffCacher = CacheManager.getInstance().getCache("OLD_DiffTracker",true);
  
-	public DiffTracker (){
+	public OLD_DiffTracker (){
 		objectMapper = new ObjectMapper();  
 		
 	}
@@ -54,7 +54,7 @@ public class DiffTracker implements UpdateListener {
 			callCounter++;
 			//if ((""+eBean.get("pair")).contains("BTC_ETH")) {
 			if ((""+eBean.get("pair")).contains("USDT_BTC")) { 
-			 System.out.println("+DIFF+"+callCounter+"+--:"+" ==:"+eBean.getProperties());
+			 System.out.println("+OLD__DIFF+"+callCounter+"+--:"+" ==:"+eBean.getProperties());
 			}
 		}
 		list.removeAll();

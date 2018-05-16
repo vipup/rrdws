@@ -1,4 +1,4 @@
-package cc.co.llabor.websocket;
+package eu.blky.cep.polo2rrd;
 
 import java.io.IOException;
 import java.util.Set;
@@ -21,21 +21,21 @@ import org.apache.juli.logging.LogFactory;
 import cc.co.llabor.cache.CacheManager;
 import net.sf.jsr107cache.Cache; 
  
-@ServerEndpoint(value = "/websocket/tabledata")
-public class TableDataStream {
+@ServerEndpoint(value = "/websocket/pairs")
+public class PairCalculator {
 
-    private static final Log LOG = LogFactory.getLog(TableDataStream.class);
+    private static final Log LOG = LogFactory.getLog(PairCalculator.class);
 
     private static final String GUEST_PREFIX = "Herr";
     private static final AtomicInteger connectionIds = new AtomicInteger(0);
-    private static final Set<TableDataStream> connections =
-            new CopyOnWriteArraySet<TableDataStream>();
+    private static final Set<PairCalculator> connections =
+            new CopyOnWriteArraySet<PairCalculator>();
 
     private final String nickname;
     private Session session;
 
     final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
-    public TableDataStream() {
+    public PairCalculator() {
         nickname = GUEST_PREFIX + connectionIds.getAndIncrement();
         
         
@@ -87,7 +87,7 @@ public class TableDataStream {
 				"    {id: \""+i+++ "\", ort: \"Madrid\", name: \"Diego\", DoB: \"5.11.2001, ab 03 Uhr\" }\n" + 
 				"]";
 		try {
-			Cache diffCacher = CacheManager.getCache("OLD_DiffTracker");
+			Cache diffCacher = CacheManager.getCache("DiffTracker");
 			Object data = diffCacher .get("last");//diffCacher.put("last", tableDataMessage);
 			tableDataMessage = data!=null?""+data:tableDataMessage;
 		}catch (Exception e) {
@@ -106,7 +106,7 @@ public class TableDataStream {
 
 
     private static void broadcast(String msg) {
-        for (TableDataStream client : connections) {
+        for (PairCalculator client : connections) {
             try {
                 synchronized (client) {
                     client.session.getBasicRemote().sendText(msg);

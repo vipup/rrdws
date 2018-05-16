@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 import cc.co.llabor.websocket.cep.CEPListener;
-import cc.co.llabor.websocket.cep.DiffTracker;
+import cc.co.llabor.websocket.cep.OLD_DiffTracker;
 import cc.co.llabor.websocket.cep.OrderTick;
 import cc.co.llabor.websocket.cep.Any3SecListener;
 import cc.co.llabor.websocket.cep.BigEventListener;
@@ -479,7 +479,7 @@ public final class PoloHandler implements MessageHandler {
 					+ " group by pair, type, name , timewindow, BOS \n"
 					+ " ";
 			EPStatement difftrackerTMP = cepAdm.createEPL(eql3); 
-			diffTracker = new DiffTracker();
+			diffTracker = new OLD_DiffTracker();
 			difftrackerTMP.addListener(diffTracker );
 		}
 	}

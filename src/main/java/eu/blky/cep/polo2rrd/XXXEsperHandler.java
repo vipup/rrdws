@@ -18,21 +18,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cc.co.llabor.websocket.ErrorProcessingException;
 import cc.co.llabor.websocket.MessageHandler; 
-import cc.co.llabor.websocket.WS2RRDPump;
-import cc.co.llabor.websocket.cep.DiffTracker;
+import cc.co.llabor.websocket.WS2RRDPump; 
 import cc.co.llabor.websocket.cep.OrderTick;
+import eu.blky.cep.polo2rrd.updaters.RrdDirectUpdater;
 
 public class XXXEsperHandler implements MessageHandler {
 	final Polo2RddForwarderService parentService;
 	public XXXEsperHandler (Polo2RddForwarderService parent) {
-		parentService=parent;
-		
-	}
-
-	
-	//private EPAdministrator cepAdm;
-	//private EPRuntime cepRT;
-	//EPServiceProvider cep;
+		parentService=parent; 
+	} 
+ 
 	/** Logger */
 	private static Logger LOG = LoggerFactory.getLogger(XXXEsperHandler.class);
 	UpdateListener diffTracker = null;
@@ -130,10 +125,7 @@ public class XXXEsperHandler implements MessageHandler {
 							+ "group by BOS,timewindow, name "
 							
 											+ "";
-					EPStatement cep10sec= getCepAdm().createEPL(eql10sec);
-					
-					//RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, "price");
-					//cep10sec.addListener(rrdUpdaterTmp);
+					EPStatement cep10sec= getCepAdm().createEPL(eql10sec); 
 					RrdDirectUpdater rrdWS = new RrdDirectUpdater(nsTmp, "data" );
 					cep10sec.addListener(rrdWS); // <-- DirectRrdUpdater
 					updaterRepo.put(nsTmp,rrdWS);
@@ -158,13 +150,9 @@ public class XXXEsperHandler implements MessageHandler {
 							+ " '"+propPar+ "' name \n"
 							+ "from OrderTick_ELSE"+AGGRSUFFIX+".win:time_batch(  "+10+ "   sec) ";
 					
-					EPStatement cep10sec= getCepAdm().createEPL(eql10sec);
-					
-					//RrdOrderUpdater rrdUpdaterTmp = new RrdOrderUpdater(rrdWS, nsTmp, propPar);
-					//cep10sec.addListener(rrdUpdaterTmp);
+					EPStatement cep10sec= getCepAdm().createEPL(eql10sec); 
 					RrdDirectUpdater rrdWS = new RrdDirectUpdater(nsTmp, "data" );
-					cep10sec.addListener(rrdWS); // <-- DirectRrdUpdater
-					//updaterRepo.put(nsTmp,rrdUpdaterTmp);
+					cep10sec.addListener(rrdWS); // <-- DirectRrdUpdater 
 					updaterRepo.put(nsTmp,rrdWS);	
 				}
 				
@@ -174,21 +162,15 @@ public class XXXEsperHandler implements MessageHandler {
 			}
 		}
 
-	public EPAdministrator getCepAdm() {
+	private EPAdministrator getCepAdm() {
 		return this.parentService.getCepKeeper().getCepAdm();
 	}
 
-	public void setCepAdm(EPAdministrator cepAdm) {
-		throw new RuntimeException("wrong using");
-	}
 
-	public EPRuntime getCepRT() {
+	private EPRuntime getCepRT() {
 		return this.parentService.getCepKeeper().getCepRT();
 	}
 
-	public void setCepRT(EPRuntime cepRT) {
-		throw new RuntimeException("wrong using");
-	}
 
 	private void step3_doItOnlyOnce() {
 			// step 3 : diffTracker  

@@ -1,4 +1,4 @@
-package eu.blky.cep.polo2rrd;
+package eu.blky.cep.polo2rrd.updaters;
 
 import java.io.IOException;
 
