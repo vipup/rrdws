@@ -67,10 +67,9 @@ function transform(attrName) {
 
 function decodeColor(data){
     if (data[1]>0)return "pricePLUS";
-    if (data[1]<0)return "priceMINUS";
-    return "data";
+    if (data[1]<0)return "data";
+    return "price";
 }
-
 
 function stringCompare(a, b) {
  

@@ -3,12 +3,12 @@
 <head>
     <link rel="stylesheet" type="text/css" href="css/style.css?v=${deploymentId}">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Table sort example in D3</title>
-    <script type="text/javascript" src="WS/d3.v2.js"></script>
-	<script type="text/javascript" src="WS/sortedtable.js?v=${deploymentId}"></script>    
-    <script type="text/javascript" src="WS/pairscalculator.js?v=${deploymentId}"></script>
+    <script type="text/javascript" src="WS/d3.v2.js?v=${deploymentId}"></script>
+    
+    <title>Table sort example in D3</title> 
+
 </head>
-<body onLoad="transform('name')">
+<body onLoad="console.log('0....')">
 <h1>Sortable Table</h1>
 <table>
     <thead></thead>
@@ -27,5 +27,43 @@
 			<input type="text" placeholder="type and press enter to chat.'rrd' - to insert fake rrd."
 				id="chat" />
 		</p>
+
+
+ <script>    
+function loadScript(url, callback){
+
+    var script = document.createElement("script")
+    script.type = "text/javascript";
+
+    if (script.readyState){  //IE
+        script.onreadystatechange = function(){
+            if (script.readyState == "loaded" ||
+                    script.readyState == "complete"){
+                script.onreadystatechange = null;
+                callback();
+            }
+        };
+    } else {  //Others
+        script.onload = function(){
+            callback();
+        };
+    }
+
+    script.src = url;
+    document.getElementsByTagName("head")[0].appendChild(script);
+}   
+loadScript("WS/d3.v2.js?v=${deploymentId}", function(){    
+	console.log("1....");
+	loadScript("WS/sortedtable.js?v=${deploymentId}", function(){    
+			console.log("2....");
+			loadScript("WS/pairscalculator.js?v=${deploymentId}", function(){    
+				console.log("3....");});
+				transform('name');
+			});
+});
+
+
+ 
+</script>
 </body>
 </html> 

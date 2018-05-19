@@ -32,7 +32,9 @@ body {
     font-size: 12px; }    
 .priceMINUS {
 	color: #33ff33;
+	font-size: 11px; 
   }    
 .pricePLUS {
 	color: #33ffff;
+	font-size: 10px;
   }            
