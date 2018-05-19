@@ -1,6 +1,9 @@
 <%@ page session="false" %><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html >
-
+<html><%
+if (request.getSession().getAttribute("deploymentId") == null){
+	request.getSession().setAttribute("deploymentId", ""+System.currentTimeMillis());
+};
+%>
 <head>    
     <link rel="RRDWS icon" href="favicon.ico" type="image/ico">
 	<div class='corner' id='angle'>
@@ -58,7 +61,8 @@
 		   			<h2><a href="rrdcalc.html">RRD CALC</a></h2>	
 		   			<h2><a href="backup.htm">BACKUPRRD</a></h2>	
 		   			<h2><a href="restore.htm">restore.RRD</a></h2>	 
-		   			<h2><a href="WS/pairs.xhtml">pairs</a></h2>
+		   			
+		   			<h2><a href="pairs.html">jpairs</a></h2>
 		   			
 		   			
 		   			

@@ -267,7 +267,17 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/n
         </servlet-class>
         <load-on-startup>1</load-on-startup>
   	</servlet>
-  
+
+
+	<servlet>
+		<servlet-name>pairs</servlet-name>
+		<jsp-file>/WS/pairs.jsp</jsp-file>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>pairs</servlet-name>
+		<url-pattern>/pairs.html</url-pattern>
+	</servlet-mapping>
  
 
   <servlet-mapping>

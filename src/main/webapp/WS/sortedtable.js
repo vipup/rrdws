@@ -48,10 +48,10 @@ function transform(attrName) {
             .attr("onclick", setSortOrder)
             .text(function(d) { return d[0]; })
 
-// Rows
+// Rows TPDP .attr("class", "data price")
     var tr = d3.select("tbody").selectAll("tr")
             .data(data)
-          .enter().append("tr")
+          .enter().append("tr").attr("class", "data price")
             .sort(function (a, b) { return a == null || b == null ? 0 : stringCompare(a[attrName], b[attrName]); });
 
 // Cells
