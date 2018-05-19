@@ -51,17 +51,26 @@ function transform(attrName) {
 // Rows TPDP .attr("class", "data price")
     var tr = d3.select("tbody").selectAll("tr")
             .data(data)
-          .enter().append("tr").attr("class", "data price")
+          .enter().append("tr").attr("class", "data  ")
             .sort(function (a, b) { return a == null || b == null ? 0 : stringCompare(a[attrName], b[attrName]); });
 
-// Cells
+ // Cells
     var td = tr.selectAll("td")
             .data(function(d) { return jsonToArray(d); })
-          .enter().append("td")
+          .enter().append("td").attr("class", function(d) {return decodeColor(d);} )
            // .attr("onclick",setSortOrder)
             .text(function(d) { return d[1]; });
 
+ 
+
 }
+
+function decodeColor(data){
+    if (data[1]>0)return "pricePLUS";
+    if (data[1]<0)return "priceMINUS";
+    return "data";
+}
+
 
 function stringCompare(a, b) {
  
