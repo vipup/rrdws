@@ -69,11 +69,28 @@ public class ChatAnnotation {
     		}catch(IOException e) {
     			// Ignore
     		}
+    	}
+    	//org.jrobin.core.Util.getTimestamp(String).atStyleTimeSpec
+    	else if ((""+message).startsWith("time:")) {
+    		try {
+    			
+    			String retval=null;
+				try {
+					retval = ""+org.jrobin.core.Util.getTimestamp(message.substring("time:".length()));
+				} catch (RrdException e) {
+					retval = e.getMessage();
+					e.printStackTrace();
+				}
+				session.getBasicRemote().sendText(retval );
+    		}catch(IOException e) {
+    			// Ignore
+			}
     	} 
     	else if ("help".equals(message)) {
     		try {
     			
-    			session.getBasicRemote().sendText("available commands: "+RrdCommander.getRrdCommands());
+    			session.getBasicRemote().sendText(
+    					"available commands: "+RrdCommander.getRrdCommands()+" , timeparse like: \'time:now-1d\'");
     		}catch(IOException e) {
     			// Ignore
     		}
