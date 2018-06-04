@@ -283,6 +283,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/n
   <servlet-mapping>
  	<servlet-name>mvc-dispatcher</servlet-name>
         <url-pattern>*.htm</url-pattern>
+        <url-pattern>*.json</url-pattern>
         <url-pattern>/login</url-pattern>
         <url-pattern>/logout</url-pattern>
   </servlet-mapping>

@@ -63,6 +63,8 @@ if (request.getSession().getAttribute("deploymentId") == null){
 		   			<h2><a href="restore.htm">restore.RRD</a></h2>	 
 		   			
 		   			<h2><a href="pairs.html">jpairs</a></h2>
+		   			<h2><a href="cep.htm">CEP</a></h2>
+		   			<h2><a href="exec.htm">EXEC</a></h2>
 		   			
 		   			
 		   			

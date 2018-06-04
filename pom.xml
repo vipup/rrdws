@@ -19,6 +19,9 @@
 	<packaging>war</packaging>
 
 	<dependencies>
+
+ 
+	
 		<!-- Jackson JSON Mapper -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
