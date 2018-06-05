@@ -12,19 +12,35 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class RrdFetchController {
     // SpringWEb v.4.x.x
-    @RequestMapping(value = "/fetch.json/{rrd}/start/{start}", method = RequestMethod.GET)  
+    @RequestMapping(value = "/fet!!ch.json/{rrd}/start/{start}", method = RequestMethod.GET)  
     public @ResponseBody 
     String fetch(
-    		@PathVariable("key") String rrd,
+    		@PathVariable("rrd") String rrd,
     		@PathVariable("value") String start) 
     throws IOException, RrdException {
     	String cmdTmp = "fetch "+rrd+" MIN -s now-"+start+"min -e now";
     	return doIt(cmdTmp);
     }
+
+    // SpringWEb v.3++ mkyong :// http://www.mkyong.com/spring3/spring-3-mvc-hello-world-example/
+    @RequestMapping(value = "/fetch.json/{rrd:.+}", method = RequestMethod.GET )  
+    public ModelAndView  fetch(
+    		@PathVariable("rrd") String rrd ) 
+    throws IOException, RrdException {
+    	String start = ""+10;
+		String cmdTmp = "fetch "+rrd+" MIN -s now-"+start +"min -e now";
+		ModelAndView model = new ModelAndView("string2json");
+		model.setViewName("string2json");
+		String retval = doIt(cmdTmp);
+		model.addObject("json", retval);
+ 
+    	return model;
+    }    
 	// , produces = "application/json" 404 :((
 	//  headers="content-type='application/json'" HTTP Status 415 – Unsupported Media Type
     // SpringWEb v.3.x.x
@@ -39,6 +55,7 @@ public class RrdFetchController {
 		response.setHeader("Cache-Control","no-cache"); //HTTP 1.1
 		response.setHeader("Pragma","no-cache"); //HTTP 1.0
 		response.setDateHeader ("Expires", 0); //prevents caching at the proxy server
+		
 		
 		String cmdTmp = "fetch X-1396676775.rrd MIN -s now-1min -e now";
 		String retval = doIt(cmdTmp);

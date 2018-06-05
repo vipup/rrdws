@@ -658,8 +658,10 @@
 
 
 		<jstl.version>1.2</jstl.version>
-		<spring.version>3.2.18.RELEASE</spring.version>
+		<spring.version>4.0.1.RELEASE</spring.version>
 		<jackson.version>1.9.10</jackson.version>
+
+		
 
 		<!-- This is just for "eclipse:eclipse" goal to always attempt downloading 
 			sources -->
