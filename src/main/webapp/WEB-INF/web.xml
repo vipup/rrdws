@@ -183,10 +183,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/n
 		<servlet-class>cc.co.llabor.system.StartStopServlet</servlet-class> 
 		<load-on-startup>1</load-on-startup>
 	</servlet>	
-	<servlet>
-		<servlet-name>info</servlet-name>
-		<jsp-file>/info.jsp</jsp-file>
-	</servlet>
+ 
 	<servlet>
 		<servlet-name>L</servlet-name>
 		<jsp-file>/T/L.jsp</jsp-file>
@@ -347,44 +344,14 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/n
     <servlet-name>_ah_sessioncleanup</servlet-name>
     <url-pattern>/_ah/sessioncleanup</url-pattern>
   </servlet-mapping> 
-	<!-- 
-		<security-constraint> 
-		<web-resource-collection> 
-		<web-resource-name>session-cleanup</web-resource-name> 
-		<url-pattern>/_ah/sessioncleanup</url-pattern> 
-		</web-resource-collection> 
-		<auth-constraint> 
-		<role-name>admin</role-name> 
-		</auth-constraint> 
-		</security-constraint>
-	-->
+ 
 	<servlet-mapping>
 		<servlet-name>mailhandler</servlet-name>
 		<url-pattern>/_ah/mail/*</url-pattern>
 	</servlet-mapping>
-	<!-- 
-		<security-constraint>
-		<web-resource-collection>
-		<url-pattern>/_ah/mail/*</url-pattern>
-		</web-resource-collection>
-		auth-constraint>
-		<role-name>admin</role-name>
-		</auth-constraint
-		</security-constraint>
-	-->
-
-	<!-- 
-		<servlet-mapping>
-		<servlet-name>greetServlet</servlet-name>
-		<url-pattern>/rrd/greet</url-pattern>
-		
-		</servlet-mapping>
-	-->
-
-	<servlet-mapping>
-		<servlet-name>info</servlet-name>
-		<url-pattern>/info.htm</url-pattern>
-	</servlet-mapping>
+ 
+ 
+ 
 	<servlet-mapping>
 		<servlet-name>l</servlet-name>
 		<url-pattern>/l/*</url-pattern>
@@ -447,35 +414,6 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://java.sun.com/xml/n
     <!-- Nobody is allowed to visit these directly. --> 
   </auth-constraint>
 </security-constraint>
-
- <!--
-
-<login-config>
-    <auth-method>FORM</auth-method>
-    <form-login-config>
-        <form-login-page>/login.jsp</form-login-page>
-        <form-error-page>/login-failed.jsp</form-error-page>
-    </form-login-config>
-</login-config>
-
-
-<security-constraint>
-  <web-resource-collection>
-    <web-resource-name>FreeMarker MVC Views</web-resource-name>
-    <url-pattern>*.fEEEree</url-pattern>
-  </web-resource-collection>
-  <auth-constraint>
-    < ! - - all registered is allowed to visit these directly. - - > 
-    <role-name>user</role-name> 
-  </auth-constraint>
-</security-constraint>
- -->
-<!-- Missing login :(Step_A) 
-<error-page>
-      
-    <error-code>403</error-code>
-    <location>/log.in</location>
-</error-page>
--->
+ 
 
 </web-app>
