@@ -2,6 +2,9 @@ package eu.blky.cep.polo2rrd;
  
 import java.util.HashMap; 
 import java.util.Map;
+ 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.UpdateListener;
@@ -12,7 +15,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory; 
 import com.fasterxml.jackson.databind.node.ObjectNode; 
 
-import cc.co.llabor.cache.CacheManager;
+import cc.co.llabor.cache.CacheManager; 
 import net.sf.jsr107cache.Cache;
 
 public class DiffTracker implements UpdateListener {
@@ -31,6 +34,8 @@ public class DiffTracker implements UpdateListener {
 	String []props = "pair---BOS---percentDIFF---priceDIFF---middlePCENT---tovPCENT---dataFIRST---tovFIRST---iTOV---iAVG---pTOV---pAVG---dTOV---dMIN---dAVG---dMAX---startTIMESTAMP---diffTIME---dCAL---dCNT---type---stopTIME---startTIME".split("---");
 	
 	String []keyprops = "BOS---timewindow---type---pair".split("---");
+	private static final Logger LOG = LoggerFactory.getLogger(DiffTracker.class);
+	 
 	
 	@Override
 	public void update(EventBean[] newEvents, EventBean[] oldEvents) {
@@ -54,7 +59,7 @@ public class DiffTracker implements UpdateListener {
 			callCounter++;
 			//if ((""+eBean.get("pair")).contains("BTC_ETH")) {
 			if ((""+eBean.get("pair")).contains("USDT_BTC")) { 
-			 System.out.println("+DIFF+"+callCounter+"+--:"+" ==:"+eBean.getProperties());
+			 LOG.debug("+DIFF+{}+--: ==:{}",callCounter,eBean.getProperties());
 			}
 		}
 		list.removeAll();

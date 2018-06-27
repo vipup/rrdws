@@ -1,12 +1,17 @@
 package cc.co.llabor.websocket.cep;
+ 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.UpdateListener;
-import com.espertech.esper.event.map.MapEventBean;
+import com.espertech.esper.event.map.MapEventBean; 
 
  
 
-public class StatisticPrinter implements UpdateListener {
+public class StatisticPrinter implements UpdateListener { 
+	private static final Logger LOG  = LoggerFactory.getLogger(StatisticPrinter.class .getName());
+
 	public String toString() {
 		return StatisticPrinter.class.getName() ;
 	} 	
@@ -15,7 +20,7 @@ public class StatisticPrinter implements UpdateListener {
 	public void update(EventBean[] newEvents, EventBean[] oldEvents) {
 		for (Object e:newEvents) {
 			MapEventBean eBean = (MapEventBean)e; 
-			System.out.println("STAT::"+eBean.getProperties());
+			LOG.info("STAT::{}",eBean.getProperties());
 		}
 	}
 

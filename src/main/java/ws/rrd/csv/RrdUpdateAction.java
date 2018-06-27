@@ -9,8 +9,11 @@ import java.util.Date;
 import net.sf.jsr107cache.Cache; 
 import org.jrobin.cmd.RrdCommander;
 import org.jrobin.core.RrdException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cc.co.llabor.cache.Manager;
+import eu.blky.cep.polo2rrd.DiffTracker;
  
 
 /** 
@@ -28,6 +31,8 @@ public class RrdUpdateAction implements Action {
 
 	    public static final String MM_DD_YYYY_HH_MM_SS_SSS = "MM/dd/yyyy HH:mm:ss.SSS";
 		SimpleDateFormat sdf = new SimpleDateFormat(MM_DD_YYYY_HH_MM_SS_SSS);
+
+		private static final Logger LOG = LoggerFactory.getLogger(DiffTracker.class);
 		public RrdUpdateAction(){
 			
 		}
@@ -149,8 +154,8 @@ public class RrdUpdateAction implements Action {
 			if ( flushCount == 0 || changeCount >10 ||(last_clean +10000) < System.currentTimeMillis()){
 				synchronized (Registry.class) { 
 					reg.flush();
-					last_clean=System.currentTimeMillis();					
-					System.out.println("REGISTRY Flush #"+flushCount+++":"+changeCount);
+					last_clean=System.currentTimeMillis();		
+					LOG.info("REGISTRY Flush #"+flushCount+++":"+changeCount);
 					changeCount =0;
 				}
 			}

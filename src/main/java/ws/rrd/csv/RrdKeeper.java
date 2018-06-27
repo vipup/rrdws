@@ -646,7 +646,7 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 			Action rrdUpdateAction =  new RrdUpdateAction();  
 			String timeMs = ""+System.currentTimeMillis();
 			//TODO rrdUpdateAction.perform(   "rrdws/heartbeat/"+uuid ,  timeMs  , ""+exCounter );
-			System.out.println( "rrdws/heartbeat/"+uuid +"::"+ timeMs  + "::::"+exCounter);
+			log.trace( "rrdws/heartbeat/"+uuid +"::"+ timeMs  + "::::"+exCounter);
 			lastUpdated  = System.currentTimeMillis();
 		}
 	}

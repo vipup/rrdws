@@ -75,6 +75,7 @@ public class XXXEsperHandler implements MessageHandler {
 		setupDiffTracker_____ONLY_ONCE(); 
 		// step 4 _ PairPrice
 		String eqlPairsPrice = " select "
+				+ " pair, type, name , timewindow, BOS , "
 				+ "  dAVG , "
 				+ "  dTOV ,  "
 				+ "  dMAX  lastOnTimeWin, "
