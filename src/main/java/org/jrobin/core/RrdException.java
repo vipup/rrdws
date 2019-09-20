@@ -25,6 +25,12 @@
 
 package org.jrobin.core;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import ws.rrd.csv.RrdKeeper;
 
 /**
@@ -79,10 +85,31 @@ public class RrdException extends Exception {
 	public void collectError() {
 		if (ENABLED_THIS.length() >11)RrdKeeper.getInstance().error(this);		
 	}
-
+	// hope the number of new errors-types will not the reason for OOM-Exception
+	static final List<String> tmpRepoToAvoidDuplicatedTryToWriteDownTheCalLStackTrace = new ArrayList<String>();
 	public String getUUID() {
+		String retval = ""+(""+this.message).hashCode();
+		if(!tmpRepoToAvoidDuplicatedTryToWriteDownTheCalLStackTrace.contains(retval))
+		try {
+			tmpRepoToAvoidDuplicatedTryToWriteDownTheCalLStackTrace.add(retval);
+			File dumpTmp = new File(RrdFileBackend.CALC_DEFAULT_WORKDIR()  + "/RRD-ERROR-HASH-TOFIX-"+retval+".log");
+			
+			writeToTextSubFIle(dumpTmp,this.message);
+			System.out.println("ERROR added:++++++++++++"+retval+"++++++++::"+this.message);
+		}catch(Throwable e) {
+			// ignore all possible errors
+		}
+		return retval;
+	}
+	
+	private static final String writeToTextSubFIle(File out , String data) throws IOException {
 		 
-		return ""+(""+this.message).hashCode();
+		// fileA.deleteOnExit();
+		FileWriter fwA = new FileWriter(out);
+		fwA.write(data);
+		fwA.flush();
+		fwA.close();
+		return out.getCanonicalPath();
 	}
 
 }

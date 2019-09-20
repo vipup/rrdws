@@ -35,7 +35,8 @@ import javax.management.ReflectionException;
 
 import net.sf.jsr107cache.Cache;
 
-import org.jrobin.core.RrdException;  
+import org.jrobin.core.RrdException;
+import org.jrobin.core.RrdFileBackend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
  
@@ -639,14 +640,14 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 		this.error();
 		String uuid= rrdException.getUUID();
 		registerErrMEssageIfNotRegistered(uuid , rrdException.getMessage());
-		Long exCounter = getAndIncrementCounter(uuid);		
+			
 		if ( System.currentTimeMillis()  < (lastUpdated +1000)    ) {
 			return;
 		}else {
-			Action rrdUpdateAction =  new RrdUpdateAction();  
+			//TODO Action rrdUpdateAction =  new RrdUpdateAction();   - this update could produce follow error, what is not cool
 			String timeMs = ""+System.currentTimeMillis();
 			//TODO rrdUpdateAction.perform(   "rrdws/heartbeat/"+uuid ,  timeMs  , ""+exCounter );
-			System.out.println( "rrdws/heartbeat/"+uuid +"::"+ timeMs  + "::::"+exCounter);
+			System.out.println( "rrdws/heartbeat/"+uuid +":uid at:"+ timeMs  + "::::#error count#"+  getAndIncrementCounter(uuid)  +" check#> ls -lah "+RrdFileBackend.CALC_DEFAULT_WORKDIR()	);
 			lastUpdated  = System.currentTimeMillis();
 		}
 	}

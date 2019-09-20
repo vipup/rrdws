@@ -405,7 +405,7 @@ public class StartStopServlet extends HttpServlet {
 			Server.getInstance().stop();
 		} catch (MrtgException e) {
 			// TODO Auto-generated catch block
-			// e.  printStackTrace();
+			e.  printStackTrace();
 		}
 		
 		try{
@@ -419,22 +419,22 @@ public class StartStopServlet extends HttpServlet {
 			AlertCaptain.getInstance(mythreads ).setAlive(false);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			// e.  printStackTrace();
+			e.  printStackTrace();
 		}
 		
 		try {
 			clientLauncher.killProcessTree();
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			// TODO Auto-generated catch block
-			// e.  printStackTrace();
+			e.  printStackTrace();
 		}
 
 		
 		try {
 			RrdKeeper.getInstance().destroy();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			// e.  printStackTrace();
+		} catch (Throwable e) {
+			e.  printStackTrace();
+			log_info("Stoped  RrdKeeper.getInstance().destroy();  ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
 		}
 		
 		
