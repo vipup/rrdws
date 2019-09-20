@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import ws.rrd.csv.RrdKeeper;
+//import ws.rrd.csv.RrdKeeper;
 import ws.rrd.logback.ServletListener;
 import cc.co.llabor.features.Repo;
 import cc.co.llabor.threshold.AlertCaptain;
@@ -87,7 +87,7 @@ public class StartStopServlet extends HttpServlet {
 		
 		initCollectD();		
 		
-		initAlerter(); 
+//		initAlerter(); 
 
 		
 //		initMRTG();
@@ -104,28 +104,29 @@ public class StartStopServlet extends HttpServlet {
 
 
 
-	private void initAlerter() {
-		// do exactly the same as prev-WatchDog, but otherwise
-//		Cache tholdRepo = Manager.getCache("thold");
-//		Object tholdProps = tholdRepo.get("default.properties");//RRDHighLimitWatchDog
-		Thread.currentThread().setContextClassLoader(RrdKeeper.class.getClassLoader());
-		try {
-//			log.info(Repo.getBanner( "tholdHealthWatchDog"));
+//	private void initAlerter() {
+//		// do exactly the same as prev-WatchDog, but otherwise
+////		Cache tholdRepo = Manager.getCache("thold");
+////		Object tholdProps = tholdRepo.get("default.properties");//RRDHighLimitWatchDog
+////		refactoren to /rrd/src/main/java/com/journaldev/spring/service/RrdService.java
+////		Thread.currentThread().setContextClassLoader(RrdKeeper.class.getClassLoader());
+//		try {
+////			log.info(Repo.getBanner( "tholdHealthWatchDog"));
+////			
+////			Threshold watchDog  = ac.toThreshold(tholdProps );
+////			ac.register(  watchDog );
+////			lookInsideThold(tholdProps);
+//			AlertCaptain ac = AlertCaptain.getInstance(ServletListener.getDefaultThreadGroup());
 //			
-//			Threshold watchDog  = ac.toThreshold(tholdProps );
-//			ac.register(  watchDog );
-//			lookInsideThold(tholdProps);
-			AlertCaptain ac = AlertCaptain.getInstance(ServletListener.getDefaultThreadGroup());
-			
-			ac.init();		
-			getStatus().put("AlertCaptain", SUCCESSFUL );
-			 
-		} catch (Throwable e) {
-			getStatus().put("AlertCaptain", BROCKEN+e.getMessage());
-			// TODO Auto-generated catch block
-			// e.  printStackTrace();
-		}
-	}
+//			ac.init();		
+//			getStatus().put("AlertCaptain", SUCCESSFUL );
+//			 
+//		} catch (Throwable e) {
+//			getStatus().put("AlertCaptain", BROCKEN+e.getMessage());
+//			// TODO Auto-generated catch block
+//			// e.  printStackTrace();
+//		}
+//	}
 
 
 	private void initMRTG() {
@@ -429,13 +430,13 @@ public class StartStopServlet extends HttpServlet {
 			e.  printStackTrace();
 		}
 
-		
-		try {
-			RrdKeeper.getInstance().destroy();
-		} catch (Throwable e) {
-			e.  printStackTrace();
-			log_info("Stoped  RrdKeeper.getInstance().destroy();  ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
-		}
+// refactore to /rrd/src/main/java/com/journaldev/spring/service/RrdService.java
+//		try {
+//			RrdKeeper.getInstance().destroy();
+//		} catch (Throwable e) {
+//			e.  printStackTrace();
+//			log_info("Stoped  RrdKeeper.getInstance().destroy();  ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
+//		}
 		
 		
 		log_info(Repo.getBanner( "+rrdws"));
