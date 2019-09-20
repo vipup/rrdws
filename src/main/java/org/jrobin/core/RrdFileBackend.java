@@ -43,6 +43,19 @@ import org.jrobin.mrtg.server.Config;
 public class RrdFileBackend extends RrdBackend {
 	
 	private static final Logger log = LoggerFactory.getLogger(RrdFileBackend.class .getName());
+	public  static final String RRD_HOME = "rrd.home";
+	private static final String UUID = "#"+RRD_HOME.hashCode();//System.currentTimeMillis();
+
+	public static final String CALC_DEFAULT_WORKDIR() {
+		String retval = System.getProperty( RrdFileBackend.RRD_HOME,
+				System.getProperty("catalina.base", 
+				System.getProperty("user.dir")))
+				+ (System.getProperty("catalina.base") == null ? "/target/"+RRD_HOME+UUID // not a tomcat - > eclipse|maven|ant? --> "./target"
+						: "/work/Catalina/localhost/"+RRD_HOME+UUID);
+		log.trace("{} home inited @:[{}]",RrdFileBackend.class, retval);
+		return  retval;
+	}	
+	
 	/**
 	 * read/write file status
 	 */

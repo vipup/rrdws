@@ -147,7 +147,7 @@ public class RrdDb implements RrdUpdater {
 	 * @throws RrdException Thrown if invalid RrdDef object is supplied.
 	 */
 	public RrdDb(RrdDef rrdDef) throws RrdException, IOException {
-		this(rrdDef, RrdFileBackendFactory.getDefaultFactory());
+		this(rrdDef, RrdFileBackendFactory.getDefaultFactory(rrdDef.getPath()));
 	}
 
 	/**
@@ -231,7 +231,7 @@ public class RrdDb implements RrdUpdater {
 	 * @throws RrdException Thrown in case of JRobin specific error.
 	 */
 	public RrdDb(String path, boolean readOnly) throws IOException, RrdException {
-		this(path, readOnly, RrdBackendFactory.getDefaultFactory());
+		this(path, readOnly, RrdBackendFactory.getDefaultFactory(path));
 	}
 
 	/**
@@ -368,7 +368,7 @@ public class RrdDb implements RrdUpdater {
 	 * @throws RrdException Thrown in case of JRobin specific error
 	 */
 	public RrdDb(String rrdPath, String externalPath) throws IOException, RrdException {
-		this(rrdPath, externalPath, RrdBackendFactory.getDefaultFactory());
+		this(rrdPath, externalPath, RrdBackendFactory.getDefaultFactory(rrdPath));
 	}
 
 	/**
@@ -640,7 +640,7 @@ public class RrdDb implements RrdUpdater {
 			double diffM = diffS/60;
 			double diffH = diffM/60;
 			double diffD = diffH/60;
-			String msgTmp = ""+ newTime +"["+ newDate +"]"+
+			String msgTmp = ":::"+this.backend.getPath()+ ":::"+ newTime +"["+ newDate +"]"+
 					". Last update time was " + lastTime + "{"+lastDate+"}, at least one second step is required. Diff is "
 					+diffS+" secs|"
 					+diffM+"mins|"

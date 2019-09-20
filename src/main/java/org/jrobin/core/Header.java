@@ -49,7 +49,7 @@ public class Header implements RrdUpdater {
 	private RrdString signature;
 	private RrdLong step;
 	private RrdInt dsCount, arcCount;
-	private RrdLong lastUpdateTime;
+	volatile private RrdLong lastUpdateTime;
 
 	Header(RrdDb parentDb, RrdDef rrdDef) throws IOException {
 		boolean shouldInitialize = rrdDef != null;

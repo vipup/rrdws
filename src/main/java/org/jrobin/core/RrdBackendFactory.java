@@ -176,9 +176,17 @@ public abstract class RrdBackendFactory {
 	 *
 	 * @return Default backend factory.
 	 */
-	public static RrdBackendFactory getDefaultFactory() {
-
-		return defaultFactory;
+	public static RrdBackendFactory getDefaultFactory(String path) {
+		if(path.startsWith("!")){
+			 try {
+				return RrdBackendFactory.getFactory("MEMORY");
+			} catch (RrdException e) {
+				return null;
+			}
+		}else {
+			return defaultFactory;
+		}
+		
 	}
 
 	/**

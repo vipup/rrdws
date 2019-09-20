@@ -45,7 +45,7 @@ public class RrdDbPool {
 	private static final Logger log = LoggerFactory
 			.getLogger("org.jrobin.core.RrdDbPool");
 	private static RrdDbPool instance = new RrdDbPool();
-	private RrdBackendFactory factory;
+	
  
 	private int capacity = INITIAL_CAPACITY;
 	private HashMap<String, RrdEntry> rrdMap = new HashMap<String, RrdEntry>(INITIAL_CAPACITY);
@@ -61,7 +61,7 @@ public class RrdDbPool {
 	}
 
 	private RrdDbPool() {
-		factory = RrdBackendFactory.getDefaultFactory();
+	 
 	}
 
 	/**
