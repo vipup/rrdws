@@ -38,6 +38,7 @@ import cc.co.llabor.threshold.rrd.Threshold;
  *         <b>Company:</b> Monster AG <br>
  * 
  *         Creation: 30.08.2011::15:59:53<br>
+ * @deprecated
  */
 public class AlertCaptain implements Runnable, NotificationListener {
 

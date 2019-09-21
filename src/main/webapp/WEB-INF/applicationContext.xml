@@ -23,6 +23,8 @@
 		class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
 	<bean name="myService" class="com.journaldev.spring.service.MyService" />
 	<bean name="rrdService" class="com.journaldev.spring.service.RrdService" />
+	<bean name="cepService" class="com.journaldev.spring.service.CepService" />
+	
 	<bean name="chernoshima" class="eu.blky.cep.hello.world.esper.ChernoshimaService" />
 	<!-- cc.co.llabor.system.StatusMonitor -->
 	<bean name="StatusMonitor" class="cc.co.llabor.system.StatusMonitor" />

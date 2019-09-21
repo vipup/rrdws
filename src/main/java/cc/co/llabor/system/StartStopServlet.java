@@ -71,17 +71,20 @@ public class StartStopServlet extends HttpServlet {
 	
 	public void init(ServletConfig config) throws ServletException{
 	    super.init();
-	    ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-	    statusMonitor= (StatusMonitor) applicationContext.getBean("StatusMonitor");
-	    
-	    myBackupService =   (BackupService) applicationContext.getBean("myBackupService");
-	    try {
-	    	eu.blky.cep.polo2rrd.Polo2RddForwarderService polo2rrd =    (Polo2RddForwarderService) applicationContext.getBean("polo2rrd");
-	    	// crazyOverDozedWorkaround 
-	    	polo2rrd.setStatusMonitor(statusMonitor);
-	    }catch(Throwable e) {
-	    	e.printStackTrace();
-	    }
+//<!--  refactored into /rrd/src/main/java/com/journaldev/spring/service/CepRrdService.java    
+//	    ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+//	    statusMonitor= (StatusMonitor) applicationContext.getBean("StatusMonitor");
+//	    
+//	    myBackupService =   (BackupService) applicationContext.getBean("myBackupService");
+//	    try {
+//	    	eu.blky.cep.polo2rrd.Polo2RddForwarderService polo2rrd =    (Polo2RddForwarderService) applicationContext.getBean("polo2rrd");
+//	    	// crazyOverDozedWorkaround 
+//	    	polo2rrd.setStatusMonitor(statusMonitor);
+//	    }catch(Throwable e) {
+//	    	e.printStackTrace();
+//	    }
+//
+// refactored into /rrd/src/main/java/com/journaldev/spring/service/CepRrdService.java -->
 
 		initShutdownHookPROC();	
 		
