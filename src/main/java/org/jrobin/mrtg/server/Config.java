@@ -24,6 +24,7 @@
  */
 package org.jrobin.mrtg.server;
 
+import org.jrobin.core.RrdFileBackend;
 import org.jrobin.mrtg.MrtgConstants;
 
 import java.io.File;
@@ -41,7 +42,7 @@ public class Config implements MrtgConstants {
 	public static final String CONF = "conf";
 	
 	private static String HOME_DIR  =
-			CALC_DEFAULT_WORKDIR()
+			RrdFileBackend.CALC_DEFAULT_WORKDIR()
 			+DELIM + MRTG;
 
 	public static final String GRAPH_TEMPLATE_XML = "graph_template.xml";
@@ -80,14 +81,7 @@ public class Config implements MrtgConstants {
 		return HOME_DIR;
 	}
 
-	public static final String CALC_DEFAULT_WORKDIR() {
-		return  System.getProperty( "rrd.home",
-				System.getProperty("catalina.base", 
-				System.getProperty("user.dir")))
-				+ (System.getProperty("catalina.base") == null ? "/target/rrd.workdir" // not a tomcat - > eclipse|maven|ant? --> "./target"
-						: "/work/Catalina/localhost/rrdsaas");
-	}
-
+ 
 	static String getConfDir() {
 		return HOME_DIR + DELIM + CONF;
 	}
@@ -106,5 +100,10 @@ public class Config implements MrtgConstants {
 
 	static String getGraphTemplateFile() {
 		return getConfDir() + DELIM + GRAPH_TEMPLATE_XML;
+	}
+
+
+	public static String CALC_DEFAULT_WORKDIR() {
+		return RrdFileBackend.CALC_DEFAULT_WORKDIR();
 	}
 }

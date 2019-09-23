@@ -1,6 +1,7 @@
 package eu.blky.springmvc;
-import java.io.File;  
- 
+import java.io.File;
+
+import org.jrobin.core.RrdDbPool;
 import org.jrobin.mrtg.server.Config;
 import org.springframework.stereotype.Service; 
 
@@ -44,6 +45,7 @@ public class BackupService {
 			File workdirTmp = new File ( Config.CALC_DEFAULT_WORKDIR() );
 			File tmpdirTmp = new File (System.getProperty("java.io.tmpdir")); 
 			File backupTmp = new File(tmpdirTmp, "rrd"+System.currentTimeMillis()+".backup"); 
+			RrdDbPool.getInstance().reset();
 			Zipper zTmp = new Zipper(workdirTmp, backupTmp); 
 			zTmp.zip();
 			sm.getStatus().put("backupDB", "backupIsDone");

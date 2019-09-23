@@ -74,7 +74,7 @@ public class Zipper {
 	            }
 
 	            zos.closeEntry();
-	            System.out.println("Folder successfully compressed");
+	            System.out.println("Folder successfully compressed:"+zipFile);
 
 	        } catch (IOException ex) {
 	            ex.printStackTrace();
