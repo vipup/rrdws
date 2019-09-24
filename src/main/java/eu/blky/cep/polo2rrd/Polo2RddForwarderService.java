@@ -59,7 +59,7 @@ public class Polo2RddForwarderService {
 		System.out.println("Assigned StatusMonitor:"+sm);
 		this.statusMonitor = sm;
 	}
-	boolean CEP_INIT_ALLOWED = false;
+	boolean CEP_INIT_ALLOWED = true;
 	
 	@PostConstruct
 	public void init(){

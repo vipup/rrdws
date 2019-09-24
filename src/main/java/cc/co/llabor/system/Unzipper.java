@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream; 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -16,6 +18,7 @@ import eu.blky.cep.polo2rrd.SysoUpdater;
 public class Unzipper { 
 	private String outForlderToUnzip;
 	private String inputZipArchiveFileName;
+	private List<String> whiteList;
 	static final Logger log = Logger.getLogger(Unzipper.class.getName()); 
 	
 	    public Unzipper(String inName, String outName) {
@@ -26,19 +29,30 @@ public class Unzipper {
 	    public Unzipper(File toRestore, File workdirTmp) {
 	    	this.inputZipArchiveFileName =toRestore.getAbsolutePath();  
 	        this.outForlderToUnzip = workdirTmp.getAbsolutePath();
+	        
 		}
 
 		public final void unzip(Merger m) throws IOException{
+			long length = new File(inputZipArchiveFileName).length();
 	    	byte[] buffer = new byte[1024];
 	    	//get the zip file content
 	    	ZipInputStream zis = null;
 	    	try{
-	    		zis = new ZipInputStream(new FileInputStream(inputZipArchiveFileName));
+	    		
+	    		FileInputStream is = new FileInputStream(inputZipArchiveFileName);
+	    		FileChannel channel = is.getChannel();
+				zis = new ZipInputStream(is);
 		    	//get the zipped file list entry
 		    	ZipEntry ze = zis.getNextEntry();
-		    	while(ze!=null){
+		    	for(ze = zis.getNextEntry();ze!=null;ze = zis.getNextEntry()){
+		    		String fileName = ze.getName();//ze.getLastModifiedTime() (new File(outForlderToUnzip +"/"+fileName  )).exists()
+		    		if (this.whiteList!=null) {this.whiteList.add("X-1491558113.rrd");
+		    			if (!this.whiteList.contains(fileName.replace("/rrd.home/", ""))) {
+		    				continue; 
+		    			}
+		    		}
 	
-		     	   String fileName = ze.getName();//ze.getLastModifiedTime() (new File(outForlderToUnzip +"/"+fileName  )).exists()
+		     	  
 		            File newFile = new File(outForlderToUnzip + File.separator + fileName);
 	
 		            log.info( "file unzip : "+ newFile.getAbsoluteFile());
@@ -58,6 +72,10 @@ public class Unzipper {
 			             }
 		
 		             }catch(IOException e) {
+		            	 
+		            	 System.out.println("}catch(IOException e) {"+e.getMessage());
+		             }catch(Throwable e) {
+		            	 e.printStackTrace();
 		            	 System.out.println("}catch(IOException e) {"+e.getMessage());
 		             }finally {
 		            	 if(null!=fos) {
@@ -67,11 +85,22 @@ public class Unzipper {
 							} catch (RrdException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
+				             }catch(Throwable e) {
+				            	 e.printStackTrace();
+				            	 System.out.println("}catch(IOException e) {"+e.getMessage());								
 							}
 		            	 }
 		            	 
 		             }
-		             ze = zis.getNextEntry();
+		            
+					System.out.println("ZZZZZZZZ  :"+(channel.position()*100.0/length)+"% ZZZZZZ Done: "+channel.position() +"from ::::"+ length);
+		             try {
+						Thread.sleep(1);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		             
 		     	}
 	
 		        zis.closeEntry();
@@ -98,6 +127,10 @@ public class Unzipper {
 					return false; 
 				}});
 	    }
+
+		public void setWhilelist(List<String> whiteList) {
+			this.whiteList = whiteList;
+		}
 
 	    
 	}

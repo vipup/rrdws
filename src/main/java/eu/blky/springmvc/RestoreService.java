@@ -1,12 +1,18 @@
 package eu.blky.springmvc; 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
@@ -85,6 +91,10 @@ public class RestoreService  extends Merger{
 			if (toRestore != null){
 				RrdDbPool.getInstance().reset();
 				Unzipper zTmp = new Unzipper(toRestore, workdirTmp);
+				if ((new File(tmpdirTmp,"unzipperwhitelist.txt").exists())){
+					List<String> whiteList = readWhiteList(new File(tmpdirTmp,"unzipperwhitelist.txt"));
+					zTmp.setWhilelist(whiteList);
+				}
 				zTmp.unzip(this);
 				st.getStatus().put("restoreDB", "DB restore Done"); 
 
@@ -93,6 +103,26 @@ public class RestoreService  extends Merger{
 			log.error("restoreDB", e);
 			st.getStatus().put("restoreDB", "DB restore is not possible! New Server/instance/App/Node/DB?");
 		}
+	}
+
+	private List<String> readWhiteList(File file) {
+		
+		List<String> retval = new ArrayList<String>();
+		BufferedReader bin;
+		try {
+			bin = new BufferedReader(new FileReader(file));
+			for(String l=bin.readLine();l!=null;l=bin.readLine()) {
+				retval.add(l.split("\t")[2]);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
+
+		return retval ; 
 	}
 
 	public boolean restorePerformedFromExternal() { 
@@ -176,17 +206,17 @@ public class RestoreService  extends Merger{
 					"				RRA:AVERAGE:0.5:17:592 " +
 					"				RRA:AVERAGE:0.5:131:340 " +
 					"				RRA:AVERAGE:0.5:731:719 " +
-					"				RRA:AVERAGE:0.5:10000:2730 " +
+					"				RRA:AVERAGE:0.5:3300:"+(273*6)+" " + // !2730 _> 2y
 					"				RRA:MAX:0.5:3:480 " +
 					"				RRA:MAX:0.5:17:592 " +
 					"				RRA:MAX:0.5:131:340 " +
 					"				RRA:MAX:0.5:731:719 " +
-					"				RRA:MAX:0.5:10000:273 " +
+					"				RRA:MAX:0.5:3300:"+(273*2)+" "+
 					"				RRA:MIN:0.5:3:480 " +
 					"				RRA:MIN:0.5:17:592 " +
 					"				RRA:MIN:0.5:131:340 " +
 					"				RRA:MIN:0.5:731:719 " +
-					"				RRA:MIN:0.5:10000:273 " +
+					"				RRA:MIN:0.5:3300:"+(273*2)+" "+
 													" "; 		
  
 			RrdCommander.execute(crTmp  );
@@ -200,61 +230,47 @@ public class RestoreService  extends Merger{
 			// rrdtool fetch  a.rrd AVERAGE -r 1 -s 920804700 > a.txt
 			// rrdtool fetch  b.rrd AVERAGE -r 1 -s 920804700 > b.txt
 			
-			String command = "rrdtool fetch "+aRRD+" -r 1 -s  "+initDate+" AVERAGE";
-			log.info(command);
+			String command = "rrdtool fetch "+aRRD+" -r 1 -s  "+initDate+" AVERAGE"; // 1hour  . see 3600 https://oss.oetiker.ch/rrdtool/doc/rrdfetch.en.html
+			log.info(command); // command = "rrdtool info "+aRRD; RrdCommander.execute("rrdtool tune -h data:240 "+aRRD);RrdCommander.execute("rrdtool info "+aRRD);
 			String sA = ""+RrdCommander.execute(command);
-			writeToTextSubFIle(a+".txt",sA);
-			String aTxt[] = sA.split("\n");
-			String command2 = "rrdtool fetch "+bRRD+" -r 1 -s  "+initDate+" AVERAGE";
+			File a2DEL = writeToTextSubFIle(a+".A.txt",sA);
+			
+			String command2 = "rrdtool fetch "+bRRD+"   -r 3600  -s  "+initDate+" AVERAGE";
 			log.info(command2);
 			String sB = ""+RrdCommander.execute(command2);
-			writeToTextSubFIle(b+".txt",sB);
-			String bTxt[] = sB.split("\n");
+			File b2DEL = writeToTextSubFIle(b+".B.txt",sB);
 			
-			 
-			int toSkip = 0;
+			//String aTxt[] = sA.split("\n");
+			//String bTxt[] = sB.split("\n");
+			
+			BufferedReader bIN = new BufferedReader(new FileReader(b2DEL));
+			BufferedReader aIN = new BufferedReader(new FileReader(a2DEL));
+			
+				
+			  
 			String upTmp = updatetxtTmp  ;
 			String oldTmp = "----------EMPTY---------------------" ;
-			for (int i=0;i<aTxt.length;i+=1) {
-				try {
-		
-					String[] aLINE = aTxt[i].split(":"); 
-					toSkip =  Integer.valueOf( aTxt[i].split(":")[0].trim() ) - Integer.valueOf( bTxt[i].split(":")[0].trim()  ); 
-					if (toSkip >0) {
-						System.out.println("TOSKIP."+toSkip);
-					}
-					Object valueToPush = aLINE[1].trim().equals("nan")?bTxt[i+toSkip].split(":")[1].trim():aLINE[1].trim();
-					
-					if ("nan". equals(valueToPush)) continue;
-					if ("". equals(valueToPush)) continue;
-					
-				// DO THE JOB
-					upTmp +=  " " +aLINE[0].trim()+":"+ valueToPush;
-					if (i%1 == 0) {
+			int i = 0;
+			DFReader aR = new DFReader(aIN); 
+			DFReader bR = new DFReader(bIN,aR); 
+			try { 
+				for (String popSample = bR.readNextChainedSample(); popSample != null; popSample = bR.readNextChainedSample() ) {
+					i++;
+					// DO THE JOB 					upTmp +=  " " +aLINE[0].trim()+":"+ valueToPush;
+					upTmp +=  " "+popSample.replaceAll(" " , "");
+					if (i%1 == 110) {
 						Object o = RrdCommander.execute( upTmp );
 						oldTmp = upTmp ;
 						upTmp = updatetxtTmp ;
 					}
+				}
+			}catch (IOException e) {
+				Object o = RrdCommander.execute( upTmp );
+			}
 					
-				}catch(  ArrayIndexOutOfBoundsException e) {
-					System.err.println("BREAK:#"+i+"::"+aTxt[i]);
-					System.err.println("BREAK:#"+i+"::"+bTxt[i+toSkip]+"::"+toSkip);
-					System.err.println("LAST UPDATE:"+upTmp);
-					System.err.println("PRELAST UPDATE: "+oldTmp);
-					//e.printStackTrace();
-					break;
-				}catch(  NumberFormatException e) {
-					System.err.println("skip:#"+i+"::"+aTxt[i]);
-					//e.printStackTrace();
-				}catch(Throwable e) {
-					System.out.println("skip:#"+i+"::"+aTxt[i]);
-					System.err.println("LAST UPDATE:"+upTmp);
-					System.err.println("PRELAST UPDATE: "+oldTmp);
-					upTmp = updatetxtTmp ;
-					//e.printStackTrace();
-					 
-				}			
-			} 
+
+					
+		 			 
 	
 			
 	//		RrdCommander.execute("rrdtool graph  "+cRRD+  ".gif --start "+initDate+"  --end "+ (secToLive+initDate) + " DEF:data="+cRRD+":data:AVERAGE AREA:data#FF55FF " );
@@ -267,13 +283,19 @@ public class RestoreService  extends Merger{
 			
 			String toXMPcmd = "rrdtool dump  " + cRRD+" ";
 			String Cxml = (String) RrdCommander.execute(toXMPcmd); 
-			String pathToExported = writeToTextSubFIle(c,Cxml);
+			File pathToExported = writeToTextSubFIle(c+".XML",Cxml);
 			String resultTmp= aRRD.replace(".rrd",".AB_merged."+System.currentTimeMillis()+".rrd"); // cRRD = aRRD.replace(".rrd","TMP.rrd");
-			String cmdREST = "rrdtool restore "+pathToExported+"   "+ resultTmp;
+			String cmdREST = "rrdtool restore "+pathToExported.getCanonicalPath()+"   "+ resultTmp;
 	
 	
 			String retval = (String) RrdCommander.execute(cmdREST);
 			System.out.println("AFTER RESTORE::"+retval+":::");
+			
+			bIN.close();
+			aIN.close();
+			//pathToExported.delete();
+			//b2DEL.delete();
+			//a2DEL.delete();
 			
 			String cToGraph = cmdGraphrrdTmp.replace(cRRD, resultTmp);
 			System.out.println(cToGraph);
@@ -306,14 +328,14 @@ public class RestoreService  extends Merger{
 			
 		}
 
-	private String writeToTextSubFIle(String path, String data) throws IOException {
-		File fileA = new File( path + ".txt");
+	private File writeToTextSubFIle(String path, String data) throws IOException {
+		File fileA = new File( path);
 		fileA.deleteOnExit();
 		FileWriter fwA = new FileWriter(fileA);
 		fwA.write(data);
 		fwA.flush();
 		fwA.close();
-		return fileA.getCanonicalPath();
+		return fileA;
 	}
 
 	@Override
@@ -321,7 +343,7 @@ public class RestoreService  extends Merger{
 		try {
 			return postCreateAndUpdateSTDRRD_OwnMergeOverFetchToUpdate( rrdname );
 		} catch (RrdException e) {	
-			System.out.println("IGNORE error:"+e.getMessage());
+			System.out.println("IGNORE error:"+e.getMessage());System.gc();e.printStackTrace();
 			return false;
 		} catch (Throwable  e) {
 			e.printStackTrace();
