@@ -38,7 +38,7 @@ public class Unzipper {
 		    	ZipEntry ze = zis.getNextEntry();
 		    	while(ze!=null){
 	
-		     	   String fileName = ze.getName();
+		     	   String fileName = ze.getName();//ze.getLastModifiedTime() (new File(outForlderToUnzip +"/"+fileName  )).exists()
 		            File newFile = new File(outForlderToUnzip + File.separator + fileName);
 	
 		            log.info( "file unzip : "+ newFile.getAbsoluteFile());
@@ -57,12 +57,13 @@ public class Unzipper {
 			        		fos.write(buffer, 0, len);
 			             }
 		
-			             
+		             }catch(IOException e) {
+		            	 System.out.println("}catch(IOException e) {"+e.getMessage());
 		             }finally {
 		            	 if(null!=fos) {
 		            		 fos.close();
 		            		 try {
-								m.merge(fileName);
+								m.merge(fileName.replace("/rrd.home/", ""));
 							} catch (RrdException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();

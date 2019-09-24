@@ -51,9 +51,9 @@ class RrdFetchCmd extends RrdToolCmd implements RrdGraphConstants {
 		RrdDb rrdDb = getRrdDbReference(path);
 		try {
 			FetchRequest fetchRequest = rrdDb.createFetchRequest(consolFun, timestamps[0], timestamps[1], resolution);
-			System.out.println(fetchRequest.dump());
+			//System.out.println(fetchRequest.dump());
 			FetchData fetchData = fetchRequest.fetchData();
-			println(fetchData.toString());
+			//println(fetchData.toString());
 			return fetchData;
 		}
 		finally {

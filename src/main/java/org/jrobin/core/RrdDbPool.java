@@ -259,7 +259,7 @@ public class RrdDbPool {
 	public synchronized void reset() throws RrdException{
 		for (String rrdName : instance.getOpenFiles()) {
 			try {
-				log.info("cleaning rrd=[{}]..",rrdName);
+				log.info("cleaning rrd=[{}].."+rrdName);
 				RrdDb rrdDb = instance.requestRrdDb(rrdName); 
 				instance.release(rrdDb);
 				log.info("compleete.");

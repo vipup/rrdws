@@ -1,4 +1,5 @@
 package eu.blky.springmvc; 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
@@ -6,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 
@@ -116,9 +118,16 @@ public class RestoreService  extends Merger{
 			if (!aRRD.endsWith(".rrd")){
 				throw new RrdException("this call should be performed with existing rrd-File-name!", aRRD);
 			}
+			String RRD_WORK_DIRECTORY = RrdFileBackend.CALC_DEFAULT_WORKDIR() +"/"+RrdFileBackend.RRD_HOME+"/";
+			if (!(new File(RRD_WORK_DIRECTORY , aRRD)).exists()) {
+				Path target = new File(RRD_WORK_DIRECTORY , aRRD).toPath();
+				Path newTmp = new File(RRD_WORK_DIRECTORY , aRRD.replace(".rrd", "NEW.rrd")).toPath();
+				Files.copy(newTmp, target, StandardCopyOption.REPLACE_EXISTING);
+				return true;
+			}
 			//long  secToLive = 20 * 365 * 24 * 60 *60;	//1 000 001 111    630 720 000	
 			
-			String RRD_WORK_DIRECTORY = RrdFileBackend.CALC_DEFAULT_WORKDIR() +"/"+RrdFileBackend.RRD_HOME+"/";
+			
 			String a = RRD_WORK_DIRECTORY+aRRD;
 			String bRRD = aRRD.replace(".rrd","NEW.rrd");
 			String b = RRD_WORK_DIRECTORY+bRRD;
@@ -142,11 +151,21 @@ public class RestoreService  extends Merger{
 			cmdGraphrrdTmp += " LINE2:dbdata#44EE4499  LINE1:dbdata#003300AA ";
 			cmdGraphrrdTmp += "";
 			String aToGraph = cmdGraphrrdTmp.replace(cRRD, aRRD);
+
+			Properties pA = new Properties();
+			pA.load(new ByteArrayInputStream( (""+RrdCommander.execute(" rrdtool info  "+aRRD)).getBytes() ));
+			Properties pB = new Properties();
+			pB.load(new ByteArrayInputStream( (""+RrdCommander.execute(" rrdtool info  "+bRRD)).getBytes() ));
+			if (pB.get( "last_update").equals(pA.get( "last_update"))) {
+				System.out.println("nothig to do:: Last update:"+pB.get( "last_update"));
+				
+				return (new File(bRRD)).delete();
+			}	
 			System.out.println(aToGraph); 
-			RrdCommander.execute(aToGraph);
+			if (aToGraph.indexOf("YYYJUSTSKIPALL RRD")>=0) RrdCommander.execute(aToGraph);
 			String bToGraph = cmdGraphrrdTmp.replace(cRRD, bRRD);
 			System.out.println(bToGraph); 
-			RrdCommander.execute(bToGraph);
+			if (bToGraph.indexOf("YYYJUSTSKIPALL RRD")>=0)RrdCommander.execute(bToGraph);
 			
 			// ws.rrd.csv.RrdUpdateAction.makeCreateCMD(long, String) 
 			String crTmp = "rrdtool create " +
@@ -180,10 +199,15 @@ public class RestoreService  extends Merger{
 			// fetch all from a, b, then push it with update into c
 			// rrdtool fetch  a.rrd AVERAGE -r 1 -s 920804700 > a.txt
 			// rrdtool fetch  b.rrd AVERAGE -r 1 -s 920804700 > b.txt
-			String sA = ""+RrdCommander.execute("rrdtool fetch "+aRRD+" -r 1 -s  "+initDate+" AVERAGE");
+			
+			String command = "rrdtool fetch "+aRRD+" -r 1 -s  "+initDate+" AVERAGE";
+			log.info(command);
+			String sA = ""+RrdCommander.execute(command);
 			writeToTextSubFIle(a+".txt",sA);
 			String aTxt[] = sA.split("\n");
-			String sB = ""+RrdCommander.execute("rrdtool fetch "+bRRD+" -r 1 -s  "+initDate+" AVERAGE");
+			String command2 = "rrdtool fetch "+bRRD+" -r 1 -s  "+initDate+" AVERAGE";
+			log.info(command2);
+			String sB = ""+RrdCommander.execute(command2);
 			writeToTextSubFIle(b+".txt",sB);
 			String bTxt[] = sB.split("\n");
 			
@@ -217,17 +241,17 @@ public class RestoreService  extends Merger{
 					System.err.println("BREAK:#"+i+"::"+bTxt[i+toSkip]+"::"+toSkip);
 					System.err.println("LAST UPDATE:"+upTmp);
 					System.err.println("PRELAST UPDATE: "+oldTmp);
-					e.printStackTrace();
+					//e.printStackTrace();
 					break;
 				}catch(  NumberFormatException e) {
 					System.err.println("skip:#"+i+"::"+aTxt[i]);
-					e.printStackTrace();
+					//e.printStackTrace();
 				}catch(Throwable e) {
 					System.out.println("skip:#"+i+"::"+aTxt[i]);
 					System.err.println("LAST UPDATE:"+upTmp);
 					System.err.println("PRELAST UPDATE: "+oldTmp);
 					upTmp = updatetxtTmp ;
-					e.printStackTrace();
+					//e.printStackTrace();
 					 
 				}			
 			} 
@@ -235,7 +259,7 @@ public class RestoreService  extends Merger{
 			
 	//		RrdCommander.execute("rrdtool graph  "+cRRD+  ".gif --start "+initDate+"  --end "+ (secToLive+initDate) + " DEF:data="+cRRD+":data:AVERAGE AREA:data#FF55FF " );
 			System.out.println(cmdGraphrrdTmp);
-			RrdCommander.execute(cmdGraphrrdTmp);
+			if (cmdGraphrrdTmp.indexOf("YYYJUSTSKIPALL RRD")>=0)			RrdCommander.execute(cmdGraphrrdTmp);
 			
 	
 			
@@ -253,7 +277,7 @@ public class RestoreService  extends Merger{
 			
 			String cToGraph = cmdGraphrrdTmp.replace(cRRD, resultTmp);
 			System.out.println(cToGraph);
-			RrdCommander.execute(cToGraph); 
+			if (cToGraph.indexOf("YYYJUSTSKIPALL RRD")>=0)				RrdCommander.execute(cToGraph); 
 			
 			
 			(new File(a)).renameTo(new File(a.replace(".rrd", "."+System.currentTimeMillis()+".BAK.rrd")));
@@ -293,8 +317,16 @@ public class RestoreService  extends Merger{
 	}
 
 	@Override
-	public boolean merge(String rrdname) throws IOException, RrdException {
-		return postCreateAndUpdateSTDRRD_OwnMergeOverFetchToUpdate( rrdname ); 
+	public boolean merge(String rrdname) throws IOException { 
+		try {
+			return postCreateAndUpdateSTDRRD_OwnMergeOverFetchToUpdate( rrdname );
+		} catch (RrdException e) {	
+			System.out.println("IGNORE error:"+e.getMessage());
+			return false;
+		} catch (Throwable  e) {
+			e.printStackTrace();
+			return false;
+		} 
 	}
  
 }

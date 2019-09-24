@@ -44,7 +44,7 @@ class RrdDumpCmd extends RrdToolCmd {
 		RrdDb rrdDb = getRrdDbReference(path);
 		try {
 			String xml = rrdDb.getXml();
-			println(xml);
+			//println(xml);
 			return xml;
 		}
 		finally {

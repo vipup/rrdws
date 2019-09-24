@@ -45,7 +45,7 @@ class RrdInfoCmd extends RrdToolCmd {
 		RrdDb rrd = getRrdDbReference(path);
 		try {
 			info = getInfo(rrd);
-			println(info);
+			//println(info);
 		}
 		finally {
 			releaseRrdDbReference(rrd);
