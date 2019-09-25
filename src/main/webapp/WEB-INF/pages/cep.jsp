@@ -5,9 +5,11 @@
 </head>
 <body>
 	<h3>CEP page</h3>
-	ENV: 
+	<h1>ENV: </h1>
 	<pre>${env}</pre>
-	VARS:
-	<pre>${vars}</pre>	
+  <h1>VARS:</h1>
+  <pre>${vars}</pre> 
+   <h1>P2r:</h1>
+  <pre>${p2r}</pre> 
 </body>
 </html>

@@ -6,19 +6,23 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
 import cc.co.llabor.system.StatusMonitor;
 import cc.co.llabor.threshold.AlertCaptain;
+import eu.blky.cep.polo2rrd.Polo2RddForwarderService;
 import ws.rrd.csv.RrdKeeper;
 
 public class StatusController extends AbstractController{
-	
+	@Autowired // works
 	private StatusMonitor statusMonitor;
+	@Autowired
+	Polo2RddForwarderService p2r;
 
 	{
-		System.out.println("HelloWorldController inited");
+		System.out.println("StatusController inited. statusMonitor=="+statusMonitor);
 	}
 	
 	@Override
@@ -36,7 +40,18 @@ public class StatusController extends AbstractController{
 		model.addObject("todo", AlertCaptain.getInstance().getToDo().toString() );
 		model.addObject("status", mapToString ( statusMonitor.getStatus()  ) );
 		
-
+		Map<String, Polo2RddForwarderService> x = statusMonitor.getObjectList();
+		
+		model.addObject("Polo2RddForwarderService", x.get ( com.journaldev.spring.service.CepService.POLO2RRD2  ) );
+		
+		String cmd = request.getParameter("cmd");
+		if ("stopp2r".equals(cmd)) {
+			x.get ( com.journaldev.spring.service.CepService.POLO2RRD2  ).destroy(); 
+		}
+		if ("startp2r".equals(cmd)) {
+			x.get ( com.journaldev.spring.service.CepService.POLO2RRD2  ).init(); 
+		}
+		
 		return model;
 	}
 

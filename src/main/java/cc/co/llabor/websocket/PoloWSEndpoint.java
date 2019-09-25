@@ -22,7 +22,8 @@ import org.slf4j.LoggerFactory;
 public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
 
     /** Logger */
-    private static Logger LOG = LoggerFactory.getLogger(PoloWSEndpoint.class);	
+    private static Logger LOG = LoggerFactory.getLogger(PoloWSEndpoint.class);
+	private URI endpointURI;	
  
 
     public PoloWSEndpoint(URI endpointURI, DestroyTracker watchDog, Object thisObjectIsUsedOnlyAsFlagForCallThisConstructor) {
@@ -30,29 +31,44 @@ public class PoloWSEndpoint extends DestroyableWebSocketClientEndpoint{
         try {
         	ClassLoader clBAK = Thread.currentThread().getContextClassLoader();
         	ClassLoader cl = PoloWSEndpoint.class.getClassLoader();
-        	//Thread.currentThread().setContextClassLoader(cl );
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        	Thread.currentThread().setContextClassLoader(cl );
+            container = ContainerProvider.getWebSocketContainer();
             container.setDefaultMaxBinaryMessageBufferSize(1116*1024);
             container.setDefaultMaxTextMessageBufferSize(1132*1024);
-             
-            container.connectToServer(this, endpointURI);
-            //Thread.currentThread().setContextClassLoader( clBAK );
+            this. endpointURI = endpointURI;
+            //USE START to initial connect container.connectToServer(this, endpointURI);
+            Thread.currentThread().setContextClassLoader( clBAK );
         } catch (Exception e) {
             //throw new RuntimeException(e);
         	e.printStackTrace();
         }  	
     }
+	WebSocketContainer container;
+	/**
+	 * @deprecated -  use constructor with modified ClassLoader for correct start within tomcat
+	 * 
+	 * @param endpointURI
+	 * @param watchDog
+	 */
     public PoloWSEndpoint(URI endpointURI, DestroyTracker watchDog) {
     	super(watchDog);
         try {
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        	container = ContainerProvider.getWebSocketContainer();
             container.setDefaultMaxBinaryMessageBufferSize(1116*1024);
             container.setDefaultMaxTextMessageBufferSize(1132*1024);
-             
-            container.connectToServer(this, endpointURI);
+            this. endpointURI = endpointURI;
+            //USE START to initial connect container.connectToServer(this, endpointURI);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public void start() {
+        try { 
+            container.connectToServer(this, endpointURI);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }    	
     }
 
 

@@ -2,14 +2,21 @@ package eu.blky.springmvc;
 
 import java.util.Map; 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;  
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 import cc.co.llabor.system.StatusMonitor;
 import eu.blky.cep.polo2rrd.CepKeeper;
+import eu.blky.cep.polo2rrd.Polo2RddForwarderService;
  
  
 public class CepController extends AbstractController{
+	
+	@Autowired // not works !?
+	Polo2RddForwarderService p2r;
+	
 	private CepKeeper cepKeeper;
 	/**
 	 * @return the cepKeeper
@@ -37,7 +44,9 @@ public class CepController extends AbstractController{
 	}	
 	
 	@Override
-	protected ModelAndView handleRequestInternal(HttpServletRequest request,
+	protected ModelAndView handleRequestInternal(
+			 
+		HttpServletRequest request,
 		HttpServletResponse response) throws Exception {
 
 
@@ -47,9 +56,16 @@ public class CepController extends AbstractController{
 			Object env = cepKeeper.getCepRT().getCurrentTime();
 			model.addObject("env", env );
 		}catch (Throwable e) {}		 
+		
+		try {			
+			model.addObject("p2r", p2r);
+		}catch (Throwable e) {}		 
+		
+		
 		try {
 			Map<String, Object> vars = cepKeeper.getCepRT().getVariableValueAll();
 			model.addObject("vars", vars );
+			
 		}catch (Throwable e) {}
 		
 

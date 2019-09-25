@@ -48,7 +48,7 @@ public class RrdCountUpdater implements MessageHandler {
 	@Override
 	public void destroy() throws IOException {
 		// TODO Auto-generated method stub
-		LOG.error("public void destroy() throws IOException {}",this);
+		LOG.error("public void destroy() throws IOException {}"+this);
 
 	}
 

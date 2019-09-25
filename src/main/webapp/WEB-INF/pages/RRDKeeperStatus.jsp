@@ -15,7 +15,11 @@
 	<h4>runtimeexceptionMessages :: <%=request.getAttribute("runtimeexceptionMessages")%></h4>
 	
  
-	<h3>Status::</h3>
-	<pre>${status}</pre>
+ <h3>Status::</h3>
+ <pre>${status}</pre>
+ 
+ 
+ <h3>Polo2RddForwarderService::</h3>
+ <pre>${Polo2RddForwarderService}</pre>
 </body>
 </html>

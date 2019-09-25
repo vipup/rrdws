@@ -12,7 +12,8 @@ import ws.rrd.csv.RrdKeeper;
 
 @Service
 public class CepService {
-//    ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+public static final String POLO2RRD2 = "polo2rrd";
+	//    ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 //    statusMonitor= (StatusMonitor) applicationContext.getBean("StatusMonitor");
 //    
 //    myBackupService =   (BackupService) applicationContext.getBean("myBackupService");
@@ -31,12 +32,13 @@ public class CepService {
 	@PostConstruct
 	public void init(){
 		System.out.println("CepRrdService init method called..." );
-		try {
-			polo2rrd.setStatusMonitor(statusMonitor);
-			System.out.println("CepRrdService init method called..." );
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			polo2rrd.setStatusMonitor(statusMonitor);
+//			statusMonitor.addObjectForMonitoring(POLO2RRD2,polo2rrd);
+//			System.out.println("CepRrdService init method called..." );
+//		}catch(Exception e) {
+//			e.printStackTrace();
+//		}
 		
 	}
 	

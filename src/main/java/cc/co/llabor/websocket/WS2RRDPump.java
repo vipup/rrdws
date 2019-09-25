@@ -79,8 +79,9 @@ public class WS2RRDPump implements DestroyTracker {
 			
 			LOG.info("start WatchDOGS...");
 			createWD(this);
-			
-			
+			LOG.info("start Polo...");
+			poloWS.start();
+			LOG.info("start Polo OK!");
 			this.alive = true;
 			LOG.info("started.");
 		}	

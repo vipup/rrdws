@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.catalina.manager.StatusManagerServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +44,12 @@ public class Polo2RddForwarderService {
 		this.cepKeeper = cepKeeper;
 	}
 	
-	// @Autowired not works correctly - use applicationContext.xml def
+	// works
 	@Autowired
 	private PoloWSEndpoint poloWS;
+ 
+	
+	
 	
 	private int engineCounter;
 
@@ -56,29 +60,46 @@ public class Polo2RddForwarderService {
 	private StatusMonitor statusMonitor;
 //	@PostConstruct -  workaround via StartStopServlet 
 	public void setStatusMonitor(StatusMonitor sm){
-		System.out.println("Assigned StatusMonitor:"+sm);
+		System.out.println("Assigned StatusMonitor:"+sm);sm.addObjectForMonitoring("me", this);
 		this.statusMonitor = sm;
 	}
 	boolean CEP_INIT_ALLOWED = true;
 	
 	@PostConstruct
 	public void init(){
-		System.out.println("Polo2RddForwarderService init method called. cepConfig == "+cepKeeper.getCepConfig()); 
-		if (CEP_INIT_ALLOWED)
-		try {			 
-			initCEP();
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			System.out.println("initCEP() done");
-			statusMonitor.getStatus().put("initCEP", "done");
-		} catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		//sm.addObjectForMonitoring("public void init(){", this);sm = sm== null?new StatusMonitor():sm;// hmm..
+		statusMonitor.addObjectForMonitoring("public void init(){", this);
+		LOG.info("Polo2RddForwarderService init method called. cepConfig == "+cepKeeper.getCepConfig()); 
+		if (CEP_INIT_ALLOWED) {
+			try {			 
+				initCEP();
+				LOG.info("initCEP() done");
+				LOG.info("initCEP() done");
+				LOG.info("initCEP() done");
+				LOG.info("initCEP() done");
+				LOG.info("initCEP() done");
+				LOG.info("initCEP() done");
+				LOG.info("initCEP() done");
+				LOG.info("initCEP() done");
+				statusMonitor.getStatus().put("initCEP", "done");
+				
+				LOG.info("start POLOWS...");
+				LOG.info("start POLOWS...");
+				LOG.info("start POLOWS...");
+				LOG.info("start POLOWS...");
+				LOG.info("start POLOWS...");
+				 
+				poloWS.start();
+				LOG.info("start POLOWS OK");
+				statusMonitor.getStatus().put("poloWS.start();", "done");
+				
+			} catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				LOG.error("public void init(){}",e);
+			}
+		}else {
+			statusMonitor.getStatus().put("initCEP", "boolean CEP_INIT_ALLOWED = false;");
 		}
  
 	}
@@ -142,8 +163,8 @@ public class Polo2RddForwarderService {
 						+ "";   
 			    EPStatement notNullEventsTmp = cepKeeper.getCepAdm().createEPL(avg10sec); 	
 			    notNullEventsTmp.addListener(new SysoUpdater(symTmp,properyNameTmp ));
-			    				
-			     
+			    System.out.println("...EPStatement notNullEventsTmp = "+notNullEventsTmp);				
+			    LOG.error("...EPStatement notNullEventsTmp = "+notNullEventsTmp); 
 	    	}
 	    }
 	    

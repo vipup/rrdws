@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import ws.rrd.pid.arduino.Pid;
 
 import cc.co.llabor.cache.Manager;
+import eu.blky.cep.polo2rrd.RrdCountUpdater;
 
 /** 
  * <b>Description:Notify itself via JMX and collect any kind of statistics from other notifications</b>
@@ -191,6 +192,7 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 					setAlive(false);
 					log.error("+.. +. .+. .+  .+. .+. .+. .+ .+ +. .+ +   + RRDWS-Hearbeat is stopped:"+Thread.currentThread().getName(), e);
 				} catch (RuntimeException e){
+					setAlive(false);
 					e.printStackTrace();
 					log.error("+.. +. .+. .+  .+. .+. .+. .+ .+ +. .+ +   + RRDWS-Hearbeat is stopped:"+Thread.currentThread().getName(), e);
 					System.out.println("+.. +. .+. .+  .+. .+. .+. .+ .+ +. .+ +   + RRDWS-Hearbeat is stopped:"+Thread.currentThread().getName());
@@ -632,7 +634,9 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 	 
 	
 	private Map<String, String> exceptionsRepo = new HashMap<String, String>(); 
-	private Map<String, Long> exceptionsRTRepo = new HashMap<String, Long>(); 
+	private Map<String, Long> exceptionsRTRepo = new HashMap<String, Long>();
+	/** Logger */
+	private static Logger LOG = LoggerFactory.getLogger(RrdKeeper.class); 
 	
 	static long lastUpdated = 0;
 	
@@ -647,7 +651,7 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 			//TODO Action rrdUpdateAction =  new RrdUpdateAction();   - this update could produce follow error, what is not cool
 			String timeMs = ""+System.currentTimeMillis();
 			//TODO rrdUpdateAction.perform(   "rrdws/heartbeat/"+uuid ,  timeMs  , ""+exCounter );
-			System.out.println( "rrdws/heartbeat/"+uuid +":uid at:"+ timeMs  + "::::#error count#"+  getAndIncrementCounter(uuid)  +" check#> ls -lah "+RrdFileBackend.CALC_DEFAULT_WORKDIR()	);
+			LOG.debug(  "rrdws/heartbeat/"+uuid +":uid at:"+ timeMs  + "::::#error count#"+  getAndIncrementCounter(uuid)  +" check#> ls -lah "+RrdFileBackend.CALC_DEFAULT_WORKDIR()	);
 			lastUpdated  = System.currentTimeMillis();
 		}
 	}

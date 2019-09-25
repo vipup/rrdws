@@ -1,5 +1,8 @@
 package eu.blky.cep.polo2rrd;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -7,11 +10,23 @@ import com.espertech.esper.client.Configuration;
 import com.espertech.esper.client.EPAdministrator;
 import com.espertech.esper.client.EPRuntime;
 import com.espertech.esper.client.EPServiceProvider;
-
  
-
 @Service
 public class CepKeeper {
+	
+	@PostConstruct
+	public void init(){
+		System.out.println("CepKeeper init method called..." ); 
+	} 
+	
+	@PreDestroy
+	public void destory(){
+		System.out.println("CepKeeper destroy method called..");
+		try{cep.destroy();}catch(Throwable e) {e.printStackTrace();}
+		try{cepConfig = null;}catch(Throwable e) {e.printStackTrace();}
+		try{cepRT = null;}catch(Throwable e) {e.printStackTrace();}
+		try{cepAdm.destroyAllStatements();}catch(Throwable e) {e.printStackTrace();}
+	}
 
     private EPServiceProvider cep;
 	public EPServiceProvider getCep() {

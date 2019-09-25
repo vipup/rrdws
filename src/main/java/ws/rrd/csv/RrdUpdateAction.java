@@ -9,8 +9,11 @@ import java.util.Date;
 import net.sf.jsr107cache.Cache; 
 import org.jrobin.cmd.RrdCommander;
 import org.jrobin.core.RrdException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cc.co.llabor.cache.Manager;
+import cc.co.llabor.websocket.cep.DiffTracker;
  
 
 /** 
@@ -28,6 +31,9 @@ public class RrdUpdateAction implements Action {
 
 	    public static final String MM_DD_YYYY_HH_MM_SS_SSS = "MM/dd/yyyy HH:mm:ss.SSS";
 		SimpleDateFormat sdf = new SimpleDateFormat(MM_DD_YYYY_HH_MM_SS_SSS);
+
+		/** Logger */
+		private static Logger LOG = LoggerFactory.getLogger(DiffTracker.class);
 		public RrdUpdateAction(){
 			
 		}
@@ -150,7 +156,7 @@ public class RrdUpdateAction implements Action {
 				synchronized (Registry.class) { 
 					reg.flush();
 					last_clean=System.currentTimeMillis();					
-					System.out.println("REGISTRY Flush #"+flushCount+++":"+changeCount);
+					LOG.debug("REGISTRY Flush #"+flushCount+++":"+changeCount);
 					changeCount =0;
 				}
 			}

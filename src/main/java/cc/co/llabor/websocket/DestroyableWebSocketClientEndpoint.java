@@ -19,7 +19,11 @@ import org.slf4j.LoggerFactory;
  
 
 @ClientEndpoint
-public class DestroyableWebSocketClientEndpoint {
+public abstract class DestroyableWebSocketClientEndpoint {
+	
+	
+	public abstract void start();
+	
     private static final int MAX_ALLOWED_ERROR_BEFORE_RESTART = 333;
 
 	/** Logger */

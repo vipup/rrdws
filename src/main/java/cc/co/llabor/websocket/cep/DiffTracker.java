@@ -1,36 +1,21 @@
 package cc.co.llabor.websocket.cep;
-
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+ 
+import java.util.HashMap; 
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.UpdateListener;
-import com.espertech.esper.event.map.MapEventBean;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.core.JsonParser.NumberType;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.espertech.esper.event.map.MapEventBean; 
+import com.fasterxml.jackson.databind.JsonNode; 
+import com.fasterxml.jackson.databind.ObjectMapper; 
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.ValueNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory; 
+import com.fasterxml.jackson.databind.node.ObjectNode; 
 
-import cc.co.llabor.cache.CacheManager;
+import cc.co.llabor.cache.CacheManager; 
 import net.sf.jsr107cache.Cache;
 
 public class DiffTracker implements UpdateListener {
@@ -49,6 +34,8 @@ public class DiffTracker implements UpdateListener {
 	String []props = "pair---timewindow---BOS---percentDIFF---priceDIFF---middlePCENT---tovPCENT---dataFIRST---tovFIRST---iTOV---iAVG---pTOV---pAVG---dTOV---dAVG---dMIN---startTIMESTAMP---diffTIME---dCAL---dCNT---type---dMAX---name---stopTIME---startTIME".split("---");
 	
 	String []keyprops = "BOS---timewindow---type---pair".split("---");
+	/** Logger */
+	private static Logger LOG = LoggerFactory.getLogger(DiffTracker.class);
 	
 	@Override
 	public void update(EventBean[] newEvents, EventBean[] oldEvents) {
@@ -72,7 +59,7 @@ public class DiffTracker implements UpdateListener {
 			callCounter++;
 			//if ((""+eBean.get("pair")).contains("BTC_ETH")) {
 			if ((""+eBean.get("pair")).contains("USDT_BTC")) { 
-			 System.out.println("+DIFF+"+callCounter+"+--:"+" ==:"+eBean.getProperties());
+			 LOG.info( "+DIFF+"+callCounter+"+--:"+" ==:"+eBean.getProperties());
 			}
 		}
 		list.removeAll();

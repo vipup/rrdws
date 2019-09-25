@@ -18,6 +18,8 @@ public class RRDWSEndpoint extends DestroyableWebSocketClientEndpoint{
 
 	/** Logger */
 	private static Logger LOG = LoggerFactory.getLogger(RRDWSEndpoint.class);
+	private URI endpointURI;
+	WebSocketContainer container;
 
 	public RRDWSEndpoint(URI endpointURI, DestroyTracker watchDog) {
 		super(watchDog);
@@ -26,11 +28,12 @@ public class RRDWSEndpoint extends DestroyableWebSocketClientEndpoint{
         try {
     		System.out.println("T6");
 
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+    		container = ContainerProvider.getWebSocketContainer();
     		System.out.println("T7");
-
-            container.connectToServer(this, endpointURI);
-    		System.out.println("T8");
+    		this.endpointURI = endpointURI;
+// USE start() to activate 
+//            container.connectToServer(this, endpointURI);
+//    		System.out.println("T8");
 
         } catch (Exception e) {
     		System.out.println("T9");
@@ -39,5 +42,17 @@ public class RRDWSEndpoint extends DestroyableWebSocketClientEndpoint{
         }
     }
 
+	@Override
+	public void start() {
+		try {
+			container.connectToServer(this, endpointURI);
+			System.out.println("T8");
+
+		} catch (Exception e) {
+			System.out.println("T9");
+			LOG.error("public RRDWSEndpoint(URI: " + endpointURI + ", DestroyTracker: " +  ") {" + e);
+			throw new RuntimeException(e);
+		}
+	}
   
 }
