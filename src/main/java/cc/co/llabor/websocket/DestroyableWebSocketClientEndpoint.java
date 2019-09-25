@@ -39,6 +39,7 @@ public abstract class DestroyableWebSocketClientEndpoint {
 	}
 
 	public void destroy() throws IOException {
+		if (!this.isAlive)return; // do nothing
 		this.isAlive = false;
 		
     	MessageHandler bak = this.messageHandler ;

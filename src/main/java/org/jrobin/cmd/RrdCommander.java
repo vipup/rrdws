@@ -156,8 +156,10 @@ public class RrdCommander {
 	 * @throws RrdException thrown for all other errors (parsing errors,
 	 *                      unknown RRDTool syntax/command/option, internal RRD errors...)
 	 */
-	public synchronized static Object execute(String command) throws IOException, RrdException {
-		String cmd = command.trim(), rrdtool = "rrdtool ";
+	public /*synchronized */static Object execute(String command) throws IOException, RrdException {
+		String cmd = command;
+		cmd = cmd.trim();
+		String rrdtool = "rrdtool ";
 		if (cmd.startsWith(rrdtool)) {
 			cmd = cmd.substring(rrdtool.length());
 		}

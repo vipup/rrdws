@@ -52,8 +52,9 @@ public class ChernoshimaService {
 	@PreDestroy
 	public void destroy(){
 		System.out.println("ChernoshimaService destroy method called");
-		provider.destroy();
 		generator.stop();
+		provider.destroy();
+		
 		
 	}	
 }

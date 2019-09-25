@@ -27,16 +27,20 @@ import org.jrobin.mrtg.server.Config;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cc.co.llabor.system.Merger;
 import cc.co.llabor.system.StatusMonitor;
-import cc.co.llabor.system.Unzipper; 
+import cc.co.llabor.system.Unzipper;
+import cc.co.llabor.websocket.PoloWSEndpoint; 
 
 @Service
 public class RestoreService  extends Merger{
 	 
- 
+	// works
+	@Autowired
+	private PoloWSEndpoint poloWS;
 
 	private StatusMonitor st;
 	private boolean restorePerformedFromExternal=false;
@@ -62,47 +66,61 @@ public class RestoreService  extends Merger{
 
 	public void restore( ) { 
 		
-		try{
-			File workdirTmp = new File ( Config.CALC_DEFAULT_WORKDIR() );
-			File tmpdirTmp = new File (System.getProperty("java.io.tmpdir"));
-			FilenameFilter filterTmp = new FilenameFilter(){
-
-				@Override
-				public boolean accept(File dir, String name) {
-					return  // internal - reuse locally stored between restart-redeploy-etc
-							(name.startsWith("rrd") && name.endsWith(".backup"))||
-							// external - use externally uploaded zip
-							(name.startsWith("backup") && name.endsWith(".zip")); 
-				} 
-			}; 
-			// search last backup
-			File toRestore = null;
-			for (String next: tmpdirTmp.list(filterTmp)){
-				if (toRestore == null){
-					toRestore = new File(tmpdirTmp, next);
-					continue;
-				}
-				File theNext = new File(tmpdirTmp, next);
-				if (toRestore.lastModified() < theNext.lastModified()){
-					toRestore = theNext;
-				}
+		try {
+			if (poloWS !=null ) {
+				System.out.println("STOP poloWS-...");
+			 	poloWS.destroy();
 			}
 			
-			if (toRestore != null){
-				RrdDbPool.getInstance().reset();
-				Unzipper zTmp = new Unzipper(toRestore, workdirTmp);
-				if ((new File(tmpdirTmp,"unzipperwhitelist.txt").exists())){
-					List<String> whiteList = readWhiteList(new File(tmpdirTmp,"unzipperwhitelist.txt"));
-					zTmp.setWhilelist(whiteList);
+			try{
+				File workdirTmp = new File ( Config.CALC_DEFAULT_WORKDIR() );
+				File tmpdirTmp = new File (System.getProperty("java.io.tmpdir"));
+				FilenameFilter filterTmp = new FilenameFilter(){
+	
+					@Override
+					public boolean accept(File dir, String name) {
+						return  // internal - reuse locally stored between restart-redeploy-etc
+								(name.startsWith("rrd") && name.endsWith(".backup"))||
+								// external - use externally uploaded zip
+								(name.startsWith("backup") && name.endsWith(".zip")); 
+					} 
+				}; 
+				// search last backup
+				File toRestore = null;
+				for (String next: tmpdirTmp.list(filterTmp)){
+					if (toRestore == null){
+						toRestore = new File(tmpdirTmp, next);
+						continue;
+					}
+					File theNext = new File(tmpdirTmp, next);
+					if (toRestore.lastModified() < theNext.lastModified()){
+						toRestore = theNext;
+					}
 				}
-				zTmp.unzip(this);
-				st.getStatus().put("restoreDB", "DB restore Done"); 
-
+				
+				if (toRestore != null){
+					RrdDbPool.getInstance().reset();
+					Unzipper zTmp = new Unzipper(toRestore, workdirTmp);
+					if ((new File(tmpdirTmp,"unzipperwhitelist.txt").exists())){
+						List<String> whiteList = readWhiteList(new File(tmpdirTmp,"unzipperwhitelist.txt"));
+						zTmp.setWhilelist(whiteList);
+					}
+					zTmp.unzip(this);
+					st.getStatus().put("restoreDB", "DB restore Done"); 
+	
+				}
+			}catch(Exception e){
+				log.error("restoreDB", e);
+				st.getStatus().put("restoreDB", "DB restore is not possible! New Server/instance/App/Node/DB?");
 			}
-		}catch(Exception e){
-			log.error("restoreDB", e);
-			st.getStatus().put("restoreDB", "DB restore is not possible! New Server/instance/App/Node/DB?");
-		}
+			if (poloWS !=null ) {
+				System.out.println("...and START poloWS again...");
+				poloWS.start();
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}	
 	}
 
 	private List<String> readWhiteList(File file) {
@@ -201,23 +219,62 @@ public class RestoreService  extends Merger{
 			String crTmp = "rrdtool create " +
 					""+cRRD+" --start "+(initDate)+"" + 
 					" --step 1 " +
-					"				DS:data:GAUGE:2121212240:U:U " +
-					"				RRA:AVERAGE:0.5:3:480 " +
-					"				RRA:AVERAGE:0.5:17:592 " +
-					"				RRA:AVERAGE:0.5:131:340 " +
-					"				RRA:AVERAGE:0.5:731:719 " +
-					"				RRA:AVERAGE:0.5:3300:"+(273*6)+" " + // !2730 _> 2y
-					"				RRA:MAX:0.5:3:480 " +
-					"				RRA:MAX:0.5:17:592 " +
-					"				RRA:MAX:0.5:131:340 " +
-					"				RRA:MAX:0.5:731:719 " +
-					"				RRA:MAX:0.5:3300:"+(273*2)+" "+
-					"				RRA:MIN:0.5:3:480 " +
-					"				RRA:MIN:0.5:17:592 " +
-					"				RRA:MIN:0.5:131:340 " +
-					"				RRA:MIN:0.5:731:719 " +
-					"				RRA:MIN:0.5:3300:"+(273*2)+" "+
-													" "; 		
+					"				DS:data:GAUGE:2121212240:U:U "+
+					//"rrdtool create data314y.rrd --step 1 \n"+
+					// "DS:data:GAUGE:1:U:U \n" + 
+/*
+ * Made with rrdcalc.html
+ * RRA Definitions
+ 	Days to keep	Minutes to summerize
+RRA1	1				0.5
+RRA2	7				15
+RRA3	31				30
+RRA4	120				120
+RRA5	1000			480
+					
+ */
+//					"RRA:AVERAGE:0.5:30:2880 \n" + 
+//					"RRA:AVERAGE:0.5:900:672 \n" + 
+//					"RRA:AVERAGE:0.5:1800:1488 \n" + 
+//					"RRA:AVERAGE:0.5:7200:1440 \n" + 
+//					"RRA:AVERAGE:0.5:28800:3000 \n" + 
+//					"RRA:MAX:0.5:30:2880 \n" + 
+//					"RRA:MAX:0.5:900:672 \n" + 
+//					"RRA:MAX:0.5:1800:1488 \n" + 
+//					"RRA:MAX:0.5:7200:1440 \n" + 
+//					"RRA:MAX:0.5:28800:3000 \n" + 
+//					"RRA:MIN:0.5:30:2880 \n" + 
+//					"RRA:MIN:0.5:900:672 \n" + 
+//					"RRA:MIN:0.5:1800:1488 \n" + 
+//					"RRA:MIN:0.5:7200:1440 \n" + 
+//					"RRA:MIN:0.5:28800:3000 \n" +
+/**
+ * 	Days to keep	Minutes to summerize
+RRA1	1				0.5
+RRA2	7				15
+RRA3	31				30
+RRA4	992				480
+RRA5	10000			1500
+
+ */
+//"rrdtool create dataEEE271y.rrd --step 1 \\\n" + 
+//"DS:data:GAUGE:1:U:U \n" + 
+				"RRA:AVERAGE:0.5:3:28800 \n" + 
+				"RRA:AVERAGE:0.5:900:672 \n" + 
+				"RRA:AVERAGE:0.5:1800:1488 \n" + 
+				"RRA:AVERAGE:0.5:28800:2976 \n" + 
+				"RRA:AVERAGE:0.5:90000:9600 \n" + 
+				"RRA:MAX:0.5:30:2880 \n" + 
+				"RRA:MAX:0.5:900:672 \n" + 
+				"RRA:MAX:0.5:1800:1488 \n" + 
+				"RRA:MAX:0.5:28800:2976 \n" + 
+				"RRA:MAX:0.5:90000:9600 \n" + 
+				"RRA:MIN:0.5:30:2880 \n" + 
+				"RRA:MIN:0.5:900:672 \n" + 
+				"RRA:MIN:0.5:1800:1488 \n" + 
+				"RRA:MIN:0.5:28800:2976 \n" + 
+				"RRA:MIN:0.5:90000:9600 "+
+					" "; 		
  
 			RrdCommander.execute(crTmp  );
 			String updatetxtTmp= " rrdtool update "+ cRRD+" "; //920804700:12345
@@ -258,14 +315,19 @@ public class RestoreService  extends Merger{
 					i++;
 					// DO THE JOB 					upTmp +=  " " +aLINE[0].trim()+":"+ valueToPush;
 					upTmp +=  " "+popSample.replaceAll(" " , "");
-					if (i%1 == 110) {
+					if (i%99 == 0) {
 						Object o = RrdCommander.execute( upTmp );
 						oldTmp = upTmp ;
 						upTmp = updatetxtTmp ;
 					}
 				}
 			}catch (IOException e) {
-				Object o = RrdCommander.execute( upTmp );
+				try { 
+					Object o = RrdCommander.execute( upTmp );
+				}catch (Exception e1) {
+					log.error("Object o = RrdCommander.execute( "+upTmp+" );",e1);
+					e1.printStackTrace();
+				}
 			}
 					
 
