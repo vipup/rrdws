@@ -281,7 +281,6 @@ RRA5	10000			1500
 //					""+rrddb+" --start "+(((timestampTmp-10000)/1000L))+"" + 
 //					" --step 1 " +
 //					"				DS:data:GAUGE:240:U:U " +
-					"				DS:data:GAUGE:240:U:U " +
 					"				RRA:AVERAGE:0.5:3:480 " +
 					"				RRA:AVERAGE:0.5:17:592 " +
 					"				RRA:AVERAGE:0.5:131:340 " +
