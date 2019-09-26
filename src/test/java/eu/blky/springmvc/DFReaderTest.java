@@ -135,16 +135,16 @@ public class DFReaderTest {
 				" 920910000:   +1.8773875566E02\n" + 
 				" 1121080000:  +8.4575808991E02\n" + 
 				" 1269020000:  +2.8575808991E02\n" + 
-				" 1269020000:  +7.4575808991E02\n" + 
+				" 1269020001:  +7.4575808991E02\n" + 
 				" 1369030000:  +3.8111111111E01\n" + 
-				" 1369030000:  +6.4111111111E01\n" + 
+				" 1369030001:  +6.4111111111E01\n" + 
 				" 1469040000:  +4.8903809616E02\n" + 
-				" 1469040000:  +5.4903809616E02\n" + 
+				" 1469040001:  +5.4903809616E02\n" + 
 				" 1569050000:  +5.8776999332E02\n" + 
-				" 1569050000:  +4.4776999332E02\n" + 
+				" 1569050001:  +4.4776999332E02\n" + 
 				" 1569080000:  +3.4612173360E02\n" + 
 				" 1569090000:  +6.8625488692E02\n" + 
-				" 1569090000:  +2.4625488692E02\n" + 
+				" 1569090001:  +2.4625488692E02\n" + 
 				" 1569100000:  +7.8598222442E02\n" + 
 				" 1569100001:  +1.4198222442E02\n" + 
 				" 1569100002:  +1.4298222442E02\n" + 
@@ -152,10 +152,16 @@ public class DFReaderTest {
 				" 1569100004:  +1.4498222442E02\n";
 		String c = "";
 		try {
-			 
+			 	long lastTIMESTAMP = 0;
 				for (String popSample = b.readNextChainedSample(); popSample != null; popSample = b.readNextChainedSample() ) {
-			 
+						long newTIMESTAMP = Long.valueOf(popSample.split(":")[0].trim());
+						if (newTIMESTAMP ==  lastTIMESTAMP) {
+							newTIMESTAMP++;
+							popSample = popSample.replace(""+lastTIMESTAMP, ""+newTIMESTAMP); 
+						}
+						lastTIMESTAMP = newTIMESTAMP;
 						System.out.println(" ::  "+popSample);
+						
 						c += popSample;
 						c += "\n";
 						 

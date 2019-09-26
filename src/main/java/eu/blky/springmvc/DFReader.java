@@ -17,12 +17,12 @@ public class DFReader {
 	public DFReader(BufferedReader bufferedReader, DFReader a) {
 		this(bufferedReader);
 		this.chainedReader = a; 
-		a.chainedReader = this;
+		//a.chainedReader = this;
 	}
 	
 	public String readNextChainedSample() throws IOException {
 		try {
-			String retval = getNextTimestamp()<=chainedReader.getNextTimestamp()?popSample():chainedReader.readNextChainedSample();
+			String retval = chainedReader==null||getNextTimestamp()<=chainedReader.getNextTimestamp()?popSample():chainedReader.readNextChainedSample();
 			return retval;
 		}catch(StackOverflowError e) {
 			throw new IOException("EOChain");
