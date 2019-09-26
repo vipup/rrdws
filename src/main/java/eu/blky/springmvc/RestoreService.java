@@ -259,21 +259,45 @@ RRA5	10000			1500
  */
 //"rrdtool create dataEEE271y.rrd --step 1 \\\n" + 
 //"DS:data:GAUGE:1:U:U \n" + 
-				"RRA:AVERAGE:0.5:3:28800 \n" + 
-				"RRA:AVERAGE:0.5:900:672 \n" + 
-				"RRA:AVERAGE:0.5:1800:1488 \n" + 
-				"RRA:AVERAGE:0.5:28800:2976 \n" + 
-				"RRA:AVERAGE:0.5:90000:9600 \n" + 
-				"RRA:MAX:0.5:30:2880 \n" + 
-				"RRA:MAX:0.5:900:672 \n" + 
-				"RRA:MAX:0.5:1800:1488 \n" + 
-				"RRA:MAX:0.5:28800:2976 \n" + 
-				"RRA:MAX:0.5:90000:9600 \n" + 
-				"RRA:MIN:0.5:30:2880 \n" + 
-				"RRA:MIN:0.5:900:672 \n" + 
-				"RRA:MIN:0.5:1800:1488 \n" + 
-				"RRA:MIN:0.5:28800:2976 \n" + 
-				"RRA:MIN:0.5:90000:9600 "+
+//				"RRA:AVERAGE:0.5:3:28800 \n" + 
+//				"RRA:AVERAGE:0.5:900:672 \n" + 
+//				"RRA:AVERAGE:0.5:1800:1488 \n" + 
+//				"RRA:AVERAGE:0.5:28800:2976 \n" + 
+//				"RRA:AVERAGE:0.5:90000:9600 \n" + 
+//				"RRA:MAX:0.5:30:2880 \n" + 
+//				"RRA:MAX:0.5:900:672 \n" + 
+//				"RRA:MAX:0.5:1800:1488 \n" + 
+//				"RRA:MAX:0.5:28800:2976 \n" + 
+//				"RRA:MAX:0.5:90000:9600 \n" + 
+//				"RRA:MIN:0.5:30:2880 \n" + 
+//				"RRA:MIN:0.5:900:672 \n" + 
+//				"RRA:MIN:0.5:1800:1488 \n" + 
+//				"RRA:MIN:0.5:28800:2976 \n" + 
+//				"RRA:MIN:0.5:90000:9600 "+
+// ws.rrd.csv.RrdUpdateAction.makeCreateCMD(long, String) 
+// ws.rrd.csv.RrdUpdateAction.makeCreateCMD(long, String) 
+// ws.rrd.csv.RrdUpdateAction.makeCreateCMD(long, String) 
+//			String cmdCreate = "rrdtool create " +
+//					""+rrddb+" --start "+(((timestampTmp-10000)/1000L))+"" + 
+//					" --step 1 " +
+//					"				DS:data:GAUGE:240:U:U " +
+					"				DS:data:GAUGE:240:U:U " +
+					"				RRA:AVERAGE:0.5:3:480 " +
+					"				RRA:AVERAGE:0.5:17:592 " +
+					"				RRA:AVERAGE:0.5:131:340 " +
+					"				RRA:AVERAGE:0.5:731:719 " +
+					"				RRA:AVERAGE:0.5:10000:273 " + // back to calc: 10000 x 273  sec-> 2730000 / 60 / 60  / 24 =  2730000 / 60 / 60 / 24 -> 31.597(2) days
+					"				RRA:MAX:0.5:3:480 " +
+					"				RRA:MAX:0.5:17:592 " +
+					"				RRA:MAX:0.5:131:340 " +
+					"				RRA:MAX:0.5:731:719 " +
+					"				RRA:MAX:0.5:10000:273 " +
+					"				RRA:MIN:0.5:3:480 " +
+					"				RRA:MIN:0.5:17:592 " +
+					"				RRA:MIN:0.5:131:340 " +
+					"				RRA:MIN:0.5:731:719 " +
+					"				RRA:MIN:0.5:10000:273 " + 
+													 
 					" "; 		
  
 			RrdCommander.execute(crTmp  );

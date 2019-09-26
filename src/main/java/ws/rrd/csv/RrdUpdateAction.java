@@ -128,7 +128,7 @@ public class RrdUpdateAction implements Action {
 				"				RRA:AVERAGE:0.5:17:592 " +
 				"				RRA:AVERAGE:0.5:131:340 " +
 				"				RRA:AVERAGE:0.5:731:719 " +
-				"				RRA:AVERAGE:0.5:10000:2730 " +
+				"				RRA:AVERAGE:0.5:10000:273 " + // back to calc: 10000 x 273  sec-> 2730000 / 60 / 60  / 24 =  2730000 / 60 / 60 / 24 -> 31.597(2) days
 				"				RRA:MAX:0.5:3:480 " +
 				"				RRA:MAX:0.5:17:592 " +
 				"				RRA:MAX:0.5:131:340 " +
