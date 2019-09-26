@@ -22,7 +22,7 @@ public class DFReader {
 	
 	public String readNextChainedSample() throws IOException {
 		try {
-			String retval = chainedReader==null||getNextTimestamp()<=chainedReader.getNextTimestamp()?popSample():chainedReader.readNextChainedSample();
+			String retval = chainedReader==null||getNextTimestamp()<=chainedReader.getNextTimestamp()?(getNextTimestamp()==this.lastTimeStamp?popSample():chainedReader.readNextChainedSample()):chainedReader.readNextChainedSample();
 			return retval;
 		}catch(StackOverflowError e) {
 			throw new IOException("EOChain");
@@ -54,7 +54,7 @@ public class DFReader {
 		if(nextSample==null) {
 			this.pushSample(this.readNExt());
 		 }
-		 return lastTimeStamp; 
+		 return chainedReader==null? lastTimeStamp:Math.min(lastTimeStamp, chainedReader.getNextTimestamp()); 
 	}
 
 	public String popSample() {
