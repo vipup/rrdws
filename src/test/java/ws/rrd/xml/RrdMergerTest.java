@@ -641,7 +641,7 @@ public class RrdMergerTest {
 		long start = System.currentTimeMillis();
 		postCreateAndUpdateSTDRRD_OwnMergeOverFetchToUpdate("X-553689133.rrd");
 		System.out.println("EXECTIME:"+(System.currentTimeMillis()-start)+" ms.");
-		assertEquals(tTmp.length(),testTmp.length()); 
+		assertEquals(178356,testTmp.length()); 
 		
 		
 	}
@@ -665,8 +665,7 @@ public class RrdMergerTest {
 					return true;
 				}
 				//long  secToLive = 20 * 365 * 24 * 60 *60;	//1 000 001 111    630 720 000	
-				
-				
+ 
 				String a = RRD_WORK_DIRECTORY+aRRD;
 				String bRRD = aRRD.replace(".rrd","NEW.rrd");
 				String b = RRD_WORK_DIRECTORY+bRRD;
@@ -701,95 +700,21 @@ public class RrdMergerTest {
 					return (new File(bRRD)).delete();
 				}	
 				System.out.println(aToGraph); 
-				if (aToGraph.indexOf("rrd")>=0) RrdCommander.execute(aToGraph);
+				if (aToGraph.indexOf("553689133")>=0) RrdCommander.execute(aToGraph);
 				String bToGraph = cmdGraphrrdTmp.replace(cRRD, bRRD);
 				System.out.println(bToGraph); 
-				if (bToGraph.indexOf("rrd")>=0)RrdCommander.execute(bToGraph);
+				if (bToGraph.indexOf("553689133")>=0)RrdCommander.execute(bToGraph);
 				
 				// ws.rrd.csv.RrdUpdateAction.makeCreateCMD(long, String) 
 				String crTmp = "rrdtool create " +
 						""+cRRD+" --start "+(initDate)+"" + 
 						" --step 1 " +
-						"				DS:data:GAUGE:2121212240:U:U "+
-						//"rrdtool create data314y.rrd --step 1 \n"+
-						// "DS:data:GAUGE:1:U:U \n" + 
-	/*
-	 * Made with rrdcalc.html
-	 * RRA Definitions
-	 	Days to keep	Minutes to summerize
-	RRA1	1				0.5
-	RRA2	7				15
-	RRA3	31				30
-	RRA4	120				120
-	RRA5	1000			480
-						
-	 */
-	//					"RRA:AVERAGE:0.5:30:2880 \n" + 
-	//					"RRA:AVERAGE:0.5:900:672 \n" + 
-	//					"RRA:AVERAGE:0.5:1800:1488 \n" + 
-	//					"RRA:AVERAGE:0.5:7200:1440 \n" + 
-	//					"RRA:AVERAGE:0.5:28800:3000 \n" + 
-	//					"RRA:MAX:0.5:30:2880 \n" + 
-	//					"RRA:MAX:0.5:900:672 \n" + 
-	//					"RRA:MAX:0.5:1800:1488 \n" + 
-	//					"RRA:MAX:0.5:7200:1440 \n" + 
-	//					"RRA:MAX:0.5:28800:3000 \n" + 
-	//					"RRA:MIN:0.5:30:2880 \n" + 
-	//					"RRA:MIN:0.5:900:672 \n" + 
-	//					"RRA:MIN:0.5:1800:1488 \n" + 
-	//					"RRA:MIN:0.5:7200:1440 \n" + 
-	//					"RRA:MIN:0.5:28800:3000 \n" +
-	/**
-	 * 	Days to keep	Minutes to summerize
-	RRA1	1				0.5
-	RRA2	7				15
-	RRA3	31				30
-	RRA4	992				480
-	RRA5	10000			1500
-	
-	 */
-	//"rrdtool create dataEEE271y.rrd --step 1 \\\n" + 
-	//"DS:data:GAUGE:1:U:U \n" + 
-	//				"RRA:AVERAGE:0.5:3:28800 \n" + 
-	//				"RRA:AVERAGE:0.5:900:672 \n" + 
-	//				"RRA:AVERAGE:0.5:1800:1488 \n" + 
-	//				"RRA:AVERAGE:0.5:28800:2976 \n" + 
-	//				"RRA:AVERAGE:0.5:90000:9600 \n" + 
-	//				"RRA:MAX:0.5:30:2880 \n" + 
-	//				"RRA:MAX:0.5:900:672 \n" + 
-	//				"RRA:MAX:0.5:1800:1488 \n" + 
-	//				"RRA:MAX:0.5:28800:2976 \n" + 
-	//				"RRA:MAX:0.5:90000:9600 \n" + 
-	//				"RRA:MIN:0.5:30:2880 \n" + 
-	//				"RRA:MIN:0.5:900:672 \n" + 
-	//				"RRA:MIN:0.5:1800:1488 \n" + 
-	//				"RRA:MIN:0.5:28800:2976 \n" + 
-	//				"RRA:MIN:0.5:90000:9600 "+
-	// ws.rrd.csv.RrdUpdateAction.makeCreateCMD(long, String) 
-	// ws.rrd.csv.RrdUpdateAction.makeCreateCMD(long, String) 
-	// ws.rrd.csv.RrdUpdateAction.makeCreateCMD(long, String) 
-	//			String cmdCreate = "rrdtool create " +
-	//					""+rrddb+" --start "+(((timestampTmp-10000)/1000L))+"" + 
-	//					" --step 1 " +
-	//					"				DS:data:GAUGE:240:U:U " +
+						"				DS:data:GAUGE:2121212240:U:U "+ 
 						"				RRA:AVERAGE:0.5:3:480 " +
 						"				RRA:AVERAGE:0.5:17:592 " +
 						"				RRA:AVERAGE:0.5:131:340 " +
-						"				RRA:AVERAGE:0.5:731:719 " +
-// EXECTIME:1668 ms.						
-//ORIGINAL(59028)		"				RRA:AVERAGE:0.5:10000:273 " + // back to calc: 10000 x 273  sec-> 2730000 / 60 / 60  / 24 =  2730000 / 60 / 60 / 24 -> 31.597(2) days
-
-// X10 -
-// EXECTIME:12269 ms.
-//						"				RRA:AVERAGE:0.5:10000:2731 " + // back to calc: 10000 x 273  sec-> 2730000 / 60 / 60  / 24 =  2730000 / 60 / 60 / 24 -> 31.597(2) days
-//- y == MIN z == MAX
-// X10 + y10 + z10 (118020)
-// EXECTIME:13206 ms.
-//X + y10 ' z10
-//EXECTIME:1716 ms.
-//X + y30 ' z30
-//EXECTIME:1717 ms..
-						"				RRA:AVERAGE:0.5:10000:273 " + // back to calc: 10000 x 273  sec-> 2730000 / 60 / 60  / 24 =  2730000 / 60 / 60 / 24 -> 31.597(2) days
+						"				RRA:AVERAGE:0.5:731:719 " + 
+						"				RRA:AVERAGE:0.5:10000:273 " +  
 						"				RRA:MAX:0.5:3:480 " +
 						"				RRA:MAX:0.5:17:592 " +
 						"				RRA:MAX:0.5:131:340 " +
@@ -850,11 +775,8 @@ public class RrdMergerTest {
 				try { 
 					long lastTIMESTAMP = 0; 
 					for (String popSample = aR.readNextChainedSample(); popSample != null; popSample = aR.readNextChainedSample() ) {
-						System.out.println("O:"+popSample);
-						i++;
-						
-						 
-						// DO THE JOB 					upTmp +=  " " +aLINE[0].trim()+":"+ valueToPush;
+						log.trace("O:{}",popSample);
+						i++; 
 						
 						long newTIMESTAMP = Long.valueOf(popSample.split(":")[0].trim());
 						if (lastTIMESTAMP <newTIMESTAMP) {
@@ -866,11 +788,13 @@ public class RrdMergerTest {
 						if (newTIMESTAMP/10 ==  lastTIMESTAMP/10) { 
 							popSample = popSample.replace(""+lastTIMESTAMP, ""+(lastTIMESTAMP+(j))); 
 						} 
-						System.out.println("m:"+popSample);
+						log.trace("m:{}",popSample);
 						upTmp +=  " "+popSample.replaceAll(" " , "");
 						
 						if (i%99 == 0) {
+							// DO THE JOB 					upTmp +=  " " +aLINE[0].trim()+":"+ valueToPush; 
 							Object o = RrdCommander.execute( upTmp );
+							log.debug("::{}",o);
 							oldTmp = upTmp ;
 							upTmp = updatetxtTmp ;
 						}
@@ -883,6 +807,8 @@ public class RrdMergerTest {
 						e1.printStackTrace();
 					}
 				}catch (Exception e) {
+					log.error("oldTmp::::::::::{}{}{}::::::::",oldTmp);
+					log.error("upTmp:::::{}{}{}:::::::::::::",upTmp);
 					e.printStackTrace();
 				}
 						
@@ -907,7 +833,7 @@ public class RrdMergerTest {
 		
 		
 				String retval = (String) RrdCommander.execute(cmdREST);
-				System.out.println("AFTER RESTORE::"+retval+":::");
+				log.info("AFTER RESTORE::{}:::",retval );
 				
 //				bIN.close();
 //				aIN.close();
@@ -916,8 +842,8 @@ public class RrdMergerTest {
 				//a2DEL.delete();
 				
 				String cToGraph = cmdGraphrrdTmp.replace(cRRD, resultTmp);
-				System.out.println(cToGraph);
-				if (cToGraph.indexOf("rrd")>=0)				RrdCommander.execute(cToGraph); 
+				log.info("TO EXEC::",cToGraph);
+				if (cToGraph.indexOf("X-553689133")>=0)				RrdCommander.execute(cToGraph); 
 				
 				
 				(new File(a)).renameTo(new File(a.replace(".rrd", "."+System.currentTimeMillis()+".BAK.rrd")));
@@ -933,13 +859,14 @@ public class RrdMergerTest {
 			    Files.copy(originalPath, copied, StandardCopyOption.REPLACE_EXISTING);
 			    
 			    // clean tmps
-//			    File aFile = new File(a+".gif");
-//			    aFile.delete();
-//			    File bFile = new File(b+".gif");
-//			    bFile.delete();
-//			    File cFile = new File(c+".gif");
-//			    cFile.delete();
-				
+			    if (!a.contains("X-553689133")) {
+				    File aFile = new File(a+".gif");
+				    aFile.delete();
+				    File bFile = new File(b+".gif");
+				    bFile.delete();
+				    File cFile = new File(c+".gif");
+				    cFile.delete();
+			    }
 			    
 			    System.out.println(retval);
 				return true;
