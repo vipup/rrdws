@@ -8,12 +8,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.FileSystems;
+import java.io.InputStreamReader; 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.Date;
+import java.nio.file.StandardCopyOption; 
 import java.util.Properties;
 
 import org.jrobin.cmd.RrdCommander;
@@ -28,16 +26,10 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.blky.cep.polo2rrd.SysoUpdater;
-import eu.blky.springmvc.DFReader;
+ 
+import eu.blky.logparser.ParaReader;
 import eu.blky.springmvc.RestoreService;
-
-//import eu.blky.net.mrtg.server.Config;
-//import eu.blky.rrd.cmd.RrdCommander;
-//import eu.blky.rrd.core.RrdException;
-//import eu.blky.rrd.core.RrdFileBackend;
-
+ 
 /** 
  * <b>Description:TODO</b>
  * @author      vipup<br>
@@ -62,6 +54,7 @@ public class RrdMergerTest {
 		new File(RrdFileBackend.CALC_DEFAULT_WORKDIR()  +"/"+RrdFileBackend.RRD_HOME+ "/testC.rrd") .delete();
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testCreateAandBThenMerge() throws IOException, RrdException {
 		createA() ; // create before!! 
@@ -83,35 +76,22 @@ public class RrdMergerTest {
 		
 		// C = A + B
 		Object a = RrdCommander.execute("rrdtool fetch testA.rrd AVERAGE --start 920804400 --end 920809200" );
+		log.trace("{}",a);
 		Object b = RrdCommander.execute("rrdtool fetch testB.rrd AVERAGE --start 920804400 --end 920809200" );
+		log.trace("{}",b);
 		Object c = RrdCommander.execute("rrdtool fetch testC.rrd AVERAGE --start 920804400 --end 920809200" );
-		(new Diff()).diff((""+a).split("\n"), readFully("t3.txt").split("\n"));
-		(new Diff()).diff((""+b).split("\n"), readFully("t3.txt").split("\n"));
-		(new Diff()).diff((""+c).split("\n"), readFully("t3.txt").split("\n"));
-		(new Diff()).diff((""+a).split("\n"), (""+b).split("\n"));
-		(new Diff()).diff((""+c).split("\n"), (""+b).split("\n"));
-		(new Diff()).diff((""+c).split("\n"), (""+a).split("\n"));
-		// TODO Assert.assertEquals(readFully("t4.txt") , (""+c)   );
+		log.trace("{}",c);
+ 
+		assertEquals( readFully("t4.txt"), (""+c)   ); // 
 		
-//		rrdtool graph testA.png \
-//		 --start 920804400 --end 920808000 \
-//		 DEF:myspeed=testA.rrd:speed:AVERAGE \
-//		 AREA:myspeed#FF0000
-		Object aG = RrdCommander.execute("rrdtool graph testA.png  --start 920804400 --end 920808000 DEF:myspeed=testA.rrd:speed:AVERAGE AREA:myspeed#FF0000 " );
-		Object bG = RrdCommander.execute("rrdtool graph testB.png  --start 920804400 --end 920808000 DEF:myspeed=testB.rrd:speed:AVERAGE AREA:myspeed#22FF00 " );
-		Object cG = RrdCommander.execute("rrdtool graph testC.png  --start 920804400 --end 920808000 DEF:myspeed=testC.rrd:speed:AVERAGE AREA:myspeed#2222FF " );
-		
-//
-//		rrdtool graph testB.png \
-//		 --start 920804400 --end 920808000 \
-//		 DEF:myspeed=testB.rrd:speed:AVERAGE \
-//		 AREA:myspeed#22FF00
-//
-//		rrdtool graph testC.png \
-//		 --start 920804400 --end 920808000 \
-//		 DEF:myspeed=testC.rrd:speed:AVERAGE \
-//		 AREA:myspeed#2222FF
-
+ 
+		Object aG = RrdCommander.execute("rrdtool graph testA.gif  --start 920804400 --end 920808000 DEF:myspeed=testA.rrd:speed:AVERAGE AREA:myspeed#FF0000 " );
+		log.trace("{}",aG);
+		Object bG = RrdCommander.execute("rrdtool graph testB.gif  --start 920804400 --end 920808000 DEF:myspeed=testB.rrd:speed:AVERAGE AREA:myspeed#22FF00 " );
+		log.trace("{}",bG);
+		Object cG = RrdCommander.execute("rrdtool graph testC.gif  --start 920804400 --end 920808000 DEF:myspeed=testC.rrd:speed:AVERAGE AREA:myspeed#2222FF " );
+		log.trace("{}",cG);
+ 
 		
 	}	
 	
@@ -126,6 +106,7 @@ public class RrdMergerTest {
 				+ ""
 				+ "";
  		Object o = RrdCommander.execute(createA.replace("\\", "\n ") );
+ 		log.trace("{}",o);
 		
 	}
 	private void createB() throws IOException, RrdException {
@@ -138,21 +119,19 @@ public class RrdMergerTest {
 				+ ""
 				+ "";
  		Object o = RrdCommander.execute(createA.replace("\\", "\n ") );
-		
+ 		log.trace("{}",o);
 	}
 	
 	
-	@Test
+	 
 	public void testCreateAndUpdateAndFetch() throws IOException, RrdException {
 		testCreateA();
 		testCreateAndUpdate();
 		Object o =  RrdCommander.execute("rrdtool fetch test.rrd AVERAGE --start 920804400 --end 920809200" );
-		(new Diff()).diff((""+o).split("\n"), readFully("t3.txt").split("\n"));
-		//Assert.assertEquals( (""+o)  , readFully("t3.txt") );
-		
+		(new Diff()).diff((""+o).split("\n"), readFully("t3.txt").split("\n"));  
 	}
 	
-	@Test
+	 
 	public void testCreateA() throws IOException, RrdException {
 		String createA = "rrdtool create test.rrd \\"
 				+ " --start 920804400 \\"
@@ -167,7 +146,8 @@ public class RrdMergerTest {
  		
  		o =  RrdCommander.execute("rrdtool fetch test.rrd AVERAGE --start 920804400 --end 920809200" );
  		String[] d = (new Diff()).diff((""+o).replace("  ", " ").split("\n"), readFully("t1.txt").replace("  ", " ").split("\n"));
- 		//Assert.assertEquals(d[0], (""+o).length() , readFully("t0.txt").length());
+ 		log.trace("{}",""+d);
+
  		
  		
 	}
@@ -200,13 +180,12 @@ public class RrdMergerTest {
 		RrdCommander.execute(crTmp  );
 		RrdCommander.execute(crTmp.replace("20yearsdata.rrd ", "ODDyearsdata.rrd ")  );
 		RrdCommander.execute(crTmp.replace("20yearsdata.rrd ", "EVENyearsdata.rrd ")  );
-		//RrdCommander.execute("rrdtool graph 20yearsdata.png --start  "+initDate+" --end "+ (secToLive+initDate) + " DEF:data=20yearsdata.rrd:data:AVERAGE AREA:data#FF0000 " );
-		RrdCommander.execute("rrdtool graph  20yearsdata.gif --start "+initDate+"  --end "+ (secToLive+initDate) + " DEF:data=20yearsdata.rrd:data:AVERAGE AREA:data#FF0000 " );
+ 		RrdCommander.execute("rrdtool graph  20yearsdata.gif --start "+initDate+"  --end "+ (secToLive+initDate) + " DEF:data=20yearsdata.rrd:data:AVERAGE AREA:data#FF0000 " );
 		
-		String updatetxtTmp= " rrdtool update 20yearsdata.rrd "; //920804700:12345
+		String updatetxtTmp= " rrdtool update 20yearsdata.rrd ";  
 		long j = 0;
 		long starttime = System.currentTimeMillis();
-		long n = (secToLive - 111 ) / (secToLive/10000); // 1111111
+		long n = (secToLive - 111 ) / (secToLive/10000);  
 		for (int i=111;i<secToLive;i+=secToLive/10000 ) {
 			
 			if (j++%100 == 0) {
@@ -219,6 +198,7 @@ public class RrdMergerTest {
 			String upTmp = updatetxtTmp +" " + (initDate+i)+":"+(11100*Math.sin( j/365)+100.0*Math.sin( j/7)+1100.0*Math.sin( j/30) +j);
 			try {
 				Object o = RrdCommander.execute( upTmp );
+				log.trace("{}",o);
 				if ( j/365%2 == 0) {
 					RrdCommander.execute( upTmp.replace("20yearsdata.rrd ", "ODDyearsdata.rrd ")  );
 				}else {
@@ -229,14 +209,14 @@ public class RrdMergerTest {
 				System.out.println("iiiiiiiii:"+i);
 				e.printStackTrace();
 				break;
-			}
-			//Assert.assertEquals( o , "test.rrd");
+			} 
 		} 
 		RrdCommander.execute("rrdtool graph  20yearsdata.gif --start "+920804700+"  --end "+ (secToLive+initDate) + " DEF:data=20yearsdata.rrd:data:AVERAGE AREA:data#FF0000 " ); 
 		System.err.println("1111111");
 		dump20year();
 	}	
 	
+	@SuppressWarnings("deprecation")
 	@Test
 	@Ignore
 	/**
@@ -258,7 +238,7 @@ public class RrdMergerTest {
 		RrdCommander.execute("rrdtool graph  ODD_plus_EVENyearsdata.gif --start "+920804700+"  --end "+ (secToLive+initDate) + " DEF:data=ODD_plus_EVENyearsdata.rrd:data:AVERAGE AREA:data#6666ff " );
 	}
 	
-	@Test 
+	 
 	/** 
 	 * 
 	 * @throws IOException
@@ -344,6 +324,7 @@ public class RrdMergerTest {
 				upTmp +=  " " +aLINE[0].trim()+":"+ valueToPush;
 				if (i%1 == 0) {
 					Object o = RrdCommander.execute( upTmp );
+					log.trace("{}",o);
 					oldTmp = upTmp ;
 					upTmp = updatetxtTmp ;
 				}
@@ -381,6 +362,7 @@ public class RrdMergerTest {
 		String pathToExported = writeToTextSubFIle(c,Cxml);
 		String cmdREST = "rrdtool restore "+pathToExported+"  AplusB_merged"+System.currentTimeMillis()+".rrd ";
 		String retval = (String) RrdCommander.execute(cmdREST);
+		log.trace("{}",retval);
 		//System.out.println(retval);
 		
 	}
@@ -393,8 +375,7 @@ public class RrdMergerTest {
 		fwA.close();
 		return fileA.getCanonicalPath();
 	}
-	
-	@Test
+	 
 	public void testCreateAndUpdate() throws IOException, RrdException {
 		testCreateA() ; // create before!! 
 		String updatetxtTmp= " rrdtool update test.rrd 920804700:12345 920805000:12357 920805300:12363\r\n" + 
@@ -405,7 +386,7 @@ public class RrdMergerTest {
 		String[] updates=  updatetxtTmp.split("\n");
 		for (String update:updates) {
 			Object o = RrdCommander.execute( update );
-			//Assert.assertEquals( o , "test.rrd");
+			log.trace("{}",o);
 		} 
  		
  		Object o1 = RrdCommander.execute("rrdtool fetch test.rrd AVERAGE --start 920804400 --end 920809200" );
@@ -435,7 +416,7 @@ public class RrdMergerTest {
 	public void postCreateAndUpdateSTDRRD_OwnMergeOverFetchToUpdate() throws IOException, RrdException {
 		long initDate = 920804700; 
 		
-		long  secToLive = 20 * 365 * 24 * 60 *60;	//1 000 001 111    630 720 000	
+ 
 		String aRRD = "X-553689133.rrd";
 		String RRD_WORK_DIRECTORY = RrdFileBackend.CALC_DEFAULT_WORKDIR() +"/"+RrdFileBackend.RRD_HOME+"/";
 		String a = RRD_WORK_DIRECTORY+aRRD;
@@ -456,8 +437,7 @@ public class RrdMergerTest {
 		cmdGraphrrdTmp += " DEF:dbdata="+dbName+":data:AVERAGE  ";
 		cmdGraphrrdTmp += " DEF:min1="+dbName+":data:MIN  ";
 		cmdGraphrrdTmp += " DEF:max1="+dbName+":data:MAX  ";
-		//cmdTmp += " LINE1:min1#EE444499  ";
-		//cmdTmp += " LINE1:max1#4444EE99 ";
+ 
 		cmdGraphrrdTmp += " LINE2:dbdata#44EE4499  LINE1:dbdata#003300AA ";
 		cmdGraphrrdTmp += "";
 		String aToGraph = cmdGraphrrdTmp.replace(cRRD, aRRD);
@@ -488,41 +468,13 @@ public class RrdMergerTest {
 				"				RRA:MIN:0.5:731:719 " +
 				"				RRA:MIN:0.5:10000:273 " +
 												" "; 		
-//		String crTmp = 		 "rrdtool create " +
-//				""+cRRD+" --start "+(920804700)+"" + 
-//				" --step 1 " +
-//				"				DS:data:GAUGE:11111240:U:U " +
-//				"				RRA:AVERAGE:0.5:1:592 " +
-//				"				RRA:AVERAGE:0.5:15:80320 " + 
-//				"				RRA:AVERAGE:0.5:60:43800 " + 
-//				//"				RRA:AVERAGE:0.5:2:592 " +
-//				//"				RRA:AVERAGE:0.5:10:340 " +
-//				//"				RRA:AVERAGE:0.5:20:719 " +
-//				"				RRA:AVERAGE:0.5:4800:13140 " + // 8 hour summ // 4 values per day X 1 year: 6 * 60 *  365
-//				"				RRA:MAX:0.5:30:40320 " +
-//				"				RRA:MAX:0.5:60:43800 " +
-//				//"				RRA:MAX:0.5:17:592 " +
-//				//"				RRA:MAX:0.5:131:340 " +
-//				//"				RRA:MAX:0.5:731:719 " +
-//				"				RRA:MAX:0.5:4800:13140 " +
-//				"				RRA:MIN:0.5:30:40320 " +
-//				"				RRA:MIN:0.5:60:43800 " +
-//				//"				RRA:MIN:0.5:17:592 " +
-//				//"				RRA:MIN:0.5:131:340 " +
-//				//"				RRA:MIN:0.5:731:719 " +
-//				"				RRA:MIN:0.5:4800:13140 " + // 10*8 hour summ // 4 values per day X 1 year: 6 * 60 *  365  
-//												" "; 
-		//System.setProperty( "RrdMemoryBackendFactory", "JO!");
+ 
 		RrdCommander.execute(crTmp  );
 		String updatetxtTmp= " rrdtool update "+ cRRD+" "; //920804700:12345
 		
 		int toshft=1;
 		RrdCommander.execute(updatetxtTmp +(initDate+toshft++) +":0"  );
-		
-		// replacement >> m.mergeRRD(a, b, c);
-		// fetch all from a, b, then push it with update into c
-		// rrdtool fetch  a.rrd AVERAGE -r 1 -s 920804700 > a.txt
-		// rrdtool fetch  b.rrd AVERAGE -r 1 -s 920804700 > b.txt
+ 
 		String sA = ""+RrdCommander.execute("rrdtool fetch "+aRRD+" -r 1 -s  "+initDate+" AVERAGE");
 		writeToTextSubFIle(a+".txt",sA);
 		String aTxt[] = sA.split("\n");
@@ -551,6 +503,7 @@ public class RrdMergerTest {
 				upTmp +=  " " +aLINE[0].trim()+":"+ valueToPush;
 				if (i%1 == 0) {
 					Object o = RrdCommander.execute( upTmp );
+					log.trace("{}",o);
 					oldTmp = upTmp ;
 					upTmp = updatetxtTmp ;
 				}
@@ -738,7 +691,7 @@ public class RrdMergerTest {
 				// fetch all from a, b, then push it with update into c
 				// rrdtool fetch  a.rrd AVERAGE -r 1 -s 920804700 > a.txt
 				// rrdtool fetch  b.rrd AVERAGE -r 1 -s 920804700 > b.txt
-				DFReader aR = null;
+				ParaReader aR = null;
 				/**
 				 * new DFReader(aIN); 
 				DFReader bR = new DFReader(bIN,aR);
@@ -760,9 +713,9 @@ public class RrdMergerTest {
 							//String bTxt[] = sB.split("\n");
 							
 							BufferedReader bIN = new BufferedReader(new FileReader(b2DEL));
-							aR = new   DFReader(bIN,aR);
+							aR = new   ParaReader(bIN,aR);
 							BufferedReader aIN = new BufferedReader(new FileReader(a2DEL));
-							aR = new   DFReader(aIN,aR);
+							aR = new   ParaReader(aIN,aR);
 				
 				}
 					
@@ -774,7 +727,7 @@ public class RrdMergerTest {
 
 				try { 
 					long lastTIMESTAMP = 0; 
-					for (String popSample = aR.readNextChainedSample(); popSample != null; popSample = aR.readNextChainedSample() ) {
+					for (String popSample = aR.readLine(); popSample != null; popSample = aR.readLine() ) {
 						log.trace("O:{}",popSample);
 						i++; 
 						
@@ -802,6 +755,7 @@ public class RrdMergerTest {
 				}catch (IOException e) {
 					try { 
 						Object o = RrdCommander.execute( upTmp );
+						log.trace("{}",o);
 					}catch (Exception e1) {
 						log.error("Object o = RrdCommander.execute( "+upTmp+" );",e1);
 						e1.printStackTrace();
@@ -810,12 +764,7 @@ public class RrdMergerTest {
 					log.error("oldTmp::::::::::{}{}{}::::::::",oldTmp);
 					log.error("upTmp:::::{}{}{}:::::::::::::",upTmp);
 					e.printStackTrace();
-				}
-						
-	
-						
-			 			 
-		
+				} 
 				//secToLive+
 				RrdCommander.execute("rrdtool graph  "+cRRD+  ".gif --start "+initDate+"  --end "+ (secToLive+initDate) + " DEF:data="+cRRD+":data:AVERAGE AREA:data#FF55FF " );
 				System.out.println("RESULT GIF:"+cmdGraphrrdTmp);
@@ -834,12 +783,7 @@ public class RrdMergerTest {
 		
 				String retval = (String) RrdCommander.execute(cmdREST);
 				log.info("AFTER RESTORE::{}:::",retval );
-				
-//				bIN.close();
-//				aIN.close();
-				//pathToExported.delete();
-				//b2DEL.delete();
-				//a2DEL.delete();
+ 
 				
 				String cToGraph = cmdGraphrrdTmp.replace(cRRD, resultTmp);
 				log.info("TO EXEC::",cToGraph);
@@ -847,7 +791,7 @@ public class RrdMergerTest {
 				
 				
 				(new File(a)).renameTo(new File(a.replace(".rrd", "."+System.currentTimeMillis()+".BAK.rrd")));
-				//(new File(resultTmp)).renameTo(new File(a));
+ 
 			    Path copied = new File(a).toPath();
 		
 			    File resultFile = new File(RRD_WORK_DIRECTORY+resultTmp);

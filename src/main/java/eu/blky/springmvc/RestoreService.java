@@ -33,7 +33,8 @@ import org.springframework.stereotype.Service;
 import cc.co.llabor.system.Merger;
 import cc.co.llabor.system.StatusMonitor;
 import cc.co.llabor.system.Unzipper;
-import cc.co.llabor.websocket.PoloWSEndpoint; 
+import cc.co.llabor.websocket.PoloWSEndpoint;
+import eu.blky.logparser.ParaReader; 
 
 @Service
 public class RestoreService  extends Merger{
@@ -331,10 +332,10 @@ RRA5	10000			1500
 			String upTmp = updatetxtTmp  ;
 			String oldTmp = "----------EMPTY---------------------" ;
 			int i = 0;
-			DFReader aR = new DFReader(aIN); 
-			DFReader bR = new DFReader(bIN,aR); 
+			ParaReader aR = new ParaReader(aIN); 
+			ParaReader bR = new ParaReader(bIN,aR); 
 			try { 
-				for (String popSample = bR.readNextChainedSample(); popSample != null; popSample = bR.readNextChainedSample() ) {
+				for (String popSample = bR.readLine(); popSample != null; popSample = bR.readLine() ) {
 					i++;
 					// DO THE JOB 					upTmp +=  " " +aLINE[0].trim()+":"+ valueToPush;
 					upTmp +=  " "+popSample.replaceAll(" " , "");

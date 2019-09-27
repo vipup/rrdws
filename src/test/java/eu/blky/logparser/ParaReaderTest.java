@@ -1,4 +1,4 @@
-package eu.blky.springmvc;
+package eu.blky.logparser;
 
 import static org.junit.Assert.*;
 
@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 
 import org.junit.Test;
 
-public class DFReaderTest {
+public class ParaReaderTest {
 
 	@Test
 	public void testGetNextTimestampWithLoop() throws IOException {
@@ -49,8 +49,8 @@ public class DFReaderTest {
 				" 1569090000:  +6.8625488692E02\n" + 
 				" 1569100000:  +7.8598222442E02\n" + 
 				"";
-		DFReader a = new DFReader(new BufferedReader(new InputStreamReader( new ByteArrayInputStream(aTXT.getBytes()))));
-		DFReader b = new DFReader(new BufferedReader(new InputStreamReader( new ByteArrayInputStream(bTXT.getBytes()))));
+		ParaReader a = new ParaReader(new BufferedReader(new InputStreamReader( new ByteArrayInputStream(aTXT.getBytes()))));
+		ParaReader b = new ParaReader(new BufferedReader(new InputStreamReader( new ByteArrayInputStream(bTXT.getBytes()))));
 		
 		String expectedC = " 920910000:   +1.8773875566E02\n" + 
 				" 1121080000:  +8.4575808991E02\n" + 
@@ -127,8 +127,8 @@ public class DFReaderTest {
 				" 1569090000:  +6.8625488692E02\n" + 
 				" 1569100000:  +7.8598222442E02\n" + 
 				"";
-		DFReader a = new DFReader(new BufferedReader(new InputStreamReader( new ByteArrayInputStream(aTXT.getBytes()))));
-		DFReader b = new DFReader(new BufferedReader(new InputStreamReader( new ByteArrayInputStream(bTXT.getBytes()))),a);
+		ParaReader a = new ParaReader(new BufferedReader(new InputStreamReader( new ByteArrayInputStream(aTXT.getBytes()))));
+		ParaReader b = new ParaReader(new BufferedReader(new InputStreamReader( new ByteArrayInputStream(bTXT.getBytes()))),a);
 		
 		String expectedC = 
 				" 820910000:   +0.8773875566E02\n" + 
@@ -153,7 +153,7 @@ public class DFReaderTest {
 		String c = "";
 		try {
 			 	long lastTIMESTAMP = 0;
-				for (String popSample = b.readNextChainedSample(); popSample != null; popSample = b.readNextChainedSample() ) {
+				for (String popSample = b.readLine(); popSample != null; popSample = b.readLine() ) {
 						long newTIMESTAMP = Long.valueOf(popSample.split(":")[0].trim());
 						if (newTIMESTAMP ==  lastTIMESTAMP) {
 							newTIMESTAMP++;

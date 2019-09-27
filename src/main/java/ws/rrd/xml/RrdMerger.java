@@ -43,6 +43,17 @@ public class RrdMerger {
 	private static final Log LOG = LogFactory.getLog(RrdMerger.class);
 	
 
+	/**
+	 * merge two rrd over pythonMerge(A.dump () , B.dump()).restore()  -> C.dump() ->  RESULT.restore()  
+	 * 
+	 * @deprecated -  use 
+	 * 
+	 * @param aPar
+	 * @param bPar
+	 * @param cPar
+	 * @throws IOException
+	 * @throws RrdException
+	 */
 	public void mergeRRD(String aPar, String bPar, String cPar) throws IOException, RrdException {
 		File fileA, fileB, fileC, fileD;
 		String Acmd = "rrdtool dump  " + aPar;
@@ -69,24 +80,27 @@ public class RrdMerger {
 		}
 		ByteArrayOutputStream CxmlMERGED = new ByteArrayOutputStream();
 		PrintWriter Cpw = new PrintWriter(CxmlMERGED, true);
-		Cpw.write(rra(Axml, Bxml));
-		Cpw.write("</rrd>");
+		String toWrireCTmp= rra(Axml, Bxml);
+		toWrireCTmp = toWrireCTmp.endsWith("</rrd>\n")?toWrireCTmp:toWrireCTmp+"</rrd>";
+		Cpw.write(toWrireCTmp);
 		Cpw.flush();
 		Cpw.close();
 		String dumpCTMP = cPar+".Ctmp.XML";
 		fileC = new File(dumpCTMP);
 		fileC.deleteOnExit();
-		CxmlMERGED.writeTo(new FileOutputStream(fileC));
 		CxmlMERGED.flush();
 		CxmlMERGED.close();
+		FileOutputStream file_C_Tmp = new FileOutputStream(fileC);
+		CxmlMERGED.writeTo(file_C_Tmp);
+
 		String CcmdREST = "rrdtool restore "+dumpCTMP+" "+cPar+" ";
 		LOG.error("RESTORE:{}..."+cPar);
 		try {
 			String cTMP = (String) RrdCommander.execute(CcmdREST); // existAsXml(bPar) ? readFully(bPar) :
 			LOG.debug("RESTORED:{}"+cTMP);
-			fileC.delete();
-			fileB.delete();
-			fileA.delete();
+			fileC.deleteOnExit();
+			fileB.deleteOnExit();
+			fileA.deleteOnExit();
 		}catch(Exception e) {
 			System.out.println("CcmdREST::::::::::::::::"+CcmdREST);
 			e.printStackTrace();
@@ -103,7 +117,7 @@ public class RrdMerger {
 			FileWriter fwC = new FileWriter(fileD);
 			fwC.write(Cxml);
 			fwC.close();
-			fileD.delete();
+			fileD.deleteOnExit();
 		}catch (Exception e) {
 			// TODO: handle exception
 		} 
