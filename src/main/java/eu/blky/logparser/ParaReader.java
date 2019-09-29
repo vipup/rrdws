@@ -60,6 +60,7 @@ public class ParaReader/* implements Reader */{
 		ParaReader lastHope = this.chainedReader;
 		//this.chainedReader = null;
 		
+		if (lastHope==null) throw new IOException("EOMe");
 		return lastHope.readOwnNext();
 		
 	}

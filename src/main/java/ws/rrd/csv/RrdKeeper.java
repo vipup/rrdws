@@ -77,7 +77,7 @@ public class RrdKeeper extends NotificationBroadcasterSupport implements Notific
 		
 	}
 	final long initialDelay = 1000;
-	final long period = 1000;
+	final long period = 60000; // 2 Min
 	static private long beatCounter = 0;
 	static private long beatStart = System.currentTimeMillis() ;
 	static private long lastBeat = Long.MIN_VALUE;

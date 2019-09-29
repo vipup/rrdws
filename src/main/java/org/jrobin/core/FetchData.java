@@ -32,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * Class used to represent data fetched from the RRD.
@@ -290,6 +291,28 @@ public class FetchData implements ConsolFuns {
 			buff.append("\n");
 		}
 		return buff.toString();
+	}
+	
+	public void writeTo(Writer wOut) throws IOException {
+		// print header row
+		 
+		wOut.append(padWithBlanks("", 10));
+		wOut.append(" ");
+		for (String dsName : dsNames) {
+			wOut.append(padWithBlanks(dsName, 18));
+		}
+		wOut.append("\n \n");
+		for (int i = 0; i < timestamps.length; i++) {
+			wOut.append(padWithBlanks("" + timestamps[i], 10));
+			wOut.append(":");
+			for (int j = 0; j < dsNames.length; j++) {
+				double value = values[j][i];
+				String valueStr = Double.isNaN(value) ? "nan" : Util.formatDouble(value);
+				wOut.append(padWithBlanks(valueStr, 18));
+			}
+			wOut.append("\n");
+		}
+		return;
 	}
 
 	private static String padWithBlanks(String input, int width) {

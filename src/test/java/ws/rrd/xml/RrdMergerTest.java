@@ -8,7 +8,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader; 
+import java.io.InputStreamReader;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption; 
@@ -408,175 +409,6 @@ public class RrdMergerTest {
 		
 	}
 	@Test 
-	/** 
-	 * 
-	 * @throws IOException
-	 * @throws RrdException
-	 */
-	public void postCreateAndUpdateSTDRRD_OwnMergeOverFetchToUpdate() throws IOException, RrdException {
-		long initDate = 920804700; 
-		
- 
-		String aRRD = "X-553689133.rrd";
-		String RRD_WORK_DIRECTORY = RrdFileBackend.CALC_DEFAULT_WORKDIR() +"/"+RrdFileBackend.RRD_HOME+"/";
-		String a = RRD_WORK_DIRECTORY+aRRD;
-		String bRRD = aRRD.replace(".rrd","NEW.rrd");
-		String b = RRD_WORK_DIRECTORY+bRRD;
-		String cRRD = aRRD.replace(".rrd",".TMP.rrd");
-		String c = RRD_WORK_DIRECTORY+cRRD;
-		String cmdGraphrrdTmp = "rrdtool graph  "+cRRD+  ".gif  ";
-		String _v=  "- ";
-		String _h =  " 480 ";
-		String _w = " 640 ";
-		String _start = "end-4month";
-		String _end = "now";
-		String _t = "  - ";
-		String dbName = cRRD;
-		cmdGraphrrdTmp +="-v '"+_v+"' -t '"+_t+"'  -h "+ _h +" -w  ";
-		cmdGraphrrdTmp += _w+" --start="+_start+"   --end="+_end;
-		cmdGraphrrdTmp += " DEF:dbdata="+dbName+":data:AVERAGE  ";
-		cmdGraphrrdTmp += " DEF:min1="+dbName+":data:MIN  ";
-		cmdGraphrrdTmp += " DEF:max1="+dbName+":data:MAX  ";
- 
-		cmdGraphrrdTmp += " LINE2:dbdata#44EE4499  LINE1:dbdata#003300AA ";
-		cmdGraphrrdTmp += "";
-		String aToGraph = cmdGraphrrdTmp.replace(cRRD, aRRD);
-		System.out.println(aToGraph); 
-		RrdCommander.execute(aToGraph);
-		String bToGraph = cmdGraphrrdTmp.replace(cRRD, bRRD);
-		System.out.println(bToGraph); 
-		RrdCommander.execute(bToGraph);
-		
-		// ws.rrd.csv.RrdUpdateAction.makeCreateCMD(long, String) 
-		String crTmp = "rrdtool create " +
-				""+cRRD+" --start "+(initDate)+"" + 
-				" --step 1 " +
-				"				DS:data:GAUGE:2121212240:U:U " +
-				"				RRA:AVERAGE:0.5:3:480 " +
-				"				RRA:AVERAGE:0.5:17:592 " +
-				"				RRA:AVERAGE:0.5:131:340 " +
-				"				RRA:AVERAGE:0.5:731:719 " +
-				"				RRA:AVERAGE:0.5:10000:2730 " +
-				"				RRA:MAX:0.5:3:480 " +
-				"				RRA:MAX:0.5:17:592 " +
-				"				RRA:MAX:0.5:131:340 " +
-				"				RRA:MAX:0.5:731:719 " +
-				"				RRA:MAX:0.5:10000:273 " +
-				"				RRA:MIN:0.5:3:480 " +
-				"				RRA:MIN:0.5:17:592 " +
-				"				RRA:MIN:0.5:131:340 " +
-				"				RRA:MIN:0.5:731:719 " +
-				"				RRA:MIN:0.5:10000:273 " +
-												" "; 		
- 
-		RrdCommander.execute(crTmp  );
-		String updatetxtTmp= " rrdtool update "+ cRRD+" "; //920804700:12345
-		
-		int toshft=1;
-		RrdCommander.execute(updatetxtTmp +(initDate+toshft++) +":0"  );
- 
-		String sA = ""+RrdCommander.execute("rrdtool fetch "+aRRD+" -r 1 -s  "+initDate+" AVERAGE");
-		writeToTextSubFIle(a+".txt",sA);
-		String aTxt[] = sA.split("\n");
-		String sB = ""+RrdCommander.execute("rrdtool fetch "+bRRD+" -r 1 -s  "+initDate+" AVERAGE");
-		writeToTextSubFIle(b+".txt",sB);
-		String bTxt[] = sB.split("\n");
-		
-		 
-		int toSkip = 0;
-		String upTmp = updatetxtTmp  ;
-		String oldTmp = "----------EMPTY---------------------" ;
-		for (int i=0;i<aTxt.length;i+=1) {
-			try {
-	
-				String[] aLINE = aTxt[i].split(":"); 
-				toSkip =  Integer.valueOf( aTxt[i].split(":")[0].trim() ) - Integer.valueOf( bTxt[i].split(":")[0].trim()  ); 
-				if (toSkip >0) {
-					System.out.println("TOSKIP."+toSkip);
-				}
-				Object valueToPush = aLINE[1].trim().equals("nan")?bTxt[i+toSkip].split(":")[1].trim():aLINE[1].trim();
-				
-				if ("nan". equals(valueToPush)) continue;
-				if ("". equals(valueToPush)) continue;
-				
-			// DO THE JOB
-				upTmp +=  " " +aLINE[0].trim()+":"+ valueToPush;
-				if (i%1 == 0) {
-					Object o = RrdCommander.execute( upTmp );
-					log.trace("{}",o);
-					oldTmp = upTmp ;
-					upTmp = updatetxtTmp ;
-				}
-				
-			}catch(  ArrayIndexOutOfBoundsException e) {
-				System.err.println("BREAK:#"+i+"::"+aTxt[i]);
-				System.err.println("BREAK:#"+i+"::"+bTxt[i+toSkip]+"::"+toSkip);
-				System.err.println("LAST UPDATE:"+upTmp);
-				System.err.println("PRELAST UPDATE: "+oldTmp);
-				e.printStackTrace();
-				break;
-			}catch(  NumberFormatException e) {
-				System.err.println("skip:#"+i+"::"+aTxt[i]);
-				e.printStackTrace();
-			}catch(Throwable e) {
-				System.out.println("skip:#"+i+"::"+aTxt[i]);
-				System.err.println("LAST UPDATE:"+upTmp);
-				System.err.println("PRELAST UPDATE: "+oldTmp);
-				upTmp = updatetxtTmp ;
-				e.printStackTrace();
-				 
-			}			
-		} 
-
-		
-//		RrdCommander.execute("rrdtool graph  "+cRRD+  ".gif --start "+initDate+"  --end "+ (secToLive+initDate) + " DEF:data="+cRRD+":data:AVERAGE AREA:data#FF55FF " );
-		System.out.println(cmdGraphrrdTmp);
-		RrdCommander.execute(cmdGraphrrdTmp);
-		
-
-		
-
-		
-		String toXMPcmd = "rrdtool dump  " + cRRD+" ";
-		String Cxml = (String) RrdCommander.execute(toXMPcmd); 
-		String pathToExported = writeToTextSubFIle(c,Cxml);
-		String resultTmp= aRRD.replace(".rrd",".AB_merged."+System.currentTimeMillis()+".rrd"); // cRRD = aRRD.replace(".rrd","TMP.rrd");
-		String cmdREST = "rrdtool restore "+pathToExported+"   "+ resultTmp;
-
-
-		String retval = (String) RrdCommander.execute(cmdREST);
-		System.out.println("AFTER RESTORE::"+retval+":::");
-		
-		String cToGraph = cmdGraphrrdTmp.replace(cRRD, resultTmp);
-		System.out.println(cToGraph);
-		RrdCommander.execute(cToGraph); 
-		
-		
-		(new File(a)).renameTo(new File(a.replace(".rrd", "."+System.currentTimeMillis()+".BAK.rrd")));
-		//(new File(resultTmp)).renameTo(new File(a));
-	    Path copied = new File(a).toPath();
-
-	    File resultFile = new File(RRD_WORK_DIRECTORY+resultTmp);
-	    resultFile.deleteOnExit();
-		Path originalPath = resultFile.toPath();
-	    RrdDbPool.getInstance().reset();
-	    System.out.println("FROM:"+originalPath);
-	    System.out.println("TO  :"+ copied );
-	    Files.copy(originalPath, copied, StandardCopyOption.REPLACE_EXISTING);
-	    
-	    // clean tmps
-	    File aFile = new File(a+".gif");
-	    aFile.delete();
-	    File bFile = new File(b+".gif");
-	    bFile.delete();
-	    File cFile = new File(c+".gif");
-	    cFile.delete();
-		
-	    
-	    System.out.println(retval);
-		
-	}
-	@Test 
 	public void testBench553689133() throws IOException, RrdException {
 		String RRD_WORK_DIRECTORY = RrdFileBackend.CALC_DEFAULT_WORKDIR() +"/"+RrdFileBackend.RRD_HOME+"/";
 		Path source = new File(new File("").getAbsoluteFile() ,"/src/test/resources/mergeData/29GB/X-553689133.rrd").toPath();
@@ -586,245 +418,101 @@ public class RrdMergerTest {
 		tTmp.mkdirs();
 		// 1st copy  NEW -> A
 		Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-		postCreateAndUpdateSTDRRD_OwnMergeOverFetchToUpdate("X-553689133.rrd");
+		RestoreService.postCreateAndUpdateSTDRRD_OwnMergeOverFetchToUpdate("X-553689133.rrd");
 		//assertEquals(tTmp.length(),testTmp.length()); // created and copied into 1st original
 		// 2nd : merge NEW->B, C= A+B
 		Path sourceB = new File(new File("").getAbsoluteFile() ,"/src/test/resources/mergeData/16.8GB/X-553689133.rrd").toPath();
 		Files.copy(sourceB, target, StandardCopyOption.REPLACE_EXISTING);
 		long start = System.currentTimeMillis();
-		postCreateAndUpdateSTDRRD_OwnMergeOverFetchToUpdate("X-553689133.rrd");
+		RestoreService.postCreateAndUpdateSTDRRD_OwnMergeOverFetchToUpdate("X-553689133.rrd");
 		System.out.println("EXECTIME:"+(System.currentTimeMillis()-start)+" ms.");
 		assertEquals(178356,testTmp.length()); 
 		
 		
 	}
-	
-			/** 
-			 * 
-			 * @throws IOException
-			 * @throws RrdException
-			 */
-			public boolean postCreateAndUpdateSTDRRD_OwnMergeOverFetchToUpdate(String aRRD /* = "X-553689133.rrd";*/) throws IOException, RrdException {
-				long initDate = 920804700; 
-				long  secToLive = 1 * 365 * 24 * 60 *60;	//1 000 001 111    630 720 000	
-				if (!aRRD.endsWith(".rrd")){
-					throw new RrdException("this call should be performed with existing rrd-File-name!", aRRD);
-				}
-				String RRD_WORK_DIRECTORY = RrdFileBackend.CALC_DEFAULT_WORKDIR() +"/"+RrdFileBackend.RRD_HOME+"/";
-				if (!(new File(RRD_WORK_DIRECTORY , aRRD)).exists()) {
-					Path target = new File(RRD_WORK_DIRECTORY , aRRD).toPath();
-					Path newTmp = new File(RRD_WORK_DIRECTORY , aRRD.replace(".rrd", "NEW.rrd")).toPath();
-					Files.copy(newTmp, target, StandardCopyOption.REPLACE_EXISTING);
-					return true;
-				}
-				//long  secToLive = 20 * 365 * 24 * 60 *60;	//1 000 001 111    630 720 000	
- 
-				String a = RRD_WORK_DIRECTORY+aRRD;
-				String bRRD = aRRD.replace(".rrd","NEW.rrd");
-				String b = RRD_WORK_DIRECTORY+bRRD;
-				String cRRD = aRRD.replace(".rrd",".TMP.rrd");
-				String c = RRD_WORK_DIRECTORY+cRRD;
-				String cmdGraphrrdTmp = "rrdtool graph  "+cRRD+  ".gif  ";
-				String _v=  "- ";
-				String _h =  " 480 ";
-				String _w = " 640 ";
-				String _start = "end-4month";
-				String _end = "now";
-				String _t = "  - ";
-				String dbName = cRRD;
-				cmdGraphrrdTmp +="-v '"+_v+"' -t '"+_t+"'  -h "+ _h +" -w  ";
-				cmdGraphrrdTmp += _w+" --start="+_start+"   --end="+_end;
-				cmdGraphrrdTmp += " DEF:dbdata="+dbName+":data:AVERAGE  ";
-				cmdGraphrrdTmp += " DEF:min1="+dbName+":data:MIN  ";
-				cmdGraphrrdTmp += " DEF:max1="+dbName+":data:MAX  ";
-				cmdGraphrrdTmp += " LINE1:min1#EE444499  ";
-				cmdGraphrrdTmp += " LINE1:max1#4444EE99 ";
-				cmdGraphrrdTmp += " LINE2:dbdata#44EE4499  LINE1:dbdata#003300AA ";
-				cmdGraphrrdTmp += "";
-				String aToGraph = cmdGraphrrdTmp.replace(cRRD, aRRD);
-	
-				Properties pA = new Properties();
-				pA.load(new ByteArrayInputStream( (""+RrdCommander.execute(" rrdtool info  "+aRRD)).getBytes() ));
-				Properties pB = new Properties();
-				pB.load(new ByteArrayInputStream( (""+RrdCommander.execute(" rrdtool info  "+bRRD)).getBytes() ));
-				if (pB.get( "last_update").equals(pA.get( "last_update"))) {
-					System.out.println("nothig to do:: Last update:"+pB.get( "last_update"));
-					
-					return (new File(bRRD)).delete();
-				}	
-				System.out.println(aToGraph); 
-				if (aToGraph.indexOf("553689133")>=0) RrdCommander.execute(aToGraph);
-				String bToGraph = cmdGraphrrdTmp.replace(cRRD, bRRD);
-				System.out.println(bToGraph); 
-				if (bToGraph.indexOf("553689133")>=0)RrdCommander.execute(bToGraph);
-				
-				// ws.rrd.csv.RrdUpdateAction.makeCreateCMD(long, String) 
-				String crTmp = "rrdtool create " +
-						""+cRRD+" --start "+(initDate)+"" + 
-						" --step 1 " +
-						"				DS:data:GAUGE:2121212240:U:U "+ 
-						"				RRA:AVERAGE:0.5:3:480 " +
-						"				RRA:AVERAGE:0.5:17:592 " +
-						"				RRA:AVERAGE:0.5:131:340 " +
-						"				RRA:AVERAGE:0.5:731:719 " + 
-						"				RRA:AVERAGE:0.5:10000:273 " +  
-						"				RRA:MAX:0.5:3:480 " +
-						"				RRA:MAX:0.5:17:592 " +
-						"				RRA:MAX:0.5:131:340 " +
-						"				RRA:MAX:0.5:731:719 " +
-						"				RRA:MAX:0.5:10000:7731 " +
-						"				RRA:MIN:0.5:3:480 " +
-						"				RRA:MIN:0.5:17:592 " +
-						"				RRA:MIN:0.5:131:340 " +
-						"				RRA:MIN:0.5:731:719 " +
-						"				RRA:MIN:0.5:10000:7731 " + 
-														 
-						" "; 		
-	 
-				RrdCommander.execute(crTmp  );
-				String updatetxtTmp= " rrdtool update "+ cRRD+" "; //920804700:12345
-				
-				int toshft=1;
-				RrdCommander.execute(updatetxtTmp +(initDate+toshft++) +":0"  );
-				
-				// replacement >> m.mergeRRD(a, b, c);
-				// fetch all from a, b, then push it with update into c
-				// rrdtool fetch  a.rrd AVERAGE -r 1 -s 920804700 > a.txt
-				// rrdtool fetch  b.rrd AVERAGE -r 1 -s 920804700 > b.txt
-				ParaReader aR = null;
-				/**
-				 * new DFReader(aIN); 
-				DFReader bR = new DFReader(bIN,aR);
-				 */
-				for (String rate:  new String[]{ "MAX","MIN","AVERAGE"} ) {
-								
-							
-							String command = "rrdtool fetch "+aRRD+" -r 1 -s  "+initDate+" AVERAGE"; // 1hour  . see 3600 https://oss.oetiker.ch/rrdtool/doc/rrdfetch.en.html
-							log.info(command); // command = "rrdtool info "+aRRD; RrdCommander.execute("rrdtool tune -h data:240 "+aRRD);RrdCommander.execute("rrdtool info "+aRRD);
-							String sA = ""+RrdCommander.execute(command);
-							File a2DEL = writeToSubFIle(a+"."+rate+".A.txt",sA);
-							
-							String command2 = "rrdtool fetch "+bRRD+"   -r 3600  -s  "+initDate+" AVERAGE";
-							log.info(command2);
-							String sB = ""+RrdCommander.execute(command2);
-							File b2DEL = writeToSubFIle(b+"."+rate+".B.txt",sB);
-							
-							//String aTxt[] = sA.split("\n");
-							//String bTxt[] = sB.split("\n");
-							
-							BufferedReader bIN = new BufferedReader(new FileReader(b2DEL));
-							aR = new   ParaReader(bIN,aR);
-							BufferedReader aIN = new BufferedReader(new FileReader(a2DEL));
-							aR = new   ParaReader(aIN,aR);
-				
-				}
-					
-				  
-				String upTmp = updatetxtTmp  ;
-				String oldTmp = "----------EMPTY---------------------" ;
-				int i = 0;
-				int j = 0;
+	@Test 
+	public void testBench553689133x3() throws IOException, RrdException {
+		String RRD_WORK_DIRECTORY = RrdFileBackend.CALC_DEFAULT_WORKDIR() +"/"+RrdFileBackend.RRD_HOME+"/";
+		
+		String originalRoundRobinDatabaseName = "X-553689133.rrd";
+		File originRRD = new File(RRD_WORK_DIRECTORY, originalRoundRobinDatabaseName);
+		
+		File externalNewRrdTmp = new File(RRD_WORK_DIRECTORY);
+		externalNewRrdTmp.mkdirs();
+		Path THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL =  null;
+		 
+		// 1st copy  NEW -> A
+		Path sourceA = new File(new File("").getAbsoluteFile() ,"/src/test/resources/mergeData/29GB/X-553689133.rrd").toPath();
+		THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL =  new File(RRD_WORK_DIRECTORY, originalRoundRobinDatabaseName.replace(".rrd", "."+System.currentTimeMillis()+".B.rrd")).toPath();
+		Files.copy(sourceA, THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL);
+		// TODO --->>doGraph(sourceA);
+		doGraph(THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL);
+		RestoreService.mergeAndB(originRRD, THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL.toFile());
+		
+		//assertEquals(tTmp.length(),testTmp.length()); // created and copied into 1st original		
+		// 2nd : merge NEW->B, C= A+B
+		Path sourceB = new File(new File("").getAbsoluteFile() ,"/src/test/resources/mergeData/16.8GB/X-553689133.rrd").toPath();
+		THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL =  new File(RRD_WORK_DIRECTORY, originalRoundRobinDatabaseName.replace(".rrd", "."+System.currentTimeMillis()+".B.rrd")).toPath();
+		Files.copy(sourceB, THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL);
+		// TODO --->>		doGraph(sourceB);
+		doGraph(THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL);
+		
+		long start1 = System.currentTimeMillis();
+		RestoreService.mergeAndB(originRRD, THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL.toFile());
+		System.out.println("EXECTIME#1:"+(System.currentTimeMillis()-start1)+" ms.");
+		// 3rd : merge NEW->B, C= A+B
+		Path sourceC = new File(new File("").getAbsoluteFile() ,"/src/test/resources/mergeData/16GB/X-553689133.rrd").toPath();
+		THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL =  new File(RRD_WORK_DIRECTORY, originalRoundRobinDatabaseName.replace(".rrd", "."+System.currentTimeMillis()+".D.rrd")).toPath();
+		Files.copy(sourceC, THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL);
+		// TODO --->>		doGraph(sourceC);
+		doGraph(THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL);
+		
+		long start2 = System.currentTimeMillis();
+		File result2 = RestoreService.mergeAndB(originRRD, THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL.toFile());
+		// TODO --->>		doGraph(originRRD.toPath());
+		doGraph(result2.toPath());
+		File bakRRD = new File(RRD_WORK_DIRECTORY, originalRoundRobinDatabaseName.replace(".rrd", "."+System.currentTimeMillis()+".BAK.rrd"));
+		//originRRD.renameTo(bakRRD );
+		//CopyOptions "REPLACE_EXISTING" and "ATOMIC_MOVE".
+		 
+		Files.move(originRRD.toPath(), bakRRD.toPath(), StandardCopyOption.ATOMIC_MOVE ,StandardCopyOption.REPLACE_EXISTING );
+		Files.move(result2.toPath(), originRRD.toPath(), StandardCopyOption.ATOMIC_MOVE ,StandardCopyOption.REPLACE_EXISTING );
+		
+		doGraph(bakRRD.toPath());
+		doGraph(originRRD.toPath());
+		
+		System.out.println("EXECTIME#2:"+(System.currentTimeMillis()-start2)+" ms.");
+		assertEquals(78684,originRRD.length()); 
 
-				try { 
-					long lastTIMESTAMP = 0; 
-					for (String popSample = aR.readLine(); popSample != null; popSample = aR.readLine() ) {
-						log.trace("O:{}",popSample);
-						i++; 
-						
-						long newTIMESTAMP = Long.valueOf(popSample.split(":")[0].trim());
-						if (lastTIMESTAMP <newTIMESTAMP) {
-							lastTIMESTAMP =newTIMESTAMP;
-							j=0;
-						}else{
-							j++;
-						}
-						if (newTIMESTAMP/10 ==  lastTIMESTAMP/10) { 
-							popSample = popSample.replace(""+lastTIMESTAMP, ""+(lastTIMESTAMP+(j))); 
-						} 
-						log.trace("m:{}",popSample);
-						upTmp +=  " "+popSample.replaceAll(" " , "");
-						
-						if (i%99 == 0) {
-							// DO THE JOB 					upTmp +=  " " +aLINE[0].trim()+":"+ valueToPush; 
-							Object o = RrdCommander.execute( upTmp );
-							log.debug("::{}",o);
-							oldTmp = upTmp ;
-							upTmp = updatetxtTmp ;
-						}
-					}
-				}catch (IOException e) {
-					try { 
-						Object o = RrdCommander.execute( upTmp );
-						log.trace("{}",o);
-					}catch (Exception e1) {
-						log.error("Object o = RrdCommander.execute( "+upTmp+" );",e1);
-						e1.printStackTrace();
-					}
-				}catch (Exception e) {
-					log.error("oldTmp::::::::::{}{}{}::::::::",oldTmp);
-					log.error("upTmp:::::{}{}{}:::::::::::::",upTmp);
-					e.printStackTrace();
-				} 
-				//secToLive+
-				RrdCommander.execute("rrdtool graph  "+cRRD+  ".gif --start "+initDate+"  --end "+ (secToLive+initDate) + " DEF:data="+cRRD+":data:AVERAGE AREA:data#FF55FF " );
-				System.out.println("RESULT GIF:"+cmdGraphrrdTmp);
-				if (cmdGraphrrdTmp.indexOf("graph")>=0)			RrdCommander.execute(cmdGraphrrdTmp);
-				
 		
-				
-		
-				
-				String toXMPcmd = "rrdtool dump  " + cRRD+" ";
-				String Cxml = (String) RrdCommander.execute(toXMPcmd); 
-				File pathToExported = writeToSubFIle(c+".XML",Cxml);
-				String resultTmp= aRRD.replace(".rrd",".AB_merged."+System.currentTimeMillis()+".rrd"); // cRRD = aRRD.replace(".rrd","TMP.rrd");
-				String cmdREST = "rrdtool restore "+pathToExported.getCanonicalPath()+"   "+ resultTmp;
-		
-		
-				String retval = (String) RrdCommander.execute(cmdREST);
-				log.info("AFTER RESTORE::{}:::",retval );
- 
-				
-				String cToGraph = cmdGraphrrdTmp.replace(cRRD, resultTmp);
-				log.info("TO EXEC::",cToGraph);
-				if (cToGraph.indexOf("X-553689133")>=0)				RrdCommander.execute(cToGraph); 
-				
-				
-				(new File(a)).renameTo(new File(a.replace(".rrd", "."+System.currentTimeMillis()+".BAK.rrd")));
- 
-			    Path copied = new File(a).toPath();
-		
-			    File resultFile = new File(RRD_WORK_DIRECTORY+resultTmp);
-			    resultFile.deleteOnExit();
-				Path originalPath = resultFile.toPath();
-			    RrdDbPool.getInstance().reset();
-			    System.out.println("FROM:"+originalPath);
-			    System.out.println("TO  :"+ copied );
-			    Files.copy(originalPath, copied, StandardCopyOption.REPLACE_EXISTING);
-			    
-			    // clean tmps
-			    if (!a.contains("X-553689133")) {
-				    File aFile = new File(a+".gif");
-				    aFile.delete();
-				    File bFile = new File(b+".gif");
-				    bFile.delete();
-				    File cFile = new File(c+".gif");
-				    cFile.delete();
-			    }
-			    
-			    System.out.println(retval);
-				return true;
-				
-			}
-	private File writeToSubFIle(String path, String data) throws IOException {
-		File fileA = new File( path);
-		fileA.deleteOnExit();
-		FileWriter fwA = new FileWriter(fileA);
-		fwA.write(data);
-		fwA.flush();
-		fwA.close();
-		return fileA;
 	}
+	private static String calcToGraphCmp(String absolutePath) {
+		String cmdGraphrrdTmp = "rrdtool graph  "+"RRDNAMETOREPLACE"+  ".gif  ";
+		String _v=  "- ";
+		String _h =  " 480 ";
+		String _w = " 640 ";
+		String _start = "end-4month";
+		String _end = "now";
+		String _t = "  - "; 
+		cmdGraphrrdTmp +="-v '"+_v+"' -t '"+_t+"'  -h "+ _h +" -w  ";
+		cmdGraphrrdTmp += _w+" --start="+_start+"   --end="+_end;
+		cmdGraphrrdTmp += " DEF:dbdata="+"RRDNAMETOREPLACE"+":data:AVERAGE  ";
+		cmdGraphrrdTmp += " DEF:min1="+"RRDNAMETOREPLACE"+":data:MIN  ";
+		cmdGraphrrdTmp += " DEF:max1="+"RRDNAMETOREPLACE"+":data:MAX  ";
+		cmdGraphrrdTmp += " LINE1:min1#EE444499  ";
+		cmdGraphrrdTmp += " LINE1:max1#4444EE99 ";
+		cmdGraphrrdTmp += " LINE2:dbdata#44EE4499  LINE1:dbdata#003300AA ";
+		cmdGraphrrdTmp += "";
+		
+		
+		return cmdGraphrrdTmp.replace("RRDNAMETOREPLACE",absolutePath); 
+	}	
+	private void doGraph(Path source2RRD) throws IOException, RrdException {
+		String grafCmpTMP = calcToGraphCmp(source2RRD.toString());
+		RrdCommander.execute(grafCmpTMP ); 
+	}
+	
+	
 
 }
 
