@@ -439,11 +439,21 @@ public class RrdMergerTest {
 		
 		File externalNewRrdTmp = new File(RRD_WORK_DIRECTORY);
 		externalNewRrdTmp.mkdirs();
+
 		Path THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL =  null;
+		// O-zero copy  NEW -> A
+		Path sourceZ = new File(new File("").getAbsoluteFile() ,"/src/test/resources/mergeData/23GB/X-553689133.rrd").toPath();
+		THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL =  new File(RRD_WORK_DIRECTORY, originalRoundRobinDatabaseName.replace(".rrd", "."+System.currentTimeMillis()+".0.rrd")).toPath();
+		Files.copy(sourceZ, THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL);
+		// TODO --->>doGraph(sourceA);
+		doGraph(THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL);
+		RestoreService.mergeAndB(originRRD, THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL.toFile());
+
+		
 		 
 		// 1st copy  NEW -> A
 		Path sourceA = new File(new File("").getAbsoluteFile() ,"/src/test/resources/mergeData/29GB/X-553689133.rrd").toPath();
-		THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL =  new File(RRD_WORK_DIRECTORY, originalRoundRobinDatabaseName.replace(".rrd", "."+System.currentTimeMillis()+".B.rrd")).toPath();
+		THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL =  new File(RRD_WORK_DIRECTORY, originalRoundRobinDatabaseName.replace(".rrd", "."+System.currentTimeMillis()+".A.rrd")).toPath();
 		Files.copy(sourceA, THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL);
 		// TODO --->>doGraph(sourceA);
 		doGraph(THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL);
@@ -462,7 +472,7 @@ public class RrdMergerTest {
 		System.out.println("EXECTIME#1:"+(System.currentTimeMillis()-start1)+" ms.");
 		// 3rd : merge NEW->B, C= A+B
 		Path sourceC = new File(new File("").getAbsoluteFile() ,"/src/test/resources/mergeData/16GB/X-553689133.rrd").toPath();
-		THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL =  new File(RRD_WORK_DIRECTORY, originalRoundRobinDatabaseName.replace(".rrd", "."+System.currentTimeMillis()+".D.rrd")).toPath();
+		THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL =  new File(RRD_WORK_DIRECTORY, originalRoundRobinDatabaseName.replace(".rrd", "."+System.currentTimeMillis()+".C.rrd")).toPath();
 		Files.copy(sourceC, THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL);
 		// TODO --->>		doGraph(sourceC);
 		doGraph(THE_NEW_PATH_TO_FILE_SHOULD_BE_REMOVED_AFTER_ALL);
@@ -482,17 +492,17 @@ public class RrdMergerTest {
 		doGraph(originRRD.toPath());
 		
 		System.out.println("EXECTIME#2:"+(System.currentTimeMillis()-start2)+" ms.");
-		assertEquals(78684,originRRD.length()); 
+		assertEquals(171620,originRRD.length()); 
 
 		
 	}
 	private static String calcToGraphCmp(String absolutePath) {
-		String cmdGraphrrdTmp = "rrdtool graph  "+"RRDNAMETOREPLACE"+  ".gif  ";
+		String cmdGraphrrdTmp = "rrdtool graph  "+"RRDNAMETOREPLACE"+  ".gif  -o ";
 		String _v=  "- ";
 		String _h =  " 480 ";
 		String _w = " 640 ";
-		String _start = "end-4month";
-		String _end = "now";
+		String _start = "end-6month";
+		String _end = "1569990000";
 		String _t = "  - "; 
 		cmdGraphrrdTmp +="-v '"+_v+"' -t '"+_t+"'  -h "+ _h +" -w  ";
 		cmdGraphrrdTmp += _w+" --start="+_start+"   --end="+_end;
