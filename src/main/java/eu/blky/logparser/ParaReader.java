@@ -20,7 +20,7 @@ import java.io.IOException;
 public class ParaReader/* implements Reader */{
 
 	private BufferedReader myIN;
-	private Long lastTimeStamp;
+	private long lastTimeStamp=-1;
 	private String nextSample;
 	private ParaReader chainedReader;
 
@@ -34,39 +34,60 @@ public class ParaReader/* implements Reader */{
 		//a.chainedReader = this;
 	}
 	
-	public String readLine() throws IOException {
-		try {
-			String retval = chainedReader==null||getNextTimestamp()<=chainedReader.getNextTimestamp()?(getNextTimestamp()==this.lastTimeStamp?popSample():chainedReader.readLine()):chainedReader.readLine();
+	public String readLine()  {
+ 
+			String retval = null;
+			if ( chainedReader==null ) {
+				retval  = popSample();
+			}else {
+				long myTIME = getNextTimestamp();
+			 
+				if (myTIME==this.lastTimeStamp){
+					//System.out.println("+++++++++++++++"+myTIME+" << "+chainedReader.getNextTimestamp());	
+					retval  = popSample();
+
+//				}else if (myTIME==chTIME){
+//					System.out.println("..............."+myTIME+" == "+chTIME);
+//					retval = popSample(); 										
+				}else {
+					//System.out.println("---------------"+myTIME+" >> "+chainedReader.getNextTimestamp());
+					retval = chainedReader.readLine();
+//					if (myTIME==this.lastTimeStamp){
+						 
+//					}else {
+//						retval = chainedReader.readLine();
+//					}
+				}
+			}	  
 			return retval;
-		}catch(StackOverflowError e) {
-			throw new IOException("EOChain");
-		}
+  
 	}
 
-	private String readOwnNext() throws IOException{
+	private String readOwnNext(){
+		
 		String  sampleTMP;
-		for(String aTXT=myIN.readLine();aTXT!=null;aTXT=myIN.readLine()) {
-			if ("". equals(aTXT.trim())) continue;
-			if ("nan". equals(aTXT.trim())) continue;
-			String[] aLINE = aTXT.split(":");
-			if (aLINE.length<2) continue;
-			Object aVAL = aLINE[1].trim() ;
-			if ("nan". equals(aVAL)) continue;
-			if ("". equals(aVAL)) continue;
-			this.lastTimeStamp = Long.valueOf(aLINE[0].trim());
-			sampleTMP = aLINE[0]+":"+aLINE[1];
-			return sampleTMP ;
+		try {
+			for(String aTXT=myIN.readLine();aTXT!=null;aTXT=myIN.readLine()) {
+				if ("". equals(aTXT.trim())) continue;
+				if ("nan". equals(aTXT.trim())) continue;
+				String[] aLINE = aTXT.split(":");
+				if (aLINE.length<2) continue;
+				Object aVAL = aLINE[1].trim() ;
+				if ("nan". equals(aVAL)) continue;
+				if ("". equals(aVAL)) continue;
+				this.lastTimeStamp = Long.valueOf(aLINE[0].trim());
+				sampleTMP = aLINE[0]+":"+aLINE[1];
+				return sampleTMP ;
+			}
+		}catch(IOException e) {
+			this.lastTimeStamp = Long.MAX_VALUE;
 		}
-		ParaReader lastHope = this.chainedReader;
-		//this.chainedReader = null;
-		
-		if (lastHope==null) throw new IOException("EOMe");
-		return lastHope.readOwnNext();
-		
+		this.lastTimeStamp = Long.MAX_VALUE;
+		return null;		
 	}
 
-	protected long getNextTimestamp() throws IOException {
-		if(nextSample==null) {
+	protected long getNextTimestamp()  {
+		if( lastTimeStamp < Long.MAX_VALUE  && nextSample==null ) {
 			this.pushSample(this.readOwnNext());
 		 }
 		 return chainedReader==null? lastTimeStamp:Math.min(lastTimeStamp, chainedReader.getNextTimestamp()); 
@@ -75,7 +96,8 @@ public class ParaReader/* implements Reader */{
 	protected String popSample() {
 		String retval = nextSample;
 		nextSample=null;
-		return retval; //
+		
+		return retval; 
 	}
 
 	public void pushSample(String nextSample) {
