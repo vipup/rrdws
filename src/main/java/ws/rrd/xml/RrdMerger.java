@@ -218,9 +218,9 @@ public class RrdMerger {
 			} //  a|b != c
 					
 			String aValue = ""; 
-			Object bValue = "";
-			Object aKey = "FAKEA";
-			Object bKey = "FAKEB";
+			String bValue = "";
+			String aKey = "FAKEA";
+			String bKey = "FAKEB";
 			while(startDatabase != null && iB< splitB.length-1 && iA <splitA.length-1)	{
 				  iA++;
 				  iB++;

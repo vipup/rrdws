@@ -352,12 +352,6 @@
 			<version>2.0.2</version>
 		</dependency> 
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-				
-			<version>${junit.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.2.1</version>
@@ -527,11 +521,11 @@
           -->
 
 		<!-- Test scope -->
-		<dependency>
+				<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.5</version>
-			<!-- scope>test</scope>  -->
+				
+			<version>${junit.version}</version>
 		</dependency>
 
 		<!--
@@ -737,8 +731,8 @@
 	<properties>
 		<failOnMissingWebXml>false</failOnMissingWebXml>
 	
-	 	<junit.version>4.8.1</junit.version>
-		<jacoco.version>0.7.5.201505241946</jacoco.version>
+	 	<junit.version>4.13</junit.version>
+		<jacoco.version>0.8.6</jacoco.version>
 	
 	 	
 		<jstl.version>1.2</jstl.version>

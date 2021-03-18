@@ -4,6 +4,9 @@ import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.jar.JarFile;
 
 import org.collectd.mx.MBeanSender;
@@ -185,6 +188,28 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		if (1==1)throw new RuntimeException("not yet implemented since 17.10.2012");
 		else {
 		}
+	}
+
+	/** 
+	 * @see java.lang.instrument.Instrumentation#isModifiableModule(java.lang.Module)
+	 */
+	@Override
+	public boolean isModifiableModule(Module arg0)
+	{
+		// TODO Auto-generated method stub << 2021 >>
+		if("TODO".length() == 4) throw new RuntimeException("the Instrumentation::isModifiableModule (...) is NOT implemented since Mar 19, 2021 at 12:22:06 AM by i1 !");
+		/*else*/  return false; 
+	}
+
+	/** 
+	 * @see java.lang.instrument.Instrumentation#redefineModule(java.lang.Module, java.util.Set, java.util.Map, java.util.Map, java.util.Set, java.util.Map)
+	 */
+	@Override
+	public void redefineModule(Module arg0, Set<Module> arg1, Map<String, Set<Module>> arg2, Map<String, Set<Module>> arg3, Set<Class<?>> arg4, Map<Class<?>, List<Class<?>>> arg5)
+	{
+		// TODO Auto-generated method stub << 2021 >>
+		if("TODO".length() == 4) throw new RuntimeException("the Instrumentation::redefineModule (...) is NOT implemented since Mar 19, 2021 at 12:22:06 AM by i1 !");
+		/*else*/   
 	}
 
 }
