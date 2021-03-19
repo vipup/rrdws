@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean; 
+import java.lang.management.RuntimeMXBean;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties; 
+import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.servlet.ServletConfig;
@@ -363,7 +365,10 @@ public class StartStopServlet extends HttpServlet {
 	 */
 	private String startColelctdClient() {
 		log_info(Repo.getBanner( "collectClient"));
-		clientLauncher = new ClientLauncher() ;
+		clientLauncher = new ClientLauncher() {
+ 
+
+		} ;
 		ThreadGroup dtgTmp = ServletListener.getDefaultThreadGroup();
 		Thread t1 = new Thread ( dtgTmp , clientLauncher, "collectdCLIENTstater.TMP");
 		t1.setDaemon(true);

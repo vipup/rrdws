@@ -23,7 +23,7 @@ import org.collectd.protocol.Network;
  * 
  * Creation:  04.04.2011::10:43:09<br> 
  */
-public class ClientLauncher implements Runnable, Instrumentation {
+public abstract class ClientLauncher implements Runnable{ // , Instrumentation 
 
 	private MBeanSender sender;
 
@@ -40,7 +40,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 			}catch(Exception e){// e.  printStackTrace();
 				 
 			}
-			Instrumentation iTmp =  this; 
+			Instrumentation iTmp =  null;//this; 
 			org.collectd.mx.RemoteMBeanSender.premain(args , iTmp );
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
@@ -55,7 +55,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		this.sender.shutdown();
 	}
 
-	@Override
+//	@Override
 	public void addTransformer(ClassFileTransformer transformer,
 			boolean canRetransform) {
 		// TODO Auto-generated method stub
@@ -64,7 +64,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	@Override
+//	@Override
 	public void addTransformer(ClassFileTransformer transformer) {
 		// TODO Auto-generated method stub
 		if (1==1)throw new RuntimeException("not yet implemented since 17.10.2012");
@@ -72,7 +72,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	@Override
+//	@Override
 	public boolean removeTransformer(ClassFileTransformer transformer) {
 		// TODO Auto-generated method stub
 		if (1==1)throw new RuntimeException("not yet implemented since 17.10.2012");
@@ -81,7 +81,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	@Override
+//	@Override
 	public boolean isRetransformClassesSupported() {
 		// TODO Auto-generated method stub
 		if (1==1)throw new RuntimeException("not yet implemented since 17.10.2012");
@@ -90,7 +90,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	@Override
+//	@Override
 	public void retransformClasses(Class<?>... classes)
 			throws UnmodifiableClassException {
 		// TODO Auto-generated method stub
@@ -99,7 +99,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	@Override
+//	@Override
 	public boolean isRedefineClassesSupported() {
 		// TODO Auto-generated method stub
 		if (1==1)throw new RuntimeException("not yet implemented since 17.10.2012");
@@ -108,7 +108,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	@Override
+//	@Override
 	public void redefineClasses(ClassDefinition... definitions)
 			throws ClassNotFoundException, UnmodifiableClassException {
 		// TODO Auto-generated method stub
@@ -117,7 +117,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	@Override
+//	@Override
 	public boolean isModifiableClass(Class<?> theClass) {
 		// TODO Auto-generated method stub
 		if (1==1)throw new RuntimeException("not yet implemented since 17.10.2012");
@@ -126,7 +126,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	@Override
+//	@Override
 	public Class[] getAllLoadedClasses() {
 		// TODO Auto-generated method stub
 		if (1==1)throw new RuntimeException("not yet implemented since 17.10.2012");
@@ -135,7 +135,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	@Override
+//	@Override
 	public Class[] getInitiatedClasses(ClassLoader loader) {
 		// TODO Auto-generated method stub
 		if (1==1)throw new RuntimeException("not yet implemented since 17.10.2012");
@@ -150,13 +150,13 @@ public class ClientLauncher implements Runnable, Instrumentation {
 	 * @see org.collectd.mx.RemoteMBeanSender.premain(String, Instrumentation)
 	 * 
 	 */
-	@Override
+//	@Override
 	public long getObjectSize(Object mBeanSender) {
 		sender = (MBeanSender) mBeanSender;
 		return sender.hashCode();
 	}
 
-	@Override
+//	@Override
 	public void appendToBootstrapClassLoaderSearch(JarFile jarfile) {
 		// TODO Auto-generated method stub
 		if (1==1)throw new RuntimeException("not yet implemented since 17.10.2012");
@@ -164,7 +164,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	@Override
+//	@Override
 	public void appendToSystemClassLoaderSearch(JarFile jarfile) {
 		// TODO Auto-generated method stub
 		if (1==1)throw new RuntimeException("not yet implemented since 17.10.2012");
@@ -172,7 +172,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	@Override
+//	@Override
 	public boolean isNativeMethodPrefixSupported() {
 		// TODO Auto-generated method stub
 		if (1==1)throw new RuntimeException("not yet implemented since 17.10.2012");
@@ -181,7 +181,7 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	@Override
+//	@Override
 	public void setNativeMethodPrefix(ClassFileTransformer transformer,
 			String prefix) {
 		// TODO Auto-generated method stub
@@ -190,27 +190,6 @@ public class ClientLauncher implements Runnable, Instrumentation {
 		}
 	}
 
-	/** 
-	 * @see java.lang.instrument.Instrumentation#isModifiableModule(java.lang.Module)
-	 */
-	@Override
-	public boolean isModifiableModule(Module arg0)
-	{
-		// TODO Auto-generated method stub << 2021 >>
-		if("TODO".length() == 4) throw new RuntimeException("the Instrumentation::isModifiableModule (...) is NOT implemented since Mar 19, 2021 at 12:22:06 AM by i1 !");
-		/*else*/  return false; 
-	}
-
-	/** 
-	 * @see java.lang.instrument.Instrumentation#redefineModule(java.lang.Module, java.util.Set, java.util.Map, java.util.Map, java.util.Set, java.util.Map)
-	 */
-	@Override
-	public void redefineModule(Module arg0, Set<Module> arg1, Map<String, Set<Module>> arg2, Map<String, Set<Module>> arg3, Set<Class<?>> arg4, Map<Class<?>, List<Class<?>>> arg5)
-	{
-		// TODO Auto-generated method stub << 2021 >>
-		if("TODO".length() == 4) throw new RuntimeException("the Instrumentation::redefineModule (...) is NOT implemented since Mar 19, 2021 at 12:22:06 AM by i1 !");
-		/*else*/   
-	}
 
 }
 
