@@ -7,11 +7,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ParaReaderTest {
 
 	@Test
+	@Ignore
+	// ((((((((((((( this is VEEEEEEEEEEEEEEEEERY CPU intensive test )))))))))))))))
 	public void testGetNextTimestampWithLoop() throws IOException {
 		String aTXT = 
 				""
